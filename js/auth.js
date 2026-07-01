@@ -86,8 +86,8 @@ function wire() {
   });
 }
 
-// ให้ล็อกเอาต์ผ่าน console ได้ (ไม่เพิ่มปุ่มใน UI เพื่อไม่แตะดีไซน์เดิม)
-window.erpLogout = () => signOut(auth).then(() => location.reload());
+// ล็อกเอาต์ (ปุ่มใน Settings หรือ console) — เคลียร์ wasSignedIn ก่อน signOut กันโชว์ toast "เซสชันหมดอายุ" ตอนตั้งใจออก
+window.erpLogout = () => { wasSignedIn = false; signOut(auth).then(() => location.reload()); };
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
 else wire();
