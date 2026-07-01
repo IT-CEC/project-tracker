@@ -9,3 +9,6 @@ seed/*.local.json
 node_modules/
 .DS_Store
 *.log
+
+.superpowers/
+.playwright-mcp/
