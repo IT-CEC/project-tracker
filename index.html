@@ -582,11 +582,11 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 <!-- ══ Login gate (ธีม ISO-DMS corporate navy) — คง id เดิมให้ auth.js ทำงาน · ไม่แตะ UI แอป ══ -->
 <style id="loginGateCss">
 body.locked{overflow:hidden}
-#loginGate{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:28px;font-family:'DM Sans','Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;background:radial-gradient(1100px 560px at 50% -8%,#1c4c7c 0%,rgba(28,76,124,0) 62%),linear-gradient(165deg,#103c66 0%,#0a2547 55%,#07182f 100%)}
-#loginGate::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:34px 34px;-webkit-mask-image:radial-gradient(circle at 50% 38%,#000 0%,transparent 72%);mask-image:radial-gradient(circle at 50% 38%,#000 0%,transparent 72%)}
+#loginGate{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:28px;font-family:'DM Sans','Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;background:#0f2f52}
 #loginGate .lg-card{position:relative;width:100%;max-width:400px;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(3,16,34,.45),0 2px 6px rgba(3,16,34,.18);padding:40px 36px 28px;text-align:center;animation:lgIn .5s cubic-bezier(.2,.7,.2,1) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-#loginGate .lg-logo{width:78px;height:78px;margin:0 auto 18px;border-radius:20px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,#fff 0%,#eef2f7 100%);box-shadow:inset 0 0 0 1px #e8edf3,0 8px 18px rgba(15,58,99,.14)}
+#loginGate .lg-logo{margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+#loginGate .lg-logo img{height:72px;width:auto;display:block}
 #loginGate .lg-ttl{font-size:27px;font-weight:700;letter-spacing:-.015em;color:#0f2c4c;line-height:1.08}
 #loginGate .lg-sub{font-size:13.5px;color:#68788b;margin-top:6px;margin-bottom:30px}
 #loginGate .lg-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;background:transparent;color:#9aa7b6;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
@@ -618,8 +618,7 @@ body.locked{overflow:hidden}
 <div id="loginGate">
   <form id="loginForm" class="lg-card" autocomplete="on">
     <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-    <!-- โลโก้: แทนที่ svg ด้วยโลโก้บริษัทจริงได้ เช่น <img src="logo.svg" width="46" alt=""> -->
-    <div class="lg-logo"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#e2342b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+    <div class="lg-logo"><img src="SMALL_CIVIL_LOGO.png" alt="Civil Engineering"></div>
     <div class="lg-ttl">Project Tracker</div>
     <div class="lg-sub">Requirement · Project Automation 2026</div>
     <div class="lg-field">
