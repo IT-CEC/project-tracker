@@ -631,6 +631,14 @@ body.locked{overflow:hidden}
   <div class="lg-foot">CIVIL ENGINEERING PUBLIC COMPANY LIMITED</div>
 </div>
 <!-- ══ end login gate ══ -->
+<style>
+#appLoading{position:fixed;inset:0;z-index:99990;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);color:var(--ink2);font-family:'DM Sans','Noto Sans Thai',sans-serif}
+#appLoading .al-spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:alspin .7s linear infinite}
+#appLoading .al-txt{font-size:13px;color:var(--ink2)}
+@keyframes alspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#appLoading .al-spin{animation-duration:1.4s}}
+</style>
+<div id="appLoading"><div class="al-spin"></div><div class="al-txt">กำลังโหลดข้อมูลจาก Firebase…</div></div>
 <div class="app" id="app">
   <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
   <aside class="dock">
@@ -1537,7 +1545,8 @@ document.addEventListener('click',function(){document.querySelectorAll('.cs').fo
 window.addEventListener('resize',function(){document.querySelectorAll('.cs').forEach(csClose);piMoveThumb();brMoveThumb();});
 
 window.startApp=async function(){
-applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();buildAP();await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();(function(){var lt=document.getElementById('lgTH'),le=document.getElementById('lgEN');if(lt)lt.classList.toggle('on',LANG!=='en');if(le)le.classList.toggle('on',LANG==='en');})();
+var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();buildAP();await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();(function(){var lt=document.getElementById('lgTH'),le=document.getElementById('lgEN');if(lt)lt.classList.toggle('on',LANG!=='en');if(le)le.classList.toggle('on',LANG==='en');})();
+if(_ld)_ld.style.display='none';
 subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePlan();
 };
 
