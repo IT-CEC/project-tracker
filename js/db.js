@@ -39,6 +39,14 @@ function clean(data) {
   return out;
 }
 
+// ── connection / sync status tracking ────────────────────────────────────────
+// ติดตามสถานะออนไลน์/ออฟไลน์ + จำนวน write ที่ยังค้างอยู่ (in-flight)
+// ให้ index.html แสดง badge สถานะซิงก์ผ่าน DB.onStatus(cb)
+let _pending = 0, _online = true, _statusCb = null;
+function _emit() { if (_statusCb) _statusCb({ online: _online, saving: _pending > 0 }); }
+window.addEventListener('online', () => { _online = true; _emit(); });
+window.addEventListener('offline', () => { _online = false; _emit(); });
+
 // ── public adapter ───────────────────────────────────────────────────────────
 const DB = {
   auth,
@@ -52,24 +60,33 @@ const DB = {
 
   // เขียนเฉพาะ item เดียว (merge) → เขียนทับเฉพาะ field ที่ส่งมา + stamp เวลา
   async saveItem(col, id, data) {
-    await setDoc(
-      doc(db, col, String(id)),
-      { ...clean(data), updatedAt: serverTimestamp() },
-      { merge: true }
-    );
+    _pending++; _emit();
+    try {
+      await setDoc(
+        doc(db, col, String(id)),
+        { ...clean(data), updatedAt: serverTimestamp() },
+        { merge: true }
+      );
+    } finally { _pending--; _emit(); }
   },
 
   // อัปเดตเฉพาะบาง field ของ item เดียว
   async updateItem(col, id, patch) {
-    await updateDoc(
-      doc(db, col, String(id)),
-      { ...clean(patch), updatedAt: serverTimestamp() }
-    );
+    _pending++; _emit();
+    try {
+      await updateDoc(
+        doc(db, col, String(id)),
+        { ...clean(patch), updatedAt: serverTimestamp() }
+      );
+    } finally { _pending--; _emit(); }
   },
 
   // ลบ item เดียว
   async deleteItem(col, id) {
-    await deleteDoc(doc(db, col, String(id)));
+    _pending++; _emit();
+    try {
+      await deleteDoc(doc(db, col, String(id)));
+    } finally { _pending--; _emit(); }
   },
 
   // realtime: มีการเปลี่ยนจากใครก็ตาม → cb(array) ; debounce กัน render รัวเกิน
@@ -82,7 +99,10 @@ const DB = {
       clearTimeout(t);
       t = setTimeout(() => cb(latest), debounceMs);
     });
-  }
+  },
+
+  // สถานะซิงก์: cb({online, saving}) — เรียกทันทีครั้งแรกด้วยสถานะปัจจุบัน
+  onStatus(cb) { _statusCb = cb; _emit(); }
 };
 
 // เปิดให้สคริปต์หลัก (classic script, global scope) เรียกใช้ได้

@@ -639,6 +639,13 @@ body.locked{overflow:hidden}
 @media (prefers-reduced-motion:reduce){#appLoading .al-spin{animation-duration:1.4s}}
 </style>
 <div id="appLoading"><div class="al-spin"></div><div class="al-txt">กำลังโหลดข้อมูลจาก Firebase…</div></div>
+<style>
+#syncBadge{position:fixed;left:14px;bottom:14px;z-index:60;display:none;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--cardsh);font:600 11.5px/1 'DM Sans','Noto Sans Thai',sans-serif;color:var(--ink2)}
+#syncBadge .sb-dot{width:8px;height:8px;border-radius:50%;background:#28cd41}
+#syncBadge.off .sb-dot{background:#ff9500}
+#syncBadge.saving .sb-dot{background:#0a84ff}
+</style>
+<div id="syncBadge"><span class="sb-dot"></span><span class="sb-txt">เชื่อมต่อแล้ว</span></div>
 <div class="app" id="app">
   <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
   <aside class="dock">
@@ -1555,6 +1562,7 @@ window.startApp=async function(){
 var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();buildAP();await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();(function(){var lt=document.getElementById('lgTH'),le=document.getElementById('lgEN');if(lt)lt.classList.toggle('on',LANG!=='en');if(le)le.classList.toggle('on',LANG==='en');})();
 if(_ld)_ld.style.display='none';
 subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePlan();
+if(window.DB&&window.DB.onStatus){var _sb=document.getElementById('syncBadge');window.DB.onStatus(function(s){if(!_sb)return;_sb.style.display='flex';_sb.classList.toggle('off',!s.online);_sb.classList.toggle('saving',s.online&&s.saving);_sb.querySelector('.sb-txt').textContent=!s.online?'ออฟไลน์ — ยังไม่ซิงก์':(s.saving?'กำลังบันทึก…':'เชื่อมต่อแล้ว');});}
 };
 
 </script>
