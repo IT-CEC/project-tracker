@@ -12,6 +12,7 @@ import { auth } from "./db.js";
 import { TEAM_EMAIL } from "./firebase-config.js";
 
 let appStarted = false;
+let wasSignedIn = false;
 
 function $(id) { return document.getElementById(id); }
 
@@ -77,8 +78,11 @@ function wire() {
 
   // สถานะ auth: ถ้ามี session อยู่แล้ว → เข้าเลย ; ไม่งั้นแสดงหน้า login
   onAuthStateChanged(auth, user => {
-    if (user) { showErr(""); setBusy(false); reveal(); }
-    else { setBusy(false); lock(); }
+    if (user) { showErr(""); setBusy(false); reveal(); wasSignedIn = true; }
+    else {
+      if (wasSignedIn) { if (window.toast) window.toast('เซสชันหมดอายุ — กรุณาเข้าสู่ระบบใหม่'); }
+      setBusy(false); lock();
+    }
   });
 }
 
