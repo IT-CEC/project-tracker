@@ -1,0 +1,11 @@
+# service account = ความลับจริง ห้าม commit เด็ดขาด
+serviceAccountKey.json
+seed/*.local.json
+
+# หมายเหตุ: js/firebase-config.js "commit ไปด้วย" เพื่อให้ GitHub Pages รันได้
+# ค่า config ไม่ใช่ความลับ + firestore.rules ล็อกเฉพาะ email ทีมแล้ว จึงปลอดภัย
+# (ถ้าต้องการซ่อน ให้ย้าย host หรือ inject ตอน build แล้วเพิ่มบรรทัด js/firebase-config.js กลับมา)
+
+node_modules/
+.DS_Store
+*.log

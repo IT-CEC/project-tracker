@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── บัญชีทีมที่ได้รับอนุญาต (ต้องตรงกับ TEAM_EMAIL ใน js/firebase-config.js) ──
+    // จำกัดเฉพาะ "email ทีม" เท่านั้น — กันคนที่เอา config ไปสมัคร email อื่นแล้วเข้าถึงข้อมูล
+    // ถ้าเปลี่ยน/เพิ่ม email ทีม แก้ที่นี่ (เพิ่มเป็น list ได้ เช่น in ['a@x','b@x'])
+    function isTeam() {
+      return request.auth != null && request.auth.token.email == 'team@civil.co.th';
+    }
+
+    // อ่าน/เขียนได้เฉพาะบัญชีทีม
+    // ครอบคลุมทุก collection: requirements, bridge, pi_tasks, ap_tasks, plan, settings
+    match /{document=**} {
+      allow read, write: if isTeam();
+    }
+
+    // ── (ทางเลือก) เข้มขึ้น: จำกัดเฉพาะ collection ที่รู้จัก ──
+    // match /requirements/{id} { allow read, write: if request.auth != null; }
+    // match /bridge/{id}       { allow read, write: if request.auth != null; }
+    // match /pi_tasks/{id}     { allow read, write: if request.auth != null; }
+    // match /ap_tasks/{id}     { allow read, write: if request.auth != null; }
+    // match /plan/{id}         { allow read, write: if request.auth != null; }
+    // match /settings/{id}     { allow read, write: if request.auth != null; }
+  }
+}
