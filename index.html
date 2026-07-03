@@ -655,7 +655,7 @@ body.locked{overflow:hidden}
   <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
   <aside class="dock">
 <div class="di" data-tip="ค้นหา (⌘K)" onclick="showTab('project');setProjView('reqs');setTimeout(()=>document.getElementById('fSearch').focus(),60)"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div>
-<div class="di active" data-tip="ภาพรวม" data-tab="overview"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span></div>
+<div class="di" data-tip="ภาพรวม" data-tab="overview" style="display:none"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span></div>
 <div class="di" data-tip="โปรเจค" data-tab="project"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg></span><i class="dbadge" id="navReqCount">83</i></div>
 <div class="di" data-tip="Project Automation 2026" data-tab="bridge"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><i class="dbadge">39</i></div>
 
@@ -1566,7 +1566,7 @@ window.addEventListener('resize',function(){document.querySelectorAll('.cs').for
 
 window.startApp=async function(){
 var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();(function(){var lt=document.getElementById('lgTH'),le=document.getElementById('lgEN');if(lt)lt.classList.toggle('on',LANG!=='en');if(le)le.classList.toggle('on',LANG==='en');})();
-if(_ld)_ld.style.display='none';
+if(_ld)_ld.style.display='none';showTab('project');
 subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePlan();
 if(window.DB&&window.DB.onStatus){var _sb=document.getElementById('syncBadge');window.DB.onStatus(function(s){if(!_sb)return;_sb.style.display='flex';_sb.classList.toggle('off',!s.online);_sb.classList.toggle('saving',s.online&&s.saving);_sb.querySelector('.sb-txt').textContent=!s.online?'ออฟไลน์ — ยังไม่ซิงก์':(s.saving?'กำลังบันทึก…':'เชื่อมต่อแล้ว');});}
 };
