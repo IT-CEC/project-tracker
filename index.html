@@ -853,6 +853,541 @@ async function reqReplaceAll(){if(!window.DB)return;try{var ex=await window.DB.l
 async function resetReqs(){if(!window.DB){REQS=reqBase();reqNorm();return;}try{var ex=await window.DB.loadAll(COL_REQ);await Promise.all(ex.map(function(d){return window.DB.deleteItem(COL_REQ,d._id);}));REQS=reqBase();await Promise.all(REQS.map(function(r){return window.DB.saveItem(COL_REQ,r._id,r);}));}catch(e){console.error('[req reset]',e);if(window.toast)toast('ซิงก์ Firebase มีปัญหา — ลองรีเฟรช');REQS=reqBase();}reqNorm();}
 async function loadSettings(){try{var s=await window.DB.loadAll(COL_SET);var g=s.find(function(x){return x.__docId==='global';})||s[0];if(g&&g.fteCost!=null){FTE_COST=g.fteCost;}else{await window.DB.saveItem(COL_SET,'global',{fteCost:FTE_COST});}}catch(e){console.error('[settings load]',e);}}
 var _reqFirst=true,_setFirst=true;
+// ══ Action Items (action_items collection) ══
+const ACT_SEED = [
+ {
+  "_id": 1,
+  "cat": "Master Data",
+  "dept": "วิศวะโครงการ, \nบัญชี, \nจัดซื้อ จัดจ้าง 1 2 3",
+  "action": "จัดเตรียมข้อมูลสำหรับการทำ Template Upload ข้อมูลโครงการ ตามด้านล่าง\n - WBS Activity Code\n - BOQ Mat Code G/L",
+  "pri": "High",
+  "owner": "วิศวะโครงการ, \nบัญชี, \nจัดซื้อ จัดจ้าง 1 2 3",
+  "due": "09/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 10/07/2026"
+ },
+ {
+  "_id": 2,
+  "cat": "Report&Flow",
+  "dept": "บัญชีแยกประเภททั่วไป - GL",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Venice Kannueang, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 3,
+  "cat": "Report&Flow",
+  "dept": "บัญชีเจ้าหนี้ - AP",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Phatkanya Chankla, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 4,
+  "cat": "Report&Flow",
+  "dept": "บัญชีลูกหนี้ - AR",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Phuangkhaimuk Amonphasitbodi , IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 5,
+  "cat": "Report&Flow",
+  "dept": "บัญชีทรัพย์สิน - AA",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Patipat Thongda, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 6,
+  "cat": "Report&Flow",
+  "dept": "บัญชีบริหาร - CO",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Rattana Pullyos , IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 7,
+  "cat": "Report&Flow",
+  "dept": "การเงิน - FINANCE",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Watinee Plubnin , IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 8,
+  "cat": "Report&Flow",
+  "dept": "จัดซื้อ จัดจ้าง 1 2 3",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K.Prasoplab Tongma-ang, \nK. Puttipong Khampeera,\nK. Boonsong Tipviboonjaroen\n, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 9,
+  "cat": "Report&Flow",
+  "dept": "วิศวะโครงการและ\nประมูลงาน",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K.Athachai Promdee, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 10,
+  "cat": "Report&Flow",
+  "dept": "เครื่องจักรและโรงงาน",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Phongsathorn Treebusayarat\n, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 11,
+  "cat": "Report&Flow",
+  "dept": "ทรัพยากรบุคคล",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "K. Ketkanok Mongkolket\n, IT",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 12,
+  "cat": "Report&Flow",
+  "dept": "IT",
+  "action": "Flow งานหลักๆ แบ่งออกเป็น 3 ส่วน\n- Pain\n- สิ่งที่อยากเห็น\n- Commitment ที่อยากเห็น\n\nรายงานแบ่งเป็น 3 ระดับ\n- Operation Report\n- Managerial Report\n- Executive Report",
+  "pri": "High",
+  "owner": "IT Teams",
+  "due": "18/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": "Present CEO, 23/07/2026"
+ },
+ {
+  "_id": 13,
+  "cat": "Forms",
+  "dept": "บัญชีแยกประเภททั่วไป - GL",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Venice Kannueang, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 14,
+  "cat": "Forms",
+  "dept": "บัญชีเจ้าหนี้ - AP",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Phatkanya Chankla, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 15,
+  "cat": "Forms",
+  "dept": "บัญชีลูกหนี้ - AR",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Phuangkhaimuk Amonphasitbodi , IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 16,
+  "cat": "Forms",
+  "dept": "บัญชีทรัพย์สิน - AA",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Patipat Thongda, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 17,
+  "cat": "Forms",
+  "dept": "บัญชีบริหาร - CO",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Rattana Pullyos , IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 18,
+  "cat": "Forms",
+  "dept": "การเงิน - FINANCE",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Watinee Plubnin , IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 19,
+  "cat": "Forms",
+  "dept": "จัดซื้อ จัดจ้าง 1 2 3",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K.Prasoplab Tongma-ang, \nK. Puttipong Khampeera,\nK. Boonsong Tipviboonjaroen\n, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 20,
+  "cat": "Forms",
+  "dept": "วิศวะโครงการและ\nประมูลงาน",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K.Athachai Promdee, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 21,
+  "cat": "Forms",
+  "dept": "เครื่องจักรและโรงงาน",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Phongsathorn Treebusayarat\n, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 22,
+  "cat": "Forms",
+  "dept": "ทรัพยากรบุคคล",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "K. Ketkanok Mongkolket\n, IT",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 23,
+  "cat": "Forms",
+  "dept": "ไอที",
+  "action": "แบบฟอร์มนอกระบบ เช่น Excel หรือ ต้อง print screen จาก SAP แล้วเซ็นด้านนอก",
+  "pri": "Low",
+  "owner": "IT Teams",
+  "due": "31/07/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 24,
+  "cat": "Master Data",
+  "dept": "All Team",
+  "action": "Civil - Location Master_01",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 25,
+  "cat": "Master Data",
+  "dept": "บัญชี",
+  "action": "Civil - Department Master_02",
+  "pri": "Low",
+  "owner": "ทีมบัญขี, IT",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 26,
+  "cat": "Master Data",
+  "dept": "All Team",
+  "action": "Civil - Class Master_03",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 27,
+  "cat": "Master Data",
+  "dept": "All Team",
+  "action": "Civil - Chart of Account_04",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 28,
+  "cat": "Master Data",
+  "dept": "All Team",
+  "action": "Civil - Running Number_05",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 29,
+  "cat": "Master Data",
+  "dept": "All Team",
+  "action": "Civil - Approval Flow_06",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 30,
+  "cat": "Master Data",
+  "dept": "All Team",
+  "action": "Civil - Item Master_07",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "31/08/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 31,
+  "cat": "BRD",
+  "dept": "All Team",
+  "action": "BRD Company Structure & General Setup",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "10/09/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 32,
+  "cat": "BRD",
+  "dept": "All Team",
+  "action": "BRD General Accounting",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "10/09/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 33,
+  "cat": "BRD",
+  "dept": "All Team",
+  "action": "BRD Item and Inventory Management",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "10/09/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 34,
+  "cat": "BRD",
+  "dept": "All Team",
+  "action": "BRD Advance Accounting and Fixed Asset",
+  "pri": "Low",
+  "owner": "All Team",
+  "due": "10/09/2026",
+  "status": "In Process",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 35,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Procure to Pay",
+  "pri": "Low",
+  "owner": "IT, Purchase, Accounting(AP), Finance",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 36,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Demand Planning",
+  "pri": "Low",
+  "owner": "IT, Machinery&Plant, Accounting, Purchase",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 37,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Order To Cash and Customer Relationship Management",
+  "pri": "Low",
+  "owner": "Everyone",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 38,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Revenue Management",
+  "pri": "Low",
+  "owner": "IT, Accounting(AR), Finance, Purchase, Machinery&Plant",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 39,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Suite Project and BOQ",
+  "pri": "Low",
+  "owner": "IT, Engineer, Accounting, Purchase, Machinery&Plant",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 40,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Demand Planning (2)",
+  "pri": "Low",
+  "owner": "IT, Machinery&Plant, Accounting, Purchase",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 41,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD Work Order, Assembly WIP and Manufacturing",
+  "pri": "Low",
+  "owner": "IT, Machinery&Plant, Accounting, Purchase",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 42,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD NSAW - Report and Analytics",
+  "pri": "Low",
+  "owner": "IT, BI Report, Everyone",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ },
+ {
+  "_id": 43,
+  "cat": "BRD",
+  "dept": "",
+  "action": "BRD eUnite",
+  "pri": "Low",
+  "owner": "IT, HR, Accounting",
+  "due": "10/09/2026",
+  "status": "Not Started",
+  "done": "",
+  "note": ""
+ }
+];
+let ACTS = [];
+const COL_ACT='action_items';
+const ACT_STATUS=['Not Started','In Process','On Hold','Done'];
+const ACT_SC={'Not Started':'#8e8e93','In Process':'#ff9500','On Hold':'#af52de','Done':'#28cd41'};
+const ACT_CATC={'BRD':'#0071e3','Report&Flow':'#5e5ce6','Forms':'#ff9500','Master Data':'#28cd41'};
+const ACT_PRIC={'High':'#ff3b30','Low':'#8e8e93'};
+function actBase(){return clone(ACT_SEED);}
+function actNorm(){ACTS.sort(function(a,b){return (a._id||0)-(b._id||0);});ACTS.forEach(function(a){if(!a.status)a.status='Not Started';if(!a.pri)a.pri='Low';});}
+function actDue(s){var p=(s||'').split('/');return p.length===3?new Date(+p[2],+p[1]-1,+p[0]):null;}
+function actOverdue(a){if((a.status||'')==='Done')return false;var d=actDue(a.due);if(!d)return false;var t=new Date();t.setHours(0,0,0,0);return d<t;}
+async function loadActs(){try{var arr=await window.DB.loadAll(COL_ACT);if(!arr.length){arr=actBase();await Promise.all(arr.map(function(a){return window.DB.saveItem(COL_ACT,a._id,a);}));}ACTS=arr;}catch(e){console.error('[act load]',e);ACTS=actBase();if(window.toast)toast('โหลด Action Items จาก Firebase ไม่ได้ · ใช้ข้อมูลตั้งต้น');}actNorm();}
+function actSaveOne(a){if(window.DB&&a&&a._id!=null)window.DB.saveItem(COL_ACT,a._id,a).catch(dbErr('action save'));}
+function actDelOne(id){if(window.DB&&id!=null)window.DB.deleteItem(COL_ACT,id).catch(dbErr('action del'));}
+var _actFirst=true;
+function subscribeActs(){if(!window.DB)return;window.DB.subscribe(COL_ACT,function(docs){if(_actFirst){_actFirst=false;return;}ACTS=docs;actNorm();if(typeof fillActFilters==='function')fillActFilters();if(typeof curProjView!=='undefined'&&curProjView==='action'&&typeof renderActs==='function')renderActs();});}
+
 function fillAbout(){var el=document.getElementById('aboutStats');if(!el)return;var mods=new Set(REQS.map(function(r){return r.module;}));var subs=new Set(REQS.map(function(r){return (r.module||'')+'|'+(r.sub||'');}));el.textContent='Requirements '+REQS.length+' · กลุ่มงาน '+mods.size+' · กลุ่มงานย่อย '+subs.size+' · Automation 2026: '+BR.length+' กระบวนการ · ข้อมูลสด Firebase';}
 function subscribeReqs(){if(!window.DB)return;window.DB.subscribe(COL_REQ,function(docs){if(_reqFirst){_reqFirst=false;return;}REQS=docs;reqNorm();fillFilters();renderAll();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();fillAbout();});}
 function subscribeSettings(){if(!window.DB)return;window.DB.subscribe(COL_SET,function(docs){if(_setFirst){_setFirst=false;return;}var g=docs.find(function(x){return x.__docId==='global';})||docs[0];if(g&&g.fteCost!=null){FTE_COST=g.fteCost;if(window.renderCockpit)renderCockpit();}});}
@@ -1565,9 +2100,9 @@ document.addEventListener('click',function(){document.querySelectorAll('.cs').fo
 window.addEventListener('resize',function(){document.querySelectorAll('.cs').forEach(csClose);piMoveThumb();brMoveThumb();});
 
 window.startApp=async function(){
-var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();(function(){var lt=document.getElementById('lgTH'),le=document.getElementById('lgEN');if(lt)lt.classList.toggle('on',LANG!=='en');if(le)le.classList.toggle('on',LANG==='en');})();
+var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();(function(){var lt=document.getElementById('lgTH'),le=document.getElementById('lgEN');if(lt)lt.classList.toggle('on',LANG!=='en');if(le)le.classList.toggle('on',LANG==='en');})();
 if(_ld)_ld.style.display='none';showTab('project');
-subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePlan();
+subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePlan();subscribeActs();
 if(window.DB&&window.DB.onStatus){var _sb=document.getElementById('syncBadge');window.DB.onStatus(function(s){if(!_sb)return;_sb.style.display='flex';_sb.classList.toggle('off',!s.online);_sb.classList.toggle('saving',s.online&&s.saving);_sb.querySelector('.sb-txt').textContent=!s.online?'ออฟไลน์ — ยังไม่ซิงก์':(s.saving?'กำลังบันทึก…':'เชื่อมต่อแล้ว');});}
 };
 
