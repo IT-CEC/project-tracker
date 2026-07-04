@@ -541,7 +541,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 
 /* macOS-style floating dock */
 .main{}
-.dock{position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px}
+.dock{position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;align-items:center;gap:22px;padding:6px}
 .di{position:relative;display:flex;align-items:center;justify-content:center;width:37px;height:37px;cursor:pointer}
 .di-ic{display:flex;align-items:center;justify-content:center;width:35px;height:35px;border-radius:11px;background:var(--chip);color:var(--ink2);transition:background .15s,color .15s;transform-origin:left center;will-change:transform}
 .di:hover .di-ic{background:var(--hover);color:var(--ink)}
@@ -553,10 +553,13 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .di.active .di-ic{background:var(--mint);color:var(--accent)}
 .di.active::before{content:"";position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:15px;border-radius:3px;background:var(--accent)}
 .dbadge{position:absolute;top:-3px;right:-3px;background:var(--accent);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--surface);pointer-events:none}
+.di-lbl{position:absolute;left:50%;top:calc(100% + 2px);transform:translateX(-50%);font-size:10px;font-weight:600;line-height:1;letter-spacing:-.01em;color:var(--ink3);white-space:nowrap;pointer-events:none;transition:opacity .16s}
+.di.active .di-lbl{color:var(--accent)}
+.dock:hover .di-lbl{opacity:0}
 .dock-div{width:22px;height:1px;background:var(--line2);margin:2px 0}
 .di::after{content:attr(data-tip);position:absolute;left:calc(100% + 16px);top:50%;transform:translateY(-50%) translateX(-5px);background:var(--ink);color:var(--surface);padding:6px 11px;border-radius:9px;font-size:12px;font-weight:500;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;box-shadow:var(--shadow);z-index:6}
 .di:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
-@media(max-width:760px){.main{padding-left:82px}.dock{left:8px;gap:5px}.di{width:33px;height:33px}.di-ic{width:31px;height:31px;border-radius:9px}.di-ic svg{width:16px;height:16px}}
+@media(max-width:760px){.main{padding-left:82px}.dock{left:8px;gap:5px}.di{width:33px;height:33px}.di-ic{width:31px;height:31px;border-radius:9px}.di-ic svg{width:16px;height:16px}.di-lbl{display:none}}
 
 .setwrap{display:grid;grid-template-columns:190px 1fr;gap:22px;max-width:880px}
 .setnav{display:flex;flex-direction:column;gap:2px}
@@ -654,12 +657,12 @@ body.locked{overflow:hidden}
 <div class="app" id="app">
   <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
   <aside class="dock">
-<div class="di" data-tip="ค้นหา (⌘K)" onclick="showTab('project');setProjView('reqs');setTimeout(()=>document.getElementById('fSearch').focus(),60)"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div>
+<div class="di" data-tip="ค้นหา (⌘K)" onclick="showTab('project');setProjView('reqs');setTimeout(()=>document.getElementById('fSearch').focus(),60)"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="di-lbl">ค้นหา</span></div>
 <div class="di" data-tip="ภาพรวม" data-tab="overview" style="display:none"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span></div>
-<div class="di" data-tip="โปรเจค" data-tab="project"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg></span><i class="dbadge" id="navReqCount">83</i></div>
-<div class="di" data-tip="Project Automation 2026" data-tab="bridge"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><i class="dbadge">39</i></div>
+<div class="di" data-tip="โปรเจค" data-tab="project"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg></span><i class="dbadge" id="navReqCount">83</i><span class="di-lbl">โปรเจค</span></div>
+<div class="di" data-tip="Project Automation 2026" data-tab="bridge"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><i class="dbadge">39</i><span class="di-lbl">Automation</span></div>
 
-<div class="di" data-tip="ตั้งค่า" data-tab="settings"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></div>
+<div class="di" data-tip="ตั้งค่า" data-tab="settings"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="di-lbl">ตั้งค่า</span></div>
 </aside>
 
   <div class="content">
@@ -670,7 +673,7 @@ body.locked{overflow:hidden}
       </div><div class="projtabs" id="brToggle"><span class="pjt-thumb"></span>
         <button class="pjt on" data-bv="table" onclick="setBrView('table')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> วิเคราะห์ FTE</button>
         <button class="pjt" data-bv="timeline" onclick="setBrView('timeline')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Timeline)</button>
-      </div><div class="tsp"></div><button class="tbtn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt">นำเสนอ</span></button><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button></div>
+      </div><div class="tsp"></div><button class="tbtn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt">นำเสนอ</span></button><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button><button class="tbtn pri" id="addActBtn" style="display:none" onclick="actAdd()">+ เพิ่ม Action Item</button><button class="tbtn pri" id="addBrBtn" style="display:none" onclick="brAddRow()">+ เพิ่มรายการ</button></div>
     <div class="main">
 
     <section class="panel active" id="overview">
@@ -739,7 +742,6 @@ body.locked{overflow:hidden}
         <span class="lbl">ผู้รับผิดชอบ</span><select id="actOwner"></select>
         <input type="text" id="actSearch" placeholder="ค้นหา…" style="width:180px;flex:none">
         <button class="tbtn" onclick="actClear()">ล้าง</button>
-        <div class="barright"><button class="tbtn pri" onclick="actAdd()">+ เพิ่ม Action Item</button></div>
       </div>
       <div class="tablecard"><div class="tscroll"><table class="dt" id="actTable"><colgroup><col style="width:52px"><col style="width:130px"><col style="width:190px"><col style="width:340px"><col style="width:90px"><col style="width:180px"><col style="width:110px"><col style="width:120px"><col style="width:170px"></colgroup>
         <thead><tr><th data-asort="_id">No <span class="ar"></span></th><th data-asort="cat">หมวด <span class="ar"></span></th><th>Department</th><th>Action Request</th><th data-asort="pri">Priority <span class="ar"></span></th><th>ผู้รับผิดชอบ</th><th data-asort="due">กำหนดส่ง <span class="ar"></span></th><th data-asort="status">สถานะ <span class="ar"></span></th><th>หมายเหตุ</th></tr></thead><tbody></tbody>
@@ -777,8 +779,7 @@ body.locked{overflow:hidden}
         <span class="lbl" data-fl="risk">ความเสี่ยง</span><select id="brRisk"></select>
         <input type="text" id="brSearch" placeholder="ค้นหา…">
         <button class="tbtn" onclick="clearBrFilters()" data-i18n="clear">ล้าง</button>
-        <span class="count" id="brCount"></span>
-        <button class="tbtn" onclick="brAddRow()" style="margin-left:auto">+ เพิ่มรายการ</button>
+        <span class="count" id="brCount" style="margin-left:auto"></span>
         <select id="brStatus" style="display:none"><option value="">ทุกสถานะ</option><option>Not Started</option><option>In Progress</option><option>On Hold</option><option>Delayed</option><option>Completed</option></select>
       </div>
       <div class="sumribbon"><span class="rlbl" data-fl="status">สถานะ</span><div class="kgroup" id="brStatusStrip"></div></div>
@@ -835,6 +836,35 @@ body.locked{overflow:hidden}
   </div>
 </div>
 
+<style id="resetConfirmCss">
+#resetConfirm{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+#resetConfirm.open{opacity:1;pointer-events:auto}
+#resetConfirm .rcm-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:min(440px,94vw);padding:26px 26px 20px;transform:scale(.96);transition:transform .2s}
+#resetConfirm.open .rcm-card{transform:none}
+#resetConfirm .rcm-ic{width:46px;height:46px;border-radius:50%;background:rgba(255,59,48,.12);color:#ff3b30;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+#resetConfirm h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
+#resetConfirm p{font-size:13px;line-height:1.6;color:var(--ink2);margin-bottom:12px}
+#resetConfirm .rcm-hint{font-size:12.5px;color:var(--ink2);margin-bottom:8px}
+#resetConfirm .rcm-hint b{color:#ff3b30}
+#resetConfirm #rcmInput{width:100%;font-size:14px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);margin-bottom:16px;font-family:inherit}
+#resetConfirm #rcmInput:focus{outline:none;border-color:#ff3b30;box-shadow:0 0 0 3px rgba(255,59,48,.15)}
+#resetConfirm .rcm-act{display:flex;gap:10px;justify-content:flex-end}
+#resetConfirm #rcmGo{background:#ff3b30;color:#fff}
+#resetConfirm #rcmGo:disabled{opacity:.4;cursor:not-allowed}
+</style>
+<div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
+  <div class="rcm-card" role="dialog" aria-modal="true">
+    <div class="rcm-ic">⚠️</div>
+    <h3>รีเซ็ตข้อมูล Requirements</h3>
+    <p>การกระทำนี้จะลบ Requirements ที่แก้ไว้ <b style="color:var(--ink)">ของทั้งทีมบน Firebase</b> แล้วคืนค่าต้นฉบับ — ทุกคนได้รับผลกระทบทันทีและกู้คืนไม่ได้</p>
+    <div class="rcm-hint">พิมพ์ <b>รีเซ็ต</b> (หรือ <b>RESET</b>) เพื่อยืนยัน</div>
+    <input id="rcmInput" type="text" autocomplete="off" spellcheck="false" placeholder="รีเซ็ต" oninput="var v=this.value.trim();document.getElementById('rcmGo').disabled=!(v==='รีเซ็ต'||v.toUpperCase()==='RESET')">
+    <div class="rcm-act">
+      <button class="btn btn-sec" onclick="closeResetConfirm()">ยกเลิก</button>
+      <button class="btn" id="rcmGo" disabled onclick="closeResetConfirm();resetConfirmed()">รีเซ็ตข้อมูล</button>
+    </div>
+  </div>
+</div>
 <div class="modal" id="modal"><div class="mbox">
   <div class="mhead"><div class="mt" id="mTitle"></div><div class="ms" id="mSub"></div><button class="close-x" onclick="closeModal()"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
   <div class="mbody" id="mBody"></div>
@@ -1446,7 +1476,10 @@ function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)retur
 function fillAbout(){var el=document.getElementById('aboutStats');if(!el)return;var mods=new Set(REQS.map(function(r){return r.module;}));var subs=new Set(REQS.map(function(r){return (r.module||'')+'|'+(r.sub||'');}));el.textContent='Requirements '+REQS.length+' · กลุ่มงาน '+mods.size+' · กลุ่มงานย่อย '+subs.size+' · Automation 2026: '+BR.length+' กระบวนการ · ข้อมูลสด Firebase';}
 function subscribeReqs(){if(!window.DB)return;window.DB.subscribe(COL_REQ,function(docs){if(_reqFirst){_reqFirst=false;return;}REQS=docs;reqNorm();fillFilters();renderAll();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();fillAbout();});}
 function subscribeSettings(){if(!window.DB)return;window.DB.subscribe(COL_SET,function(docs){if(_setFirst){_setFirst=false;return;}var g=docs.find(function(x){return x.__docId==='global';})||docs[0];if(g&&g.fteCost!=null){FTE_COST=g.fteCost;if(window.renderCockpit)renderCockpit();}});}
-async function resetData(){if(!confirm("⚠️ รีเซ็ตนี้จะลบ Requirements ที่แก้ไว้ของทั้งทีมบน Firebase แล้วคืนค่าต้นฉบับ\n\nทุกคนจะได้รับผลกระทบทันที — ยืนยันหรือไม่?"))return;await resetReqs();fillFilters();renderAll();toast("คืนค่าต้นฉบับแล้ว");}
+function resetData(){openResetConfirm();}
+function openResetConfirm(){var m=document.getElementById('resetConfirm');if(!m)return;var i=document.getElementById('rcmInput'),g=document.getElementById('rcmGo');if(i)i.value='';if(g)g.disabled=true;m.classList.add('open');setTimeout(function(){if(i)i.focus();},60);}
+function closeResetConfirm(){var m=document.getElementById('resetConfirm');if(m)m.classList.remove('open');}
+async function resetConfirmed(){await resetReqs();fillFilters();renderAll();toast("คืนค่าต้นฉบับแล้ว");}
 function normGap(g){g=(g==null?"":String(g)).trim();if(GAP_OPTS.indexOf(g)>0)return g;const m=g.match(/^([1-5])/);if(m)return GAP_OPTS[+m[1]];return "";}
 function gapAssessed(r){return GAP_OPTS.indexOf(r.gap)>0;}
 function uniq(a){return [...new Set(a)];}
@@ -1481,9 +1514,10 @@ function renderCockpit(){if(GCTX!=='pi')return;renderPhaseTimeline();var es=docu
 
 var curProjView='impl';var curBrView='table';
 function brMoveThumb(){var seg=document.getElementById('brToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
-function setBrView(bv){curBrView=bv;document.querySelectorAll('#brToggle .pjt').forEach(function(b){b.classList.toggle('on',b.dataset.bv===bv);});requestAnimationFrame(brMoveThumb);var t=document.getElementById('brTimeline'),fv=document.getElementById('brTableView');if(t)t.style.display=bv==='timeline'?'':'none';if(fv)fv.style.display=bv==='table'?'':'none';if(bv==='timeline'){setGanttCtx('ap');piSwitchView('timeline');piGanttHover();setTimeout(piFocusTasks,60);}else{setGanttCtx('pi');renderBridge();}}
+function setBrView(bv){curBrView=bv;document.querySelectorAll('#brToggle .pjt').forEach(function(b){b.classList.toggle('on',b.dataset.bv===bv);});requestAnimationFrame(brMoveThumb);var t=document.getElementById('brTimeline'),fv=document.getElementById('brTableView');if(t)t.style.display=bv==='timeline'?'':'none';if(fv)fv.style.display=bv==='table'?'':'none';if(bv==='timeline'){setGanttCtx('ap');piSwitchView('timeline');piGanttHover();setTimeout(piFocusTasks,60);}else{setGanttCtx('pi');renderBridge();}syncTopAdd();}
 function piMoveThumb(){var seg=document.getElementById('projToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
-function setProjView(pv){curProjView=pv;document.querySelectorAll('#projToggle .pjt').forEach(b=>b.classList.toggle('on',b.dataset.pv===pv));requestAnimationFrame(piMoveThumb);var im=document.getElementById('implement'),rq=document.getElementById('reqs'),ac=document.getElementById('actionView');if(im)im.style.display=pv==='impl'?'':'none';if(rq)rq.style.display=pv==='reqs'?'':'none';if(ac)ac.style.display=pv==='action'?'':'none';var vt=document.getElementById('piViewTabs');if(vt)vt.style.display=pv==='impl'?'':'none';var rb=document.getElementById('projRibbon');if(rb)rb.style.display=pv==='impl'?'':'none';var rb2=document.getElementById('reqRibbon');if(rb2)rb2.style.display=pv==='reqs'?'':'none';var ab=document.getElementById('addReqBtn');if(ab)ab.style.display=pv==='reqs'?'':'none';if(pv==='impl'){renderPI();setTimeout(piToday,90);}else if(pv==='reqs'){renderAll();}else if(pv==='action'){renderActs();}}
+function syncTopAdd(){var p=document.querySelector('.panel.active');p=p?p.id:'';var show={addReqBtn:false,addActBtn:false,addBrBtn:false};if(p==='project'){if(curProjView==='reqs')show.addReqBtn=true;else if(curProjView==='action')show.addActBtn=true;}else if(p==='bridge'){if(curBrView==='table')show.addBrBtn=true;}Object.keys(show).forEach(function(k){var b=document.getElementById(k);if(b)b.style.display=show[k]?'':'none';});}
+function setProjView(pv){curProjView=pv;document.querySelectorAll('#projToggle .pjt').forEach(b=>b.classList.toggle('on',b.dataset.pv===pv));requestAnimationFrame(piMoveThumb);var im=document.getElementById('implement'),rq=document.getElementById('reqs'),ac=document.getElementById('actionView');if(im)im.style.display=pv==='impl'?'':'none';if(rq)rq.style.display=pv==='reqs'?'':'none';if(ac)ac.style.display=pv==='action'?'':'none';var vt=document.getElementById('piViewTabs');if(vt)vt.style.display=pv==='impl'?'':'none';var rb=document.getElementById('projRibbon');if(rb)rb.style.display=pv==='impl'?'':'none';var rb2=document.getElementById('reqRibbon');if(rb2)rb2.style.display=pv==='reqs'?'':'none';syncTopAdd();if(pv==='impl'){renderPI();setTimeout(piToday,90);}else if(pv==='reqs'){renderAll();}else if(pv==='action'){renderActs();}}
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};PIMPL.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);if(!a||!b)return;if(!phs[d.ph])phs[d.ph]={a:a,b:b};if(a<phs[d.ph].a)phs[d.ph].a=a;if(b>phs[d.ph].b)phs[d.ph].b=b;});
@@ -1493,7 +1527,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+' · อีก '+Math.max(0,Math.ceil((_nm.e-now)/86400000))+' วัน'):'ไม่มี milestone ข้างหน้า';
   el.innerHTML=[c('เฟสปัจจุบัน',curPh,'จากแผนงาน',PI_PHC[curPhKey]||''),c('สถานะเฟส',_pstat,_psub,_pcol),c('Milestone ถัดไป',_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'กำหนดขึ้นระบบจริง','#c79200')].join('');}
-function showTab(id){document.querySelectorAll('.di[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{var _ab=document.getElementById('addReqBtn');if(_ab)_ab.style.display='none';}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
+function showTab(id){document.querySelectorAll('.di[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('.di[data-tab]').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
 (function(){const dock=document.querySelector('.dock');if(!dock)return;const ics=[...dock.querySelectorAll('.di-ic')];const n=ics.length;
 let cy=[],B=35,cur=ics.map(()=>1),tgt=ics.map(()=>1),my=null,raf=null;const SIG=46,BOOST=0.85;
