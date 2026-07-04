@@ -757,9 +757,9 @@ body.locked{overflow:hidden}
       </div><div class="fgrow2"><div class="ststrip"><span class="rlbl" data-fl="status">สถานะ</span><div class="kgroup" id="statusStrip"></div></div><div class="fgstrip"><span class="fglbl">Fit-Gap <span class="fghsub" id="fgGroup">· ทุกกลุ่มงาน</span></span><div class="fgbar2" id="reqGapBar"></div><span class="fgpct" id="fgPct">ประเมินแล้ว 0%</span></div></div></div></div>
       <div class="projview" id="implement">
       <div class="bar" style="margin-top:2px">
-        <span class="lbl">เฟส</span><select id="piPhase"></select>
-        <span class="lbl">สถานะ</span><select id="piStatus"></select>
-        <span class="lbl">ทีม</span><select id="piAsg"></select>
+        <span class="lbl">เฟส</span><select id="piPhase" data-multi="1"></select>
+        <span class="lbl">สถานะ</span><select id="piStatus" data-multi="1"></select>
+        <span class="lbl">ทีม</span><select id="piAsg" data-multi="1"></select>
         
         <input type="text" id="piSearch" placeholder="ค้นหางาน…" style="width:170px;flex:none">
         <button class="tbtn" onclick="clearPI()" data-i18n="clear">ล้าง</button>
@@ -810,9 +810,9 @@ body.locked{overflow:hidden}
     <section class="panel" id="bridge">
       <div class="brview" id="brTimeline" style="display:none">
         <div class="bar" style="margin-top:2px">
-          <span class="lbl">แผนก</span><select id="apPhase"></select>
-          <span class="lbl">สถานะ</span><select id="apStatus"></select>
-          <span class="lbl">ทีม</span><select id="apAsg"></select>
+          <span class="lbl">แผนก</span><select id="apPhase" data-multi="1"></select>
+          <span class="lbl">สถานะ</span><select id="apStatus" data-multi="1"></select>
+          <span class="lbl">ทีม</span><select id="apAsg" data-multi="1"></select>
           <input type="text" id="apSearch" placeholder="ค้นหางาน…" style="width:170px;flex:none">
           <button class="tbtn" onclick="clearPI()">ล้าง</button>
           <div class="barright"><span class="gtbar" id="apGtoolbar"><button class="gtbtn" onclick="piResetNotion()" title="คืนค่า Automation (ลบการแก้ไข/งานที่เพิ่ม)">↺</button><button class="gtbtn" id="apFocusBtn" onclick="toggleGFocus()" title="ขยายเต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="apZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="apViewTabs">
@@ -1894,8 +1894,8 @@ function piAsg(a){return '<span class="asg">'+a.map(x=>`<span class="atag">${esc
 function piDot(st){return `<span class="dotc" style="background:${STATUS_COLORS[st]||'#888'}"></span>`;}
 function fillPIFilters(){setOpts(GP+'Phase',Object.keys(PI_PHASES),GP==='ap'?'ทุกแผนก':'ทุกเฟส');setOpts(GP+'Status',STATUS_LIST,'ทุกสถานะ');setOpts(GP+'Asg',[...new Set(PIMPL.flatMap(d=>d.asg))].sort(),'ทุกทีม');}
 function clearPI(){[GP+'Phase',GP+'Status',GP+'Asg',GP+'Search'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});renderPI();}
-function filteredPI(){var ph=v(GP+'Phase'),st=v(GP+'Status'),ag=v(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
-  return PIMPL.filter(d=>(!ph||d.ph===ph)&&(!st||d.st===st)&&(!ag||d.asg.includes(ag))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q)));}
+function filteredPI(){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
+  return PIMPL.filter(d=>(!phs.length||phs.includes(d.ph))&&(!sts.length||sts.includes(d.st))&&(!ags.length||ags.some(a=>d.asg.includes(a)))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q)));}
 let piSortK='',piSortD=1;
 function renderPITbl(){var rows=filteredPI();
   if(piSortK)rows=rows.slice().sort((a,b)=>{if(piSortK==='s'||piSortK==='e')return ((piDate(a[piSortK])||0)-(piDate(b[piSortK])||0))*piSortD;if(piSortK==='prog')return (a.prog-b.prog)*piSortD;if(piSortK==='wbs')return (a._pi-b._pi)*piSortD;return String(a[piSortK]||'').localeCompare(String(b[piSortK]||''),'th')*piSortD;});
