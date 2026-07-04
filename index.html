@@ -572,6 +572,18 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .nav-lbl{flex:1;opacity:1;transition:opacity .13s}
 .nav-badge{flex:none;font-family:var(--font-mono);font-size:10.5px;font-weight:600;color:var(--ink3);opacity:1;transition:opacity .13s}
 .nav-div{height:1px;background:var(--line2);margin:8px 16px}
+/* modes */
+.nav[data-mode="expanded"]{width:210px}
+.nav[data-mode="collapsed"]{width:54px}
+.nav[data-mode="collapsed"] .nav-lbl,.nav[data-mode="collapsed"] .nav-badge{opacity:0}
+.nav[data-mode="hover"]{width:54px}
+.nav[data-mode="hover"] .nav-lbl,.nav[data-mode="hover"] .nav-badge{opacity:0}
+.nav[data-mode="hover"]:hover{width:210px;box-shadow:6px 0 24px rgba(0,0,0,.10)}
+.nav[data-mode="hover"]:hover .nav-lbl,.nav[data-mode="hover"]:hover .nav-badge{opacity:1}
+/* tooltip when labels are hidden */
+.nav[data-mode="collapsed"] .nav-item:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--ink);color:var(--surface);padding:5px 10px;border-radius:8px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow);z-index:6;pointer-events:none}
+/* mobile: force thin rail */
+@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:54px}.nav .nav-lbl,.nav .nav-badge{opacity:0}.content{padding-left:54px!important}}
 
 .setwrap{display:grid;grid-template-columns:190px 1fr;gap:22px;max-width:880px}
 .setnav{display:flex;flex-direction:column;gap:2px}
@@ -1556,6 +1568,9 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   el.innerHTML=[c('เฟสปัจจุบัน',curPh,'จากแผนงาน',PI_PHC[curPhKey]||''),c('สถานะเฟส',_pstat,_psub,_pcol),c('Milestone ถัดไป',_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'กำหนดขึ้นระบบจริง','#c79200')].join('');}
 function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('.nav-item[data-tab]').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
+function applyNavMode(m){m=(m==='expanded'||m==='collapsed'||m==='hover')?m:'hover';var nav=document.getElementById('nav');if(nav)nav.dataset.mode=m;var app=document.getElementById('app');if(app)app.style.setProperty('--nav-w',m==='expanded'?'210px':'54px');document.querySelectorAll('#navPop .nav-pop-i').forEach(function(b){b.classList.toggle('on',b.dataset.nm===m);});}
+function setNavMode(m){try{localStorage.setItem('erp_nav_mode',m);}catch(e){}applyNavMode(m);var p=document.getElementById('navPop');if(p)p.classList.remove('open');}
+applyNavMode((function(){try{return localStorage.getItem('erp_nav_mode');}catch(e){return null;}})()||'hover');
 /* ARCHIVED DOCK magnification — revert with the dock block above.
 (function(){const dock=document.querySelector('.dock');if(!dock)return;const ics=[...dock.querySelectorAll('.di-ic')];const n=ics.length;
 let cy=[],B=35,cur=ics.map(()=>1),tgt=ics.map(()=>1),my=null,raf=null;const SIG=46,BOOST=0.85;
