@@ -1543,7 +1543,7 @@ function gapAssessed(r){return GAP_OPTS.indexOf(r.gap)>0;}
 function uniq(a){return [...new Set(a)];}
 function countBy(arr,key){const m={};arr.forEach(x=>{const k=x[key]||"(ว่าง)";m[k]=(m[k]||0)+1});return m;}
 function v(id){var e=document.getElementById(id);return e?e.value:"";}
-function vm(id){var e=document.getElementById(id);if(!e)return [];if(e.dataset.multi)return e._m?[].slice.call(e._m):[];return e.value?[e.value]:[];}
+function vm(id){var e=document.getElementById(id);if(!e)return [];if(e.dataset.multi)return e._m?Array.from(e._m):[];return e.value?[e.value]:[];}
 function esc(s){return (s||'').replace(/</g,'&lt;');}
 function attr(s){return (s||'').replace(/"/g,'&quot;');}
 
