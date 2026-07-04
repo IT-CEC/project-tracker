@@ -56,7 +56,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .profile .pn{font-size:12.5px;font-weight:600;line-height:1.1}
 .profile .pe{font-size:11px;color:var(--ink3)}
 /* content */
-.content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+.content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;padding-left:var(--nav-w,210px);transition:padding-left .18s cubic-bezier(.32,.72,0,1)}
 .topbar{flex:none;position:relative;display:flex;align-items:center;gap:14px;padding:0 16px;height:46px;background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
 .tl{display:flex;gap:8px;align-items:center}
 .tl span{width:12px;height:12px;border-radius:50%;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14)}
@@ -559,7 +559,19 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .dock-div{width:22px;height:1px;background:var(--line2);margin:2px 0}
 .di::after{content:attr(data-tip);position:absolute;left:calc(100% + 16px);top:50%;transform:translateY(-50%) translateX(-5px);background:var(--ink);color:var(--surface);padding:6px 11px;border-radius:9px;font-size:12px;font-weight:500;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;box-shadow:var(--shadow);z-index:6}
 .di:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
-@media(max-width:760px){.main{padding-left:82px}.dock{left:8px;gap:5px}.di{width:33px;height:33px}.di-ic{width:31px;height:31px;border-radius:9px}.di-ic svg{width:16px;height:16px}.di-lbl{display:none}}
+@media(max-width:760px){.dock{left:8px;gap:5px}.di{width:33px;height:33px}.di-ic{width:31px;height:31px;border-radius:9px}.di-ic svg{width:16px;height:16px}.di-lbl{display:none}}
+/* ===== Supabase-style sidebar ===== */
+.nav{position:fixed;left:0;top:0;bottom:0;z-index:90;width:210px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:10px 0;overflow:visible;transition:width .18s cubic-bezier(.32,.72,0,1)}
+.nav-group{display:flex;flex-direction:column;gap:2px}
+.nav-spacer{flex:1}
+.nav-item{position:relative;display:flex;align-items:center;gap:11px;height:34px;margin:1px 8px;padding:0 9px;border-radius:8px;color:var(--ink2);cursor:pointer;background:none;border:0;font:inherit;font-size:13.5px;text-align:left;white-space:nowrap;overflow:hidden;transition:background .13s,color .13s}
+.nav-item:hover{background:var(--hover);color:var(--ink)}
+.nav-item.active{background:var(--hover);color:var(--ink);font-weight:600}
+.nav-ic{flex:none;width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+.nav-ic svg{width:19px;height:19px;display:block}
+.nav-lbl{flex:1;opacity:1;transition:opacity .13s}
+.nav-badge{flex:none;font-family:var(--font-mono);font-size:10.5px;font-weight:600;color:var(--ink3);opacity:1;transition:opacity .13s}
+.nav-div{height:1px;background:var(--line2);margin:8px 16px}
 
 .setwrap{display:grid;grid-template-columns:190px 1fr;gap:22px;max-width:880px}
 .setnav{display:flex;flex-direction:column;gap:2px}
@@ -656,6 +668,8 @@ body.locked{overflow:hidden}
 <div id="syncBadge"><span class="sb-dot"></span><span class="sb-txt">เชื่อมต่อแล้ว</span></div>
 <div class="app" id="app">
   <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
+  <!-- ===== ARCHIVED DOCK (2026-07-04). REVERT: uncomment this dock block AND comment out the .nav block below. ===== -->
+  <!--
   <aside class="dock">
 <div class="di" data-tip="ค้นหา (⌘K)" onclick="showTab('project');setProjView('reqs');setTimeout(()=>document.getElementById('fSearch').focus(),60)"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><span class="di-lbl">ค้นหา</span></div>
 <div class="di" data-tip="ภาพรวม" data-tab="overview" style="display:none"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span></div>
@@ -664,6 +678,19 @@ body.locked{overflow:hidden}
 
 <div class="di" data-tip="ตั้งค่า" data-tab="settings"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="di-lbl">ตั้งค่า</span></div>
 </aside>
+  -->
+  <!-- ===== SUPABASE-STYLE SIDEBAR ===== -->
+  <aside class="nav" id="nav" data-mode="expanded">
+    <div class="nav-group">
+      <a class="nav-item" data-tab="project" data-tip="โปรเจค"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg></span><span class="nav-lbl">โปรเจค</span><i class="nav-badge" id="navReqCount">83</i></a>
+      <a class="nav-item" data-tab="bridge" data-tip="Automation"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><span class="nav-lbl">Automation</span><i class="nav-badge">39</i></a>
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-group nav-bottom">
+      <div class="nav-div"></div>
+      <a class="nav-item" data-tab="settings" data-tip="ตั้งค่า"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-lbl">ตั้งค่า</span></a>
+    </div>
+  </aside>
 
   <div class="content">
     <div class="topbar"><div class="crumb">Project Implementation <span style="color:var(--red);font-weight:700">Oracle</span> Netsuite - Civil Engineering / <b id="crumbNow">ภาพรวม</b></div><div class="projtabs" id="projToggle"><span class="pjt-thumb"></span>
@@ -1527,8 +1554,9 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+' · อีก '+Math.max(0,Math.ceil((_nm.e-now)/86400000))+' วัน'):'ไม่มี milestone ข้างหน้า';
   el.innerHTML=[c('เฟสปัจจุบัน',curPh,'จากแผนงาน',PI_PHC[curPhKey]||''),c('สถานะเฟส',_pstat,_psub,_pcol),c('Milestone ถัดไป',_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'กำหนดขึ้นระบบจริง','#c79200')].join('');}
-function showTab(id){document.querySelectorAll('.di[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
-document.querySelectorAll('.di[data-tab]').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
+function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
+document.querySelectorAll('.nav-item[data-tab]').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
+/* ARCHIVED DOCK magnification — revert with the dock block above.
 (function(){const dock=document.querySelector('.dock');if(!dock)return;const ics=[...dock.querySelectorAll('.di-ic')];const n=ics.length;
 let cy=[],B=35,cur=ics.map(()=>1),tgt=ics.map(()=>1),my=null,raf=null;const SIG=46,BOOST=0.85;
 function calc(){cy=ics.map(ic=>{const r=ic.getBoundingClientRect();return r.top+r.height/2;});}
@@ -1547,6 +1575,7 @@ function loop(){let moving=false;
 function kick(){if(!raf)raf=requestAnimationFrame(loop);}
 dock.addEventListener('mousemove',e=>{my=e.clientY;setTargets();kick();});
 dock.addEventListener('mouseleave',()=>{my=null;setTargets();kick();});})();
+*/
 function setChartTheme(){const dark=document.documentElement.getAttribute('data-theme')==='dark';GRID.color=dark?'#3a3a3c':'#ededf0';Chart.defaults.color=dark?'#98989d':'#86868b';}
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('erp_theme',t);setChartTheme();applyAccent();var l=document.getElementById('thLight'),d=document.getElementById('thDark');if(l)l.classList.toggle('on',t==='light');if(d)d.classList.toggle('on',t==='dark');}
 function toggleTheme(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');if(charts.cMod){renderAll();renderBridge();}}
