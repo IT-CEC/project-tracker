@@ -831,10 +831,10 @@ body.locked{overflow:hidden}
       <div class="brtoprow"><div class="kpis" id="brKpi"></div>
       <div class="brcharts"><div class="brcard"><div class="brcht">กระบวนการจำแนกตามประเภท (คลิกเพื่อกรอง)</div><div class="brcvs"><canvas id="brChartCat"></canvas></div></div><div class="brcard"><div class="brcht">กระบวนการตามแผนก × Layer (คลิกแท่งเพื่อกรอง)</div><div class="brcvs brcvs-tall"><canvas id="brChartDeptCat"></canvas></div></div></div></div>
       <div class="bar" style="margin-top:2px">
-        <span class="lbl" data-fl="dept">แผนก</span><select id="brDept"></select>
-        <span class="lbl" data-fl="type">ประเภทคำขอ</span><select id="brType"></select>
-        <span class="lbl" data-fl="complexity">ความซับซ้อน</span><select id="brCplx"></select>
-        <span class="lbl" data-fl="risk">ความเสี่ยง</span><select id="brRisk"></select>
+        <span class="lbl" data-fl="dept">แผนก</span><select id="brDept" data-multi="1"></select>
+        <span class="lbl" data-fl="type">ประเภทคำขอ</span><select id="brType" data-multi="1"></select>
+        <span class="lbl" data-fl="complexity">ความซับซ้อน</span><select id="brCplx" data-multi="1"></select>
+        <span class="lbl" data-fl="risk">ความเสี่ยง</span><select id="brRisk" data-multi="1"></select>
         <input type="text" id="brSearch" placeholder="ค้นหา…">
         <button class="tbtn" onclick="clearBrFilters()" data-i18n="clear">ล้าง</button>
         <span class="count" id="brCount" style="margin-left:auto"></span>
@@ -1783,8 +1783,8 @@ function brNum(x){const n=parseFloat(x);return isNaN(n)?0:n;}
 function brRiskVal(b){return (b.risk||'').includes('Yes')?'High':'Safe';}
 function setOpts(id,arr,allLabel){var el=document.getElementById(id);if(!el)return;el.innerHTML='<option value="">'+allLabel+'</option>'+arr.map(x=>`<option>${esc(String(x))}</option>`).join('');}
 function fillBrFilters(){setOpts('brDept',[...new Set(BR.map(b=>b.module))],'ทุกแผนก');setOpts('brType',[...new Set(BR.map(b=>b.type).filter(Boolean))],'ทุกประเภท');setOpts('brCplx',[...new Set(BR.map(b=>b.cplx).filter(Boolean))],'ทุกระดับ');setOpts('brRisk',['Safe','High'],'ทุกความเสี่ยง');}
-function filteredBr(){var d=v('brDept'),t=v('brType'),c=v('brCplx'),rk=v('brRisk'),st=v('brStatus'),q=v('brSearch').toLowerCase().trim();
-  var r=BR.filter(b=>(!d||b.module===d)&&(!t||b.type===t)&&(!c||b.cplx===c)&&(!rk||brRiskVal(b)===rk)&&(!st||(b.status||'Not Started')===st)&&(!brCatF||b.cat===brCatF)&&(!q||((b.name||'')+(b.dept||'')+(b.req||'')+(b.owner||'')+(b.app||'')).toLowerCase().includes(q)));
+function filteredBr(){var ds=vm('brDept'),ts=vm('brType'),cs=vm('brCplx'),rks=vm('brRisk'),st=v('brStatus'),q=v('brSearch').toLowerCase().trim();
+  var r=BR.filter(b=>(!ds.length||ds.includes(b.module))&&(!ts.length||ts.includes(b.type))&&(!cs.length||cs.includes(b.cplx))&&(!rks.length||rks.includes(brRiskVal(b)))&&(!st||(b.status||'Not Started')===st)&&(!brCatF||b.cat===brCatF)&&(!q||((b.name||'')+(b.dept||'')+(b.req||'')+(b.owner||'')+(b.app||'')).toLowerCase().includes(q)));
   if(brSort.key){var k=brSort.key,nk=(k==='hrs'||k==='save');r=r.slice().sort((a,b)=>nk?(brNum(a[k])-brNum(b[k]))*brSort.dir:String(a[k]||'').localeCompare(String(b[k]||''),'th')*brSort.dir);}return r;}
 function brStatusCell(b){var sv=b.status||'Not Started',c=STATUS_COLORS[sv]||'#8e8e93';return `<span class="stwrap" style="--sc:${c}"><span class="stdot"></span><select class="selmini stsel" onclick="event.stopPropagation()" onchange="setBrStatus(${b._bid},this.value)">${STATUS_LIST.map(x=>`<option ${x===sv?'selected':''}>${x}</option>`).join('')}</select></span>`;}
 function setBrStatus(bid,val){setBrField(bid,'status',val);toast(T('saved'));}
@@ -2086,7 +2086,7 @@ function renderBrCharts(){if(typeof Chart==='undefined')return;
  function tot(d){return CATS.reduce(function(sm,c){return sm+(dd[d][c]||0);},0);}depts.sort(function(a,b){return tot(b)-tot(a);});
  var dsets=CATS.map(function(c){return {label:c,data:depts.map(function(d){return dd[d][c]||0;}),backgroundColor:CATC[c],borderRadius:3,barThickness:15};});
  var barLabel={id:'barLabel',afterDatasetsDraw:function(ch){var ctx=ch.ctx;ch.data.datasets.forEach(function(ds,di){var meta=ch.getDatasetMeta(di);meta.data.forEach(function(el,i){var val=ds.data[i];if(!val)return;if(Math.abs(el.x-el.base)<13)return;ctx.save();ctx.fillStyle='#fff';ctx.font='600 10px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(val,(el.x+el.base)/2,el.y);ctx.restore();});});}};
- destroy('brDeptCat');charts.brDeptCat=new Chart(be,{type:'bar',data:{labels:depts,datasets:dsets},options:{maintainAspectRatio:false,indexAxis:'y',onClick:function(e,el){if(el.length){var ff=document.getElementById('brDept');if(ff){ff.value=(ff.value===depts[el[0].index])?'':depts[el[0].index];renderBrTable();}}},plugins:{legend:{position:'top',labels:{padding:12,boxWidth:9,boxHeight:9,usePointStyle:true,font:{size:11}}}},scales:{x:{stacked:true,beginAtZero:true,grid:GRID,border:{display:false},ticks:{font:{size:10},color:AX,precision:0},title:{display:true,text:'จำนวนกระบวนการ',font:{size:10},color:AX}},y:{stacked:true,grid:NOGRID,border:{display:false},ticks:{font:{size:11},color:AX}}}},plugins:[barLabel]});}
+ destroy('brDeptCat');charts.brDeptCat=new Chart(be,{type:'bar',data:{labels:depts,datasets:dsets},options:{maintainAspectRatio:false,indexAxis:'y',onClick:function(e,el){if(el.length){var ff=document.getElementById('brDept');if(ff){var _dv=depts[el[0].index];if(ff.dataset.multi){if(!ff._m)ff._m=new Set();if(ff._m.size===1&&ff._m.has(_dv))ff._m.clear();else{ff._m.clear();ff._m.add(_dv);}csSyncMulti(ff);}else{ff.value=(ff.value===_dv)?'':_dv;}renderBrTable();}}},plugins:{legend:{position:'top',labels:{padding:12,boxWidth:9,boxHeight:9,usePointStyle:true,font:{size:11}}}},scales:{x:{stacked:true,beginAtZero:true,grid:GRID,border:{display:false},ticks:{font:{size:10},color:AX,precision:0},title:{display:true,text:'จำนวนกระบวนการ',font:{size:10},color:AX}},y:{stacked:true,grid:NOGRID,border:{display:false},ticks:{font:{size:11},color:AX}}}},plugins:[barLabel]});}
 const BRHEAD=["Department","Process","Type","Cycle","Hours/yr","FTE Saving","FTE Now","Complexity","Risk","Status","Owner","Application","Category","Requirement","Source"];
 function brRowOut(b){return [b.module,b.name,b.type,b.cycle,b.hrs,b.save,b.fteNow,b.cplx,brRiskVal(b),b.status||'Not Started',b.owner,b.app,b.cat,b.req,b.src];}
 function exportBR(){dlXlsx([BRHEAD,...BR.map(brRowOut)],"ERP_Automation2026_Export","Automation2026",[16,40,14,12,10,11,10,12,9,12,20,16,14,50,16]);toast('ส่งออก '+BR.length+' กระบวนการ');}
