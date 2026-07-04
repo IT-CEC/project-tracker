@@ -794,10 +794,10 @@ body.locked{overflow:hidden}
     <div class="projview" id="actionView" style="display:none">
       <div id="actKpi" class="actkpi"></div>
       <div class="bar" style="margin-top:8px">
-        <span class="lbl">หมวด</span><select id="actCat"></select>
-        <span class="lbl">สถานะ</span><select id="actStatus"></select>
-        <span class="lbl">Priority</span><select id="actPri"></select>
-        <span class="lbl">ผู้รับผิดชอบ</span><select id="actOwner"></select>
+        <span class="lbl">หมวด</span><select id="actCat" data-multi="1"></select>
+        <span class="lbl">สถานะ</span><select id="actStatus" data-multi="1"></select>
+        <span class="lbl">Priority</span><select id="actPri" data-multi="1"></select>
+        <span class="lbl">ผู้รับผิดชอบ</span><select id="actOwner" data-multi="1"></select>
         <input type="text" id="actSearch" placeholder="ค้นหา…" style="width:180px;flex:none">
         <button class="tbtn" onclick="actClear()">ล้าง</button>
       </div>
@@ -1503,8 +1503,8 @@ var _actFirst=true;
 function subscribeActs(){if(!window.DB)return;window.DB.subscribe(COL_ACT,function(docs){if(_actFirst){_actFirst=false;return;}ACTS=docs;actNorm();if(typeof fillActFilters==='function')fillActFilters();if(typeof curProjView!=='undefined'&&curProjView==='action'&&typeof renderActs==='function')renderActs();});}
 let actSortK='',actSortD=1,actFilt={overdue:false};
 function fillActFilters(){setOpts('actCat',[...new Set(ACTS.map(a=>a.cat).filter(Boolean))],'ทุกหมวด');setOpts('actStatus',ACT_STATUS,'ทุกสถานะ');setOpts('actPri',['High','Low'],'ทุก Priority');setOpts('actOwner',[...new Set(ACTS.map(a=>(a.owner||'').replace(/\n/g,' ').trim()).filter(Boolean))],'ทุกคน');}
-function filteredActs(){var c=v('actCat'),st=v('actStatus'),pr=v('actPri'),ow=v('actOwner'),q=v('actSearch').toLowerCase().trim();
-  var r=ACTS.filter(function(a){return (!c||a.cat===c)&&(!st||(a.status||'Not Started')===st)&&(!pr||a.pri===pr)&&(!ow||(a.owner||'').replace(/\n/g,' ').trim()===ow)&&(!actFilt.overdue||actOverdue(a))&&(!q||((a.action||'')+(a.dept||'')+(a.owner||'')+(a.note||'')+(a.cat||'')).toLowerCase().includes(q));});
+function filteredActs(){var cs=vm('actCat'),sts=vm('actStatus'),prs=vm('actPri'),ows=vm('actOwner'),q=v('actSearch').toLowerCase().trim();
+  var r=ACTS.filter(function(a){return (!cs.length||cs.includes(a.cat))&&(!sts.length||sts.includes(a.status||'Not Started'))&&(!prs.length||prs.includes(a.pri))&&(!ows.length||ows.includes((a.owner||'').replace(/\n/g,' ').trim()))&&(!actFilt.overdue||actOverdue(a))&&(!q||((a.action||'')+(a.dept||'')+(a.owner||'')+(a.note||'')+(a.cat||'')).toLowerCase().includes(q));});
   if(actSortK){var k=actSortK;r=r.slice().sort(function(a,b){if(k==='_id')return ((a._id||0)-(b._id||0))*actSortD;if(k==='due')return ((actDue(a.due)||0)-(actDue(b.due)||0))*actSortD;return String(a[k]||'').localeCompare(String(b[k]||''),'th')*actSortD;});}return r;}
 function actClear(){actFilt.overdue=false;['actCat','actStatus','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderActTable();}
 function renderActKpi(){var el=document.getElementById('actKpi');if(!el)return;var tot=ACTS.length,inp=ACTS.filter(a=>(a.status||'Not Started')==='In Process').length,ns=ACTS.filter(a=>(a.status||'Not Started')==='Not Started').length,dn=ACTS.filter(a=>a.status==='Done').length,ov=ACTS.filter(actOverdue).length;
