@@ -591,6 +591,10 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .nav-pop-i:hover{background:var(--hover)}
 .nav-pop-dot{width:6px;height:6px;border-radius:50%;background:transparent;flex:none}
 .nav-pop-i.on .nav-pop-dot{background:var(--ink)}
+/* dark-mode readability: app's --ink resolves to --bg (dark) in dark theme, so use --side-ink for sidebar foreground */
+[data-theme="dark"] .nav-item:hover,[data-theme="dark"] .nav-item.active,[data-theme="dark"] .nav-pop-i{color:var(--side-ink)}
+[data-theme="dark"] .nav-pop-i.on .nav-pop-dot{background:var(--side-ink)}
+[data-theme="dark"] .nav[data-mode="collapsed"] .nav-item:hover::after{background:var(--side-ink);color:var(--side)}
 
 .setwrap{display:grid;grid-template-columns:190px 1fr;gap:22px;max-width:880px}
 .setnav{display:flex;flex-direction:column;gap:2px}
