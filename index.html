@@ -57,12 +57,15 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .profile .pe{font-size:11px;color:var(--ink3)}
 /* content */
 .content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;padding-left:var(--nav-w,54px);padding-top:var(--topbar-h);transition:padding-left .18s cubic-bezier(.32,.72,0,1)}
-.topbar{flex:none;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:14px;padding:0 16px;height:var(--topbar-h);background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+.topbar{flex:none;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:14px;padding:0 16px 0 0;height:var(--topbar-h);background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
 .tl{display:flex;gap:8px;align-items:center}
 .tl span{width:12px;height:12px;border-radius:50%;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14)}
 .tl .r{background:#ff5f57}.tl .y{background:#febc2e}.tl .g{background:#28c840}
 .topbar .ham{display:none;border:0;background:var(--chip);width:34px;height:34px;border-radius:9px;font-size:16px;cursor:pointer;color:var(--ink)}
 .topbar .crumb{font-size:13px;color:var(--ink);font-weight:700}.topbar .crumb b{color:var(--ink);font-weight:600}
+.brand{flex:none;width:var(--nav-w,54px);height:100%;display:flex;align-items:center;gap:11px;padding-left:16px;border-right:1px solid var(--line);overflow:hidden;transition:width .18s cubic-bezier(.32,.72,0,1)}
+.brand-logo{width:26px;height:26px;flex:none;object-fit:contain}
+.brand-wm{font-weight:700;font-size:14px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
 .topbar .tsp{flex:1}
 .tbtn{border:0;background:var(--chip);color:var(--ink);font-family:inherit;font-size:12.5px;font-weight:500;padding:8px 13px;border-radius:9px;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px}
 .tbtn:hover{background:var(--hover)}
@@ -584,7 +587,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 /* tooltip when labels are hidden */
 .nav[data-mode="collapsed"] .nav-item:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--ink);color:var(--surface);padding:5px 10px;border-radius:8px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow);z-index:6;pointer-events:none}
 /* mobile: force thin rail */
-@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:54px}.nav .nav-lbl,.nav .nav-badge{opacity:0}.content{padding-left:54px!important}.nav-pop{left:6px}}
+@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:54px}.nav .nav-lbl,.nav .nav-badge,.nav .sb-txt{opacity:0}.content{padding-left:54px!important}.nav-pop{left:6px}.brand{width:54px}}
 .nav-pop{position:absolute;left:10px;bottom:52px;min-width:186px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;z-index:20}
 .nav-pop.open{display:block}
 .nav-pop-h{font-size:11px;font-weight:600;color:var(--ink3);padding:6px 10px 8px;border-bottom:1px solid var(--line2);margin-bottom:4px}
@@ -724,7 +727,7 @@ body.locked{overflow:hidden}
   </aside>
 
   <div class="content">
-    <div class="topbar"><div class="crumb">Project Implementation <span style="color:var(--red);font-weight:700">Oracle</span> Netsuite - Civil Engineering / <b id="crumbNow">ภาพรวม</b></div><div class="projtabs" id="projToggle"><span class="pjt-thumb"></span>
+    <div class="topbar"><div class="brand"><img class="brand-logo" src="SMALL_CIVIL_LOGO.png" alt="Civil ERP"><span class="brand-wm">Civil ERP</span></div><div class="crumb">Project Implementation <span style="color:var(--red);font-weight:700">Oracle</span> Netsuite - Civil Engineering / <b id="crumbNow">ภาพรวม</b></div><div class="projtabs" id="projToggle"><span class="pjt-thumb"></span>
         <button class="pjt on" data-pv="impl" onclick="setProjView('impl')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Implementation)</button>
         <button class="pjt" data-pv="reqs" onclick="setProjView('reqs')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> ความต้องการ (Requirements)</button>
         <button class="pjt" data-pv="action" onclick="setProjView('action')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Action Item</button>
