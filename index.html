@@ -406,7 +406,8 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 #piTbl thead th[data-pis]{cursor:pointer}
 .thi{color:var(--ink3);margin-right:5px;font-weight:400;font-size:11px}
 #piGantt .g-track,#apGantt .g-track{background:none}
-#piGantt .g-lab,#apGantt .g-lab{position:sticky;left:0;z-index:4;background-color:var(--surface);box-shadow:1px 0 0 var(--line)}
+#piGantt .g-body,#apGantt .g-body{min-width:max-content}
+#piGantt .g-lab,#apGantt .g-lab{position:sticky;left:0;z-index:4;align-self:stretch;background-color:var(--surface);box-shadow:1px 0 0 var(--line),-16px 0 0 var(--surface)}
 #piGantt .g-row:hover .g-lab,#apGantt .g-row:hover .g-lab{background-image:linear-gradient(var(--hover),var(--hover))}
 #piGantt .g-head .g-lab,#apGantt .g-head .g-lab{z-index:6}
 #piGantt .g-row,#apGantt .g-row{height:38px}
