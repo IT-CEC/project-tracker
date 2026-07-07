@@ -406,10 +406,10 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 #piTbl thead th[data-pis]{cursor:pointer}
 .thi{color:var(--ink3);margin-right:5px;font-weight:400;font-size:11px}
 #piGantt .g-track,#apGantt .g-track{background:none}
-#piGantt .g-lab{position:sticky;left:0;z-index:4;background-color:var(--surface);box-shadow:1px 0 0 var(--line)}
-#piGantt .g-row:hover .g-lab{background-image:linear-gradient(var(--hover),var(--hover))}
-#piGantt .g-head .g-lab{z-index:6}
-#piGantt .g-row{height:38px}
+#piGantt .g-lab,#apGantt .g-lab{position:sticky;left:0;z-index:4;background-color:var(--surface);box-shadow:1px 0 0 var(--line)}
+#piGantt .g-row:hover .g-lab,#apGantt .g-row:hover .g-lab{background-image:linear-gradient(var(--hover),var(--hover))}
+#piGantt .g-head .g-lab,#apGantt .g-head .g-lab{z-index:6}
+#piGantt .g-row,#apGantt .g-row{height:38px}
 #piGantt .g-bar{height:28px;top:5px;background:var(--surface);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;gap:7px;padding:0 9px;overflow:visible;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:grab;z-index:2}
 #piGantt .g-bar:active{cursor:grabbing}
 .g-bdot{width:9px;height:9px;border-radius:50%;flex:none}
@@ -1902,7 +1902,7 @@ function piMidx(d){return d?(d.getFullYear()-2026)*12+d.getMonth():null;}
 function piProg(p,c){return `<span class="prog"><span style="font-size:11px;color:var(--ink3);width:30px;flex:none">${p}%</span><span class="pb"><span class="pf" style="width:${p}%;background:${c}"></span></span></span>`;}
 function piAsg(a){return '<span class="asg">'+a.map(x=>`<span class="atag">${esc(x)}</span>`).join('')+'</span>';}
 function piDot(st){return `<span class="dotc" style="background:${STATUS_COLORS[st]||'#888'}"></span>`;}
-function fillPIFilters(){setOpts(GP+'Phase',Object.keys(PI_PHASES),GP==='ap'?'ทุกแผนก':'ทุกเฟส');setOpts(GP+'Status',STATUS_LIST,'ทุกสถานะ');setOpts(GP+'Asg',[...new Set(PIMPL.flatMap(d=>d.asg))].sort(),'ทุกทีม');}
+function fillPIFilters(){setOpts(GP+'Phase',Object.keys(PI_PHASES),GP==='ap'?'ทุกแผนก':'ทุกเฟส');setOpts(GP+'Status',GP==='ap'?STATUS_LIST.filter(function(s){return PIMPL.some(function(d){return d.st===s;});}):STATUS_LIST,'ทุกสถานะ');setOpts(GP+'Asg',[...new Set(PIMPL.flatMap(d=>d.asg))].sort(),'ทุกทีม');}
 function clearPI(){[GP+'Phase',GP+'Status',GP+'Asg',GP+'Search'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});renderPI();}
 function filteredPI(){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
   return PIMPL.filter(d=>(!phs.length||phs.includes(d.ph))&&(!sts.length||sts.includes(d.st))&&(!ags.length||ags.some(a=>d.asg.includes(a)))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q)));}
