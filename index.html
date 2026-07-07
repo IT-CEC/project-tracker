@@ -410,6 +410,8 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 #piGantt .g-lab,#apGantt .g-lab{position:sticky;left:0;z-index:4;align-self:stretch;background-color:var(--surface);box-shadow:1px 0 0 var(--line),-16px 0 0 var(--surface)}
 #piGantt .g-row:hover .g-lab,#apGantt .g-row:hover .g-lab{background-image:linear-gradient(var(--hover),var(--hover))}
 #piGantt .g-head .g-lab,#apGantt .g-head .g-lab{z-index:6}
+#piGantt .g-deprow,#apGantt .g-deprow{position:relative}
+#piGantt .g-deprow::before,#apGantt .g-deprow::before{content:"";position:sticky;left:0;flex:none;align-self:stretch;width:250px;margin-right:-250px;background:var(--surface);box-shadow:1px 0 0 var(--line);z-index:3}
 #piGantt .g-row,#apGantt .g-row{height:38px}
 #piGantt .g-bar{height:28px;top:5px;background:var(--surface);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;gap:7px;padding:0 9px;overflow:visible;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:grab;z-index:2}
 #piGantt .g-bar:active{cursor:grabbing}
@@ -442,7 +444,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .apdt{width:96px;font-size:12px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);text-align:center}
 .apar{color:var(--ink3)}
 .apx{border:0;background:none;color:var(--red);cursor:pointer;font-size:17px;line-height:1;padding:0 2px}
-.ap-stc{position:absolute;top:11px;width:17px;height:17px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;box-sizing:border-box;cursor:pointer;z-index:5;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.25)}
+.ap-stc{position:absolute;top:11px;width:17px;height:17px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;box-sizing:border-box;cursor:pointer;z-index:3;box-shadow:0 0 0 1.5px #fff,0 1px 2px rgba(0,0,0,.25)}
 .ap-stc svg{width:11px;height:11px}
 .g-mline{position:absolute;top:0;bottom:0;width:1px;background:var(--line2)}
 .g-mline.mon{background:var(--line)}
