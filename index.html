@@ -1530,16 +1530,40 @@ function renderActTable(){var rows=filteredActs();var tb=document.querySelector(
 function renderActs(){renderActKpi();renderActTable();}
 function actEdit(id,f,val){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;a[f]=val;actSaveOne(a);renderActs();if(window.toast)toast(T('saved'));}
 function actBind(){['actCat','actStatus','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderActTable);});document.querySelectorAll('#actTable th[data-asort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.asort;if(actSortK===k)actSortD=-actSortD;else{actSortK=k;actSortD=1;}renderActTable();};});}
-function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var mt=document.getElementById('mTitle');if(mt)mt.textContent='Action #'+a._id+(a.cat?' · '+a.cat:'');var ms=document.getElementById('mSub');if(ms)ms.textContent=(a.dept||'').replace(/\n/g,' ');
-  var sel=function(cur,arr,f){return '<select onchange="actEdit('+id+',&quot;'+f+'&quot;,this.value);openAct('+id+')">'+arr.map(function(x){return '<option '+(x===cur?'selected':'')+'>'+x+'</option>';}).join('')+'</select>';};
-  document.getElementById('mBody').innerHTML='<div style="padding:6px 4px">'
-    +'<div class="fld"><label>Action Request</label><div class="roval" style="white-space:pre-wrap;line-height:1.5">'+esc(a.action||'')+'</div></div>'
-    +'<div class="frow"><div class="fld"><label>สถานะ</label>'+sel(a.status||'Not Started',ACT_STATUS,'status')+'</div><div class="fld"><label>Priority</label>'+sel(a.pri||'Low',['High','Low'],'pri')+'</div></div>'
-    +'<div class="fld"><label>ผู้รับผิดชอบ</label><input value="'+attr((a.owner||'').replace(/\n/g,' '))+'" onchange="actEdit('+id+',&quot;owner&quot;,this.value)"></div>'
-    +'<div class="frow"><div class="fld"><label>กำหนดส่ง (dd/mm/yyyy)</label><input value="'+attr(a.due||'')+'" onchange="actEdit('+id+',&quot;due&quot;,this.value)"></div><div class="fld"><label>วันที่เสร็จ</label><input value="'+attr(a.done||'')+'" onchange="actEdit('+id+',&quot;done&quot;,this.value)"></div></div>'
-    +'<div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea rows="2" onchange="actEdit('+id+',&quot;note&quot;,this.value)">'+esc(a.note||'')+'</textarea></div>'
-    +'</div><div class="mact"><button class="btn btn-sec del" onclick="actDel('+id+')">ลบรายการ</button><button class="btn btn-sec" onclick="closeModal()">ปิด</button></div>';
+function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var st=a.status||'Not Started';
+  document.getElementById('mTitle').textContent='Action #'+a._id+(a.cat?' · '+a.cat:'');
+  document.getElementById('mSub').textContent=(a.dept||'').replace(/\n/g,' ');
+  var opt=function(cur,arr){return arr.map(function(x){return '<option '+(x===cur?'selected':'')+'>'+x+'</option>';}).join('');};
+  document.getElementById('mBody').innerHTML=`
+    <div class="dtwo">
+      <div class="dleft">
+        <div id="actStep" class="stepper"></div>
+        <div class="frow"><div class="fld"><label>สถานะ</label><select onchange="actEdit(${id},'status',this.value);actPaintStep(this.value)">${opt(st,ACT_STATUS)}</select></div><div class="fld"><label>Priority</label><select onchange="actEdit(${id},'pri',this.value)">${opt(a.pri||'Low',['High','Low'])}</select></div></div>
+        <div class="frow"><div class="fld"><label>กำหนดส่ง (dd/mm/yyyy)</label><input value="${attr(a.due||'')}" onchange="actEdit(${id},'due',this.value)"></div><div class="fld"><label>วันที่เสร็จ</label><input value="${attr(a.done||'')}" onchange="actEdit(${id},'done',this.value)"></div></div>
+        <div class="fld"><label>ผู้รับผิดชอบ</label><input value="${attr((a.owner||'').replace(/\n/g,' '))}" onchange="actEdit(${id},'owner',this.value)"></div>
+        <div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea style="min-height:64px" onchange="actEdit(${id},'note',this.value)">${esc(a.note||'')}</textarea></div>
+        ${a.cat?`<div class="srcline">หมวด: ${esc(a.cat)}</div>`:''}
+      </div>
+      <div class="dright">
+        <div class="dsec dsec-row dsec1"><span>Action Request</span><button class="reqedit" id="actReqBtn" type="button" onclick="actReqToggle(${id})"><svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข</button></div>
+        <div id="actReqView" class="reqview"></div>
+        <textarea id="actReqTa" class="reqedit-ta" style="display:none" onchange="actEdit(${id},'action',this.value)" oninput="autoGrow(this)">${esc(a.action||'')}</textarea>
+      </div>
+    </div>
+    <div class="mact"><button class="btn btn-pri" onclick="closeModal()">ปิด</button><button class="btn btn-danger" onclick="actDel(${id})">ลบรายการ</button></div>`;
+  actPaintStep(st);
+  document.getElementById('actReqView').innerHTML=fmtReq(a.action||'')||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';
+  if(!(a.action||'').trim())actReqToggle(id);
   document.getElementById('modal').classList.add('open');}
+function actPaintStep(sv){var el=document.getElementById('actStep');if(!el)return;var order=['Not Started','In Process','Done'];var idx=sv==='Done'?2:(sv==='Not Started'?0:1);var alert=(sv==='On Hold');var ac=ACT_SC[sv]||'#8e8e93';
+  var h=order.map(function(o,i){var done=i<idx,cur=i===idx;var fill=done?'#28cd41':(cur?ac:null);var ic=done?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>':(i+1);
+    var c='<div class="stp '+(cur?'cur':'')+'"><span class="stc" style="background:'+(fill||'var(--chip)')+';color:'+(fill?'#fff':'var(--ink3)')+'">'+ic+'</span><span class="stl">'+o+'</span></div>';
+    var bar=i<2?'<span class="stbar" style="background:'+(i<idx?'#28cd41':'var(--line)')+'"></span>':'';return c+bar;}).join('');
+  if(alert)h+='<span class="stbadge" style="background:'+ac+'1a;color:'+ac+'"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> '+sv+'</span>';
+  el.innerHTML=h;}
+function actReqToggle(id){var ta=document.getElementById('actReqTa'),vw=document.getElementById('actReqView'),btn=document.getElementById('actReqBtn');if(!ta||!vw)return;
+  if(ta.style.display==='none'){vw.style.display='none';ta.style.display='block';if(btn)btn.innerHTML='<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> เสร็จ';autoGrow(ta);ta.focus();}
+  else{var a=ACTS.find(function(x){return x._id===id;});if(a){a.action=ta.value;actSaveOne(a);renderActs();}vw.innerHTML=fmtReq(ta.value)||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';ta.style.display='none';vw.style.display='block';if(btn)btn.innerHTML='<svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข';}}
 function actAdd(){var nid=ACTS.reduce(function(m,a){return Math.max(m,a._id||0);},0)+1;var a={_id:nid,cat:'',dept:'',action:'รายการใหม่',pri:'Low',owner:'',due:'',status:'Not Started',done:'',note:''};ACTS.push(a);actNorm();actSaveOne(a);fillActFilters();renderActs();openAct(nid);}
 function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!confirm('ลบ Action #'+id+' ?'))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
 
