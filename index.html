@@ -471,8 +471,6 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .subrow:hover .subdel{opacity:1}
 .subdel:hover{background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red)}
 #project.gfocus .projribbon,#project.gfocus .projhead{display:none}
-#project.gfocus #piGantt,#project.gfocus .ganttwrap{max-height:calc(100vh - 118px)}
-#bridge.gfocus #apGantt{max-height:calc(100vh - 118px)}
 .main.gffit{padding-bottom:16px}
 .gtbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .gtbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;transition:.15s;line-height:1}
@@ -2089,7 +2087,7 @@ function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi==
     ${rw('Blocked by (รอให้เสร็จก่อน)',piDepEditor(d))}
   </div></div><div class="mact"><button class="btn btn-sec" style="color:var(--red)" onclick="piDeleteTask(${d._pi})">${LANG==='en'?'Delete':'ลบงาน'}</button><button class="btn btn-sec" onclick="closeModal()">${LANG==='en'?'Close':'ปิด'}</button></div>`;
   document.getElementById('modal').classList.add('open');}
-function toggleGFocus(){var pid=GCTX==='ap'?'bridge':'project';var p=document.getElementById(pid);if(!p)return;p.classList.toggle('gfocus');var on=p.classList.contains('gfocus');var b=document.getElementById(GCTX==='ap'?'apFocusBtn':'gFocusBtn');if(b)b.classList.toggle('on',on);var m=document.querySelector('.main');if(m)m.classList.toggle('gffit',on);setTimeout(piToday,90);}
+function toggleGFocus(){var pid=GCTX==='ap'?'bridge':'project';var p=document.getElementById(pid);if(!p)return;p.classList.toggle('gfocus');var on=p.classList.contains('gfocus');var b=document.getElementById(GCTX==='ap'?'apFocusBtn':'gFocusBtn');if(b)b.classList.toggle('on',on);var m=document.querySelector('.main');if(m)m.classList.toggle('gffit',on);var gw=document.getElementById(GCTX==='ap'?'apGantt':'piGantt');if(gw&&on&&gw.dataset.origMaxH==null)gw.dataset.origMaxH=gw.style.maxHeight||'';var applyH=function(){if(!gw)return;if(p.classList.contains('gfocus')){if(m)m.scrollTop=0;var t=Math.round(gw.getBoundingClientRect().top);gw.style.maxHeight='calc(100vh - '+(t+16)+'px)';}else{gw.style.maxHeight=gw.dataset.origMaxH||'';delete gw.dataset.origMaxH;}};applyH();setTimeout(function(){applyH();piToday();},90);}
 function piGanttHover(){var gw=document.getElementById(PIGID);if(!gw||gw._hb)return;gw._hb=1;gw.addEventListener("mouseover",function(e){var hi=gw.querySelector(".g-hdrhi");if(!hi)return;var bar=e.target.closest?e.target.closest(".g-bar"):null;if(bar){hi.style.left=bar.dataset.hl+"px";hi.style.width=bar.dataset.hw+"px";hi.classList.add("on");}else{hi.classList.remove("on");}});}
 function piSwitchView(piv){piCurV=piv;var P=GP;var suf={timeline:'Timeline',status:'StatusV',priority:'PriorityV',table:'TableV'};document.querySelectorAll('#'+P+'ViewTabs .bvt').forEach(function(x){x.classList.toggle('on',x.dataset.piv===piv);});var gt=document.getElementById(P+'Gtoolbar');if(gt)gt.style.display=piv==='timeline'?'':'none';['Timeline','StatusV','PriorityV','TableV'].forEach(function(sx){var e=document.getElementById(P+sx);if(e)e.style.display='none';});var el=document.getElementById(P+suf[piv]);if(el)el.style.display='';renderPI();}
 function bindPI(){document.querySelectorAll('.bvt[data-piv]').forEach(function(b){b.onclick=function(){piSwitchView(b.dataset.piv);};});
