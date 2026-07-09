@@ -1538,19 +1538,19 @@ function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)retu
     <div class="dtwo">
       <div class="dleft">
         <div id="actStep" class="stepper"></div>
-        <div class="frow"><div class="fld"><label>สถานะ</label><select onchange="actEdit(${id},'status',this.value);actPaintStep(this.value)">${opt(st,ACT_STATUS)}</select></div><div class="fld"><label>Priority</label><select onchange="actEdit(${id},'pri',this.value)">${opt(a.pri||'Low',['High','Low'])}</select></div></div>
-        <div class="frow"><div class="fld"><label>กำหนดส่ง (dd/mm/yyyy)</label><input value="${attr(a.due||'')}" onchange="actEdit(${id},'due',this.value)"></div><div class="fld"><label>วันที่เสร็จ</label><input value="${attr(a.done||'')}" onchange="actEdit(${id},'done',this.value)"></div></div>
-        <div class="fld"><label>ผู้รับผิดชอบ</label><input value="${attr((a.owner||'').replace(/\n/g,' '))}" onchange="actEdit(${id},'owner',this.value)"></div>
-        <div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea style="min-height:64px" onchange="actEdit(${id},'note',this.value)">${esc(a.note||'')}</textarea></div>
+        <div class="frow"><div class="fld"><label>สถานะ</label><select id="ea_status" onchange="actPaintStep(this.value)">${opt(st,ACT_STATUS)}</select></div><div class="fld"><label>Priority</label><select id="ea_pri">${opt(a.pri||'Low',['High','Low'])}</select></div></div>
+        <div class="frow"><div class="fld"><label>กำหนดส่ง (dd/mm/yyyy)</label><input id="ea_due" value="${attr(a.due||'')}"></div><div class="fld"><label>วันที่เสร็จ</label><input id="ea_done" value="${attr(a.done||'')}"></div></div>
+        <div class="fld"><label>ผู้รับผิดชอบ</label><input id="ea_owner" value="${attr((a.owner||'').replace(/\n/g,' '))}"></div>
+        <div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea id="ea_note" style="min-height:64px">${esc(a.note||'')}</textarea></div>
         ${a.cat?`<div class="srcline">หมวด: ${esc(a.cat)}</div>`:''}
       </div>
       <div class="dright">
         <div class="dsec dsec-row dsec1"><span>Action Request</span><button class="reqedit" id="actReqBtn" type="button" onclick="actReqToggle(${id})"><svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข</button></div>
         <div id="actReqView" class="reqview"></div>
-        <textarea id="actReqTa" class="reqedit-ta" style="display:none" onchange="actEdit(${id},'action',this.value)" oninput="autoGrow(this)">${esc(a.action||'')}</textarea>
+        <textarea id="actReqTa" class="reqedit-ta" style="display:none" oninput="autoGrow(this)">${esc(a.action||'')}</textarea>
       </div>
     </div>
-    <div class="mact"><button class="btn btn-pri" onclick="closeModal()">ปิด</button><button class="btn btn-danger" onclick="actDel(${id})">ลบรายการ</button></div>`;
+    <div class="mact"><button class="btn btn-pri" onclick="actSave(${id})">${T('save')}</button><button class="btn btn-sec" onclick="closeModal()">${T('cancel')}</button><button class="btn btn-danger" onclick="actDel(${id})">${T('delete')}</button></div>`;
   actPaintStep(st);
   document.getElementById('actReqView').innerHTML=fmtReq(a.action||'')||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';
   if(!(a.action||'').trim())actReqToggle(id);
@@ -1563,7 +1563,8 @@ function actPaintStep(sv){var el=document.getElementById('actStep');if(!el)retur
   el.innerHTML=h;}
 function actReqToggle(id){var ta=document.getElementById('actReqTa'),vw=document.getElementById('actReqView'),btn=document.getElementById('actReqBtn');if(!ta||!vw)return;
   if(ta.style.display==='none'){vw.style.display='none';ta.style.display='block';if(btn)btn.innerHTML='<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> เสร็จ';autoGrow(ta);ta.focus();}
-  else{var a=ACTS.find(function(x){return x._id===id;});if(a){a.action=ta.value;actSaveOne(a);renderActs();}vw.innerHTML=fmtReq(ta.value)||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';ta.style.display='none';vw.style.display='block';if(btn)btn.innerHTML='<svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข';}}
+  else{vw.innerHTML=fmtReq(ta.value)||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';ta.style.display='none';vw.style.display='block';if(btn)btn.innerHTML='<svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข';}}
+function actSave(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var g=function(k){var el=document.getElementById(k);return el?el.value:undefined;};a.status=g('ea_status');a.pri=g('ea_pri');a.due=g('ea_due');a.done=g('ea_done');a.owner=g('ea_owner');a.note=g('ea_note');a.action=g('actReqTa');actSaveOne(a);renderActs();closeModal();if(window.toast)toast(T('saved'));}
 function actAdd(){var nid=ACTS.reduce(function(m,a){return Math.max(m,a._id||0);},0)+1;var a={_id:nid,cat:'',dept:'',action:'รายการใหม่',pri:'Low',owner:'',due:'',status:'Not Started',done:'',note:''};ACTS.push(a);actNorm();actSaveOne(a);fillActFilters();renderActs();openAct(nid);}
 function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!confirm('ลบ Action #'+id+' ?'))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
 
