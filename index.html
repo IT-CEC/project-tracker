@@ -603,16 +603,12 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 [data-theme="dark"] .nav[data-mode="collapsed"] .nav-item:hover::after{background:var(--side-ink);color:var(--side)}
 /* ===== sidebar accordion (sub-views) ===== */
 .nav-acc{display:flex;flex-direction:column}
-.nav-acc-hd .nav-chev{flex:none;width:14px;height:14px;margin-left:auto;color:var(--ink3);transition:transform .18s,opacity .13s}
-.nav-acc.open .nav-acc-hd .nav-chev{transform:rotate(90deg)}
-.nav-sub{display:none;flex-direction:column;gap:1px;margin:1px 8px 4px}
-.nav-acc.open .nav-sub{display:flex}
+.nav-sub{display:flex;flex-direction:column;gap:1px;margin:1px 8px 4px}
 .nav-subitem{position:relative;display:flex;align-items:center;height:30px;padding:0 9px 0 40px;border-radius:8px;color:var(--ink3);cursor:pointer;font-size:12.5px;white-space:nowrap;overflow:hidden;text-decoration:none;transition:background .13s,color .13s}
 .nav-subitem:hover{background:var(--hover);color:var(--ink)}
 .nav-subitem.active-sub{color:var(--accent);font-weight:600;background:var(--mint)}
 .nav-subitem.active-sub::before{content:"";position:absolute;left:23px;top:50%;transform:translateY(-50%);width:5px;height:5px;border-radius:50%;background:var(--accent)}
 .nav[data-mode="collapsed"] .nav-sub,.nav[data-mode="hover"]:not(:hover) .nav-sub{display:none!important}
-.nav[data-mode="collapsed"] .nav-chev,.nav[data-mode="hover"]:not(:hover) .nav-chev{opacity:0}
 [data-theme="dark"] .nav-subitem:hover{color:var(--side-ink)}
 /* toggles moved into the sidebar as sub-views */
 .topbar .projtabs{display:none!important}
@@ -731,7 +727,7 @@ body.locked{overflow:hidden}
   <aside class="nav" id="nav" data-mode="hover">
     <div class="nav-group">
       <div class="nav-acc" data-tab="project">
-        <a class="nav-item nav-acc-hd" data-tab="project" data-tip="Oracle Netsuite"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg></span><span class="nav-lbl">Oracle Netsuite</span><svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+        <a class="nav-item nav-acc-hd" data-tab="project" data-tip="Project Oracle"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg></span><span class="nav-lbl">Project Oracle</span></a>
         <div class="nav-sub">
           <a class="nav-subitem" data-tab="project" data-pv="impl">แผนงาน (Implementation)</a>
           <a class="nav-subitem" data-tab="project" data-pv="reqs">ความต้องการ (Requirements)</a>
@@ -739,10 +735,10 @@ body.locked{overflow:hidden}
         </div>
       </div>
       <div class="nav-acc" data-tab="bridge">
-        <a class="nav-item nav-acc-hd" data-tab="bridge" data-tip="Automation"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><span class="nav-lbl">Automation</span><svg class="nav-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></a>
+        <a class="nav-item nav-acc-hd" data-tab="bridge" data-tip="Project Automation"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><span class="nav-lbl">Project Automation</span></a>
         <div class="nav-sub">
-          <a class="nav-subitem" data-tab="bridge" data-bv="table">วิเคราะห์ FTE</a>
           <a class="nav-subitem" data-tab="bridge" data-bv="timeline">แผนงาน (Timeline)</a>
+          <a class="nav-subitem" data-tab="bridge" data-bv="table">วิเคราะห์ FTE</a>
         </div>
       </div>
     </div>
@@ -1635,7 +1631,7 @@ function renderCockpit(){if(GCTX!=='pi')return;renderPhaseTimeline();var es=docu
   var cRisk=`<div class="ckcard ckrisk"><div class="ckk">${nRisk>0?`<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ต้องโฟกัส ${nRisk} เรื่อง`:`<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="#28cd41" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> สถานะความเสี่ยง`}</div>${nRisk>0?`<ul class="rklist"><li onclick="cockGo('delay')"><span class="rkdot" style="background:var(--red)"></span>งานล่าช้า/พัก <b>${nDelayed}${overdue?` · เลยกำหนด ${overdue}`:''}</b></li><li onclick="cockGo('dev')"><span class="rkdot" style="background:#ff9f0a"></span>ต้องพัฒนาเพิ่ม (Customization/Not supp.) <b>${dev}</b></li><li onclick="cockGo('mile')"><span class="rkdot" style="background:#af52de"></span>Milestone ใน 60 วัน <b>${nUp}</b></li></ul>`:`<div class="ckok"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="#28cd41" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ไม่มีประเด็นเร่งด่วน</div>`}</div>`;
   ck.innerHTML=cGL+cROI+cRisk;}
 
-var curProjView='impl';var curBrView='table';
+var curProjView='impl';var curBrView='timeline';
 function brMoveThumb(){var seg=document.getElementById('brToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
 function setBrView(bv){curBrView=bv;document.querySelectorAll('.nav-subitem').forEach(function(s){s.classList.toggle('active-sub',s.dataset.bv===bv);});var _cb=document.getElementById('crumbNow');if(_cb)_cb.textContent={table:'Automation · วิเคราะห์ FTE',timeline:'Automation · แผนงาน (Timeline)'}[bv]||'Automation';document.querySelectorAll('#brToggle .pjt').forEach(function(b){b.classList.toggle('on',b.dataset.bv===bv);});requestAnimationFrame(brMoveThumb);var t=document.getElementById('brTimeline'),fv=document.getElementById('brTableView');if(t)t.style.display=bv==='timeline'?'':'none';if(fv)fv.style.display=bv==='table'?'':'none';if(bv==='timeline'){setGanttCtx('ap');piSwitchView('timeline');piGanttHover();setTimeout(piHome,60);}else{setGanttCtx('pi');renderBridge();}syncTopAdd();}
 function piMoveThumb(){var seg=document.getElementById('projToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
@@ -1650,7 +1646,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+' · อีก '+Math.max(0,Math.ceil((_nm.e-now)/86400000))+' วัน'):'ไม่มี milestone ข้างหน้า';
   el.innerHTML=[c('เฟสปัจจุบัน',curPh,'จากแผนงาน',PI_PHC[curPhKey]||''),c('สถานะเฟส',_pstat,_psub,_pcol),c('Milestone ถัดไป',_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'กำหนดขึ้นระบบจริง','#c79200')].join('');}
-function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.nav-acc').forEach(a=>a.classList.toggle('open',a.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
+function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
 document.querySelectorAll('.nav-item[data-tab]').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
 document.querySelectorAll('.nav-subitem').forEach(function(s){s.onclick=function(){var tab=s.dataset.tab,cur=document.querySelector('.panel.active');cur=cur?cur.id:'';if(tab!==cur){if(s.dataset.pv)curProjView=s.dataset.pv;else if(s.dataset.bv)curBrView=s.dataset.bv;showTab(tab);}else{if(s.dataset.pv)setProjView(s.dataset.pv);else if(s.dataset.bv)setBrView(s.dataset.bv);}};});
 function applyNavMode(m){m=(m==='expanded'||m==='collapsed'||m==='hover')?m:'hover';var nav=document.getElementById('nav');if(nav)nav.dataset.mode=m;var app=document.getElementById('app');if(app)app.style.setProperty('--nav-w',m==='expanded'?'210px':'54px');document.querySelectorAll('#navPop .nav-pop-i').forEach(function(b){b.classList.toggle('on',b.dataset.nm===m);});}
