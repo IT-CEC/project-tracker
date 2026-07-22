@@ -12,7 +12,7 @@
 @font-face{font-family:'SF Pro Display';src:url('sf-pro-display/SFPRODISPLAYREGULAR.OTF') format('opentype');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:'SF Pro Display';src:url('sf-pro-display/SFPRODISPLAYMEDIUM.OTF') format('opentype');font-weight:500 600;font-style:normal;font-display:swap}
 @font-face{font-family:'SF Pro Display';src:url('sf-pro-display/SFPRODISPLAYBOLD.OTF') format('opentype');font-weight:700 900;font-style:normal;font-display:swap}
-:root{--topbar-h:46px;
+:root{--topbar-h:60px;
  --bg:#f5f5f7;--surface:#ffffff;--surface2:#fafafa;--ink:#1d1d1f;--ink2:#76767a;--ink3:#a1a1a6;
  --line:rgba(0,0,0,.10);--line2:rgba(0,0,0,.06);--side:#ffffff;--side-ink:#3c3c43;--hover:rgba(0,0,0,.04);
  --accent:#0071e3;--accent-d:#0066cc;--red:#ff3b30;--green:#28cd41;--orange:#ff9500;--purple:#af52de;--cyan:#32ade6;--mint:rgba(0,113,227,.08);--track:#e8e8ed;--chip:#e8e8ed;--shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.14);--cardsh:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05),0 24px 48px -12px rgba(0,0,0,.06);--font-ui:'SF Pro Display','Noto Sans Thai',sans-serif;--font-mono:'SF Pro Display','Noto Sans Thai',sans-serif;--serif:'SF Pro Display','Noto Sans Thai',sans-serif;--wall:linear-gradient(160deg,#dfe3ea 0%,#cdd3dd 45%,#bcc3d0 100%);
@@ -56,22 +56,29 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .profile .pn{font-size:12.5px;font-weight:600;line-height:1.1}
 .profile .pe{font-size:11px;color:var(--ink3)}
 /* content */
-.content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;padding-left:var(--nav-w,54px);padding-top:var(--topbar-h);transition:padding-left .18s cubic-bezier(.32,.72,0,1)}
-.topbar{flex:none;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:14px;padding:0 16px 0 0;height:var(--topbar-h);background:color-mix(in srgb,var(--bg) 65%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
+.content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;padding-left:var(--nav-w,64px);padding-top:var(--topbar-h);transition:padding-left .18s cubic-bezier(.32,.72,0,1)}
+.topbar{flex:none;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 20px 0 0;height:var(--topbar-h);background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.tb-title{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.4px;line-height:1.2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:8px}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;background:var(--surface);border:1px solid var(--line);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;position:relative;color:var(--ink2);flex:none}
+.icon-btn:hover{background:var(--chip);border-color:var(--line)}
+.icon-btn svg{width:16px;height:16px}
+.icon-btn .ib-lbl{display:none}
+.notif-dot{position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--surface)}
 .tl{display:flex;gap:8px;align-items:center}
 .tl span{width:12px;height:12px;border-radius:50%;display:block;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.14)}
 .tl .r{background:#ff5f57}.tl .y{background:#febc2e}.tl .g{background:#28c840}
 .topbar .ham{display:none;border:0;background:var(--chip);width:34px;height:34px;border-radius:9px;font-size:16px;cursor:pointer;color:var(--ink)}
 .topbar .crumb{font-size:13px;color:var(--ink);font-weight:700}.topbar .crumb b{color:var(--ink);font-weight:600}
-.brand{flex:none;width:var(--nav-w,54px);height:100%;display:flex;align-items:center;gap:11px;padding-left:16px;border-right:1px solid var(--line);overflow:hidden;transition:width .18s cubic-bezier(.32,.72,0,1)}
+.brand{flex:none;width:var(--nav-w,64px);height:100%;display:flex;align-items:center;gap:11px;padding-left:16px;border-right:1px solid var(--line);overflow:hidden;transition:width .18s cubic-bezier(.32,.72,0,1)}
 .brand-logo{width:26px;height:26px;flex:none;object-fit:contain}
 .brand-wm{font-weight:700;font-size:14px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
 .topbar .tsp{flex:1}
 .tbtn{border:0;background:var(--chip);color:var(--ink);font-family:inherit;font-size:12.5px;font-weight:500;padding:8px 13px;border-radius:9px;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px}
 .tbtn-logout:hover{background:rgba(255,59,48,.12);color:var(--red)}
 .tbtn:hover{background:var(--hover)}
-.tbtn.pri,.cta{background:var(--accent);color:#fff;font-weight:600}
-.tbtn.pri:hover,.cta:hover{opacity:.88}
+.tbtn.pri,.cta{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 4px rgba(0,113,227,.28)}
+.tbtn.pri:hover,.cta:hover{background:var(--accent-d);box-shadow:0 3px 10px rgba(0,113,227,.32)}
 .tbtn.icon{padding:8px 10px}
 .main{flex:1;min-width:0;min-height:0;overflow-y:scroll;overflow-x:hidden;scrollbar-gutter:stable;padding:26px 34px 52px 34px}
 .phead{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;margin-bottom:16px}
@@ -534,8 +541,10 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--mint)}
 .frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px}
 .mact{flex:none;display:flex;gap:10px;padding:13px 26px;align-items:center;background:var(--surface);border-top:1px solid var(--line)}
-.btn{font-family:inherit;font-size:14px;font-weight:500;padding:10px 20px;border-radius:10px;border:0;cursor:pointer}
-.btn-pri{background:var(--accent);color:#fff}.btn-sec{background:var(--chip);color:var(--ink)}.btn-danger{background:none;color:#e05656;margin-left:auto}
+.btn{font-family:inherit;font-size:14px;font-weight:500;padding:10px 20px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:background .15s,box-shadow .15s,border-color .15s}
+.btn-pri{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(0,113,227,.28)}.btn-pri:hover{background:var(--accent-d);box-shadow:0 3px 10px rgba(0,113,227,.32)}
+.btn-sec{background:var(--surface);color:var(--ink);border-color:var(--line)}.btn-sec:hover{background:var(--chip)}
+.btn-danger{background:none;color:var(--red);margin-left:auto}.btn-danger:hover{background:rgba(255,59,48,.10)}
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:var(--surface);padding:12px 22px;border-radius:14px;font-size:13.5px;font-weight:500;box-shadow:var(--shadow);opacity:0;transition:.3s;z-index:2000;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .foot{display:flex;justify-content:space-between;color:var(--ink3);font-size:11.5px;padding:22px 2px 0;margin-top:22px;border-top:1px solid var(--line2)}
@@ -566,7 +575,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .di:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
 @media(max-width:760px){.dock{left:8px;gap:5px}.di{width:33px;height:33px}.di-ic{width:31px;height:31px;border-radius:9px}.di-ic svg{width:16px;height:16px}.di-lbl{display:none}}
 /* ===== Supabase-style sidebar ===== */
-.nav{position:fixed;left:0;top:var(--topbar-h);bottom:0;z-index:90;width:210px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:10px 0;overflow:visible;transition:width .18s cubic-bezier(.32,.72,0,1)}
+.nav{position:fixed;left:0;top:var(--topbar-h);bottom:0;z-index:90;width:248px;background:var(--bg);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:0;overflow:visible;transition:width .22s cubic-bezier(.4,0,.2,1),box-shadow .22s ease}
 .nav-group{display:flex;flex-direction:column;gap:2px}
 .nav-spacer{flex:1}
 .nav-item{position:relative;display:flex;align-items:center;gap:11px;height:34px;margin:1px 8px;padding:0 9px;border-radius:8px;color:var(--ink2);cursor:pointer;background:none;border:0;font:inherit;font-size:13.5px;text-align:left;white-space:nowrap;overflow:hidden;transition:background .13s,color .13s}
@@ -578,18 +587,18 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .nav-badge{flex:none;font-family:var(--font-mono);font-size:10.5px;font-weight:600;color:var(--ink3);opacity:1;transition:opacity .13s}
 .nav-div{height:1px;background:var(--line2);margin:8px 16px}
 /* modes */
-.nav[data-mode="expanded"]{width:210px}
-.nav[data-mode="collapsed"]{width:54px}
+.nav[data-mode="expanded"]{width:248px}
+.nav[data-mode="collapsed"]{width:64px}
 .nav[data-mode="collapsed"] .nav-lbl,.nav[data-mode="collapsed"] .nav-badge{opacity:0}
 .nav[data-mode="collapsed"] .nav-item{overflow:visible}
-.nav[data-mode="hover"]{width:54px}
+.nav[data-mode="hover"]{width:64px}
 .nav[data-mode="hover"] .nav-lbl,.nav[data-mode="hover"] .nav-badge{opacity:0}
-.nav[data-mode="hover"]:hover{width:210px;box-shadow:6px 0 24px rgba(0,0,0,.10)}
+.nav[data-mode="hover"]:hover{width:248px;box-shadow:6px 0 28px rgba(0,0,0,.22)}
 .nav[data-mode="hover"]:hover .nav-lbl,.nav[data-mode="hover"]:hover .nav-badge{opacity:1}
 /* tooltip when labels are hidden */
 .nav[data-mode="collapsed"] .nav-item:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--ink);color:var(--surface);padding:5px 10px;border-radius:8px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow);z-index:6;pointer-events:none}
 /* mobile: force thin rail */
-@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:54px}.nav .nav-lbl,.nav .nav-badge,.nav .sb-txt{opacity:0}.content{padding-left:54px!important}.nav-pop{left:6px}.brand{width:54px}}
+@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:64px}.nav .nav-lbl,.nav .nav-badge,.nav .sb-txt{opacity:0}.content{padding-left:64px!important}.nav-pop{left:6px}.brand{width:64px}}
 .nav-pop{position:absolute;left:10px;bottom:52px;min-width:186px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;z-index:20}
 .nav-pop.open{display:block}
 .nav-pop-h{font-size:11px;font-weight:600;color:var(--ink3);padding:6px 10px 8px;border-bottom:1px solid var(--line2);margin-bottom:4px}
@@ -601,6 +610,53 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 [data-theme="dark"] .nav-item:hover,[data-theme="dark"] .nav-item.active,[data-theme="dark"] .nav-pop-i{color:var(--side-ink)}
 [data-theme="dark"] .nav-pop-i.on .nav-pop-dot{background:var(--side-ink)}
 [data-theme="dark"] .nav[data-mode="collapsed"] .nav-item:hover::after{background:var(--side-ink);color:var(--side)}
+/* ===== ported chrome: sidebar (AI-Recruiting reference) ===== */
+.sb-ws{height:58px;box-sizing:border-box;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid var(--line);flex:none}
+.ws-chip{display:flex;align-items:center;gap:11px;width:100%;padding:8px 6px;background:transparent;border:none;border-radius:8px;color:var(--ink);font-family:inherit;text-align:left;cursor:pointer;transition:background .15s}
+.ws-chip:hover{background:var(--mint)}
+.ws-iconbox{width:28px;height:28px;border-radius:8px;background:transparent;color:var(--accent);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ws-iconbox svg{width:20px;height:20px}
+.ws-text{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.ws-title{font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ws-sub{font-size:10px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ws-chevron{color:var(--ink3);flex-shrink:0;width:14px;height:14px}
+.sb-nav{padding:6px 0 8px;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-sep{height:1px;background:var(--line);margin:8px 12px}
+.sb-section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);padding:16px 22px 8px;white-space:nowrap;overflow:hidden}
+.sb-item{display:flex;align-items:center;gap:12px;padding:11px 22px;font-size:13.5px;color:var(--ink);font-weight:500;text-decoration:none;transition:background .15s,color .15s;position:relative;cursor:pointer;white-space:nowrap}
+.sb-item:hover{background:var(--mint);color:var(--ink)}
+.sb-item.active{background:var(--accent);color:#fff;font-weight:600}
+.sb-item.active::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent-d)}
+.sb-item svg{width:19px;height:19px;flex-shrink:0;opacity:.85;stroke-width:1.7}
+.sb-item.active svg{opacity:1;color:#fff}
+.sb-label{display:inline-block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:180px;opacity:1;transform:translateX(0);transition:max-width .24s cubic-bezier(.4,0,.2,1),opacity .2s ease .03s,transform .24s cubic-bezier(.4,0,.2,1)}
+.sb-badge{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:999px;background:var(--accent);color:#fff;min-width:18px;text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px var(--bg)}
+.sb-item.active .sb-badge{background:#fff;color:var(--accent)}
+.sb-pin{display:flex;align-items:center;gap:12px;width:100%;padding:9px 22px;box-sizing:border-box;min-height:37px;background:none;border:none;cursor:pointer;color:var(--ink);opacity:.6;font-family:inherit;font-size:12.5px;text-align:left;white-space:nowrap;transition:opacity .15s}
+.sb-pin:hover{opacity:1}
+.sb-pin svg{flex-shrink:0;width:18px;height:18px}
+.sb-footer{padding:12px 16px;border-top:1px solid var(--line);margin-top:auto;min-height:64px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;flex:none}
+.sb-user{display:flex;align-items:center;gap:8px;padding:4px 0}
+.sb-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5ac8fa,#0071e3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 0 1px var(--line)}
+.sb-uname{font-size:11.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-urole{font-size:9.5px;color:var(--ink3);display:inline-flex;align-items:center;gap:5px}
+.sb-urole::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px rgba(40,205,65,.5);animation:sbLivePulse 2s infinite;flex:none}
+#syncBadge.off .sb-urole::before,.sb-urole.off::before{background:var(--red);box-shadow:0 0 5px rgba(255,59,48,.5)}
+@keyframes sbLivePulse{0%,100%{opacity:1}50%{opacity:.4}}
+.sb-logout{color:var(--ink3);background:none;border:0;cursor:pointer;display:flex;padding:4px;border-radius:6px;flex:none}
+.sb-logout:hover{color:var(--ink);background:var(--hover)}
+.sb-logout svg{width:15px;height:15px}
+/* rail state (collapsed / hover-not-hovered) */
+#nav[data-mode="collapsed"] .sb-label,#nav[data-mode="hover"]:not(:hover) .sb-label{max-width:0;opacity:0;transform:translateX(-8px)}
+#nav[data-mode="collapsed"] .sb-section,#nav[data-mode="hover"]:not(:hover) .sb-section{opacity:0;height:10px;padding:0;pointer-events:none}
+#nav[data-mode="collapsed"] .sb-sep,#nav[data-mode="hover"]:not(:hover) .sb-sep{margin:6px 18px}
+#nav[data-mode="collapsed"] .ws-text,#nav[data-mode="collapsed"] .ws-chevron,#nav[data-mode="hover"]:not(:hover) .ws-text,#nav[data-mode="hover"]:not(:hover) .ws-chevron,#nav[data-mode="collapsed"] .sb-pin-label,#nav[data-mode="hover"]:not(:hover) .sb-pin-label,#nav[data-mode="collapsed"] .sb-user>div:not(.sb-avatar),#nav[data-mode="collapsed"] .sb-logout,#nav[data-mode="hover"]:not(:hover) .sb-user>div:not(.sb-avatar),#nav[data-mode="hover"]:not(:hover) .sb-logout{display:none}
+#nav[data-mode="collapsed"] .sb-user,#nav[data-mode="hover"]:not(:hover) .sb-user,#nav[data-mode="collapsed"] .ws-chip,#nav[data-mode="hover"]:not(:hover) .ws-chip,#nav[data-mode="collapsed"] .sb-pin,#nav[data-mode="hover"]:not(:hover) .sb-pin{justify-content:center}
+#nav[data-mode="collapsed"] .sb-ws,#nav[data-mode="hover"]:not(:hover) .sb-ws,#nav[data-mode="collapsed"] .ws-chip,#nav[data-mode="hover"]:not(:hover) .ws-chip{padding:0}
+#nav[data-mode="collapsed"] .ws-iconbox,#nav[data-mode="hover"]:not(:hover) .ws-iconbox{border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+#nav[data-mode="collapsed"] .sb-badge,#nav[data-mode="hover"]:not(:hover) .sb-badge{position:absolute;top:8px;left:34px;min-width:0;width:9px;height:9px;padding:0;font-size:0;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px var(--bg)}
+[data-theme="dark"] .sb-item:hover,[data-theme="dark"] .ws-chip:hover .ws-title,[data-theme="dark"] .sb-uname{color:var(--side-ink)}
 /* ===== sidebar accordion (sub-views) ===== */
 .nav-acc{display:flex;flex-direction:column}
 .nav-sub{display:flex;flex-direction:column;gap:1px;margin:1px 8px 4px}
@@ -723,49 +779,58 @@ body.locked{overflow:hidden}
 <div class="di" data-tip="ตั้งค่า" data-tab="settings"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="di-lbl">ตั้งค่า</span></div>
 </aside>
   -->
-  <!-- ===== SUPABASE-STYLE SIDEBAR ===== -->
-  <aside class="nav" id="nav" data-mode="hover">
-    <div class="nav-group">
-      <div class="nav-acc" data-tab="project">
-        <a class="nav-item nav-acc-hd" data-tab="project" data-tip="Project Oracle"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg></span><span class="nav-lbl">Project Oracle</span></a>
-        <div class="nav-sub">
-          <a class="nav-subitem" data-tab="project" data-pv="impl">แผนงาน (Implementation)</a>
-          <a class="nav-subitem" data-tab="project" data-pv="reqs">ความต้องการ (Requirements)</a>
-          <a class="nav-subitem" data-tab="project" data-pv="action">Action Item</a>
-        </div>
-      </div>
-      <div class="nav-acc" data-tab="bridge">
-        <a class="nav-item nav-acc-hd" data-tab="bridge" data-tip="Project Automation"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg></span><span class="nav-lbl">Project Automation</span></a>
-        <div class="nav-sub">
-          <a class="nav-subitem" data-tab="bridge" data-bv="timeline">แผนงาน (Timeline)</a>
-          <a class="nav-subitem" data-tab="bridge" data-bv="table">วิเคราะห์ FTE</a>
-        </div>
+  <!-- ===== SIDEBAR (AI-Recruiting chrome) ===== -->
+  <aside class="nav sidebar" id="nav" data-mode="hover">
+    <div class="sb-ws">
+      <button class="ws-chip" type="button" onclick="showTab('project')" title="Civil ERP · Oracle Netsuite">
+        <span class="ws-iconbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+        <span class="ws-text"><span class="ws-title">Civil ERP</span><span class="ws-sub">Oracle Netsuite</span></span>
+        <svg class="ws-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Oracle</div>
+      <a class="sb-item" data-tab="project" data-pv="impl" data-tip="แผนงาน (Implementation)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label">แผนงาน (Implementation)</span></a>
+      <a class="sb-item" data-tab="project" data-pv="reqs" data-tip="ความต้องการ (Requirements)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span class="sb-label">ความต้องการ (Requirements)</span></a>
+      <a class="sb-item" data-tab="project" data-pv="action" data-tip="Action Item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="sb-label">Action Item</span></a>
+      <div class="sb-sep"></div>
+      <div class="sb-section">Automation</div>
+      <a class="sb-item" data-tab="bridge" data-bv="timeline" data-tip="แผนงาน (Timeline)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label">แผนงาน (Timeline)</span></a>
+      <a class="sb-item" data-tab="bridge" data-bv="table" data-tip="วิเคราะห์ FTE"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg><span class="sb-label">วิเคราะห์ FTE</span></a>
+      <div class="sb-sep"></div>
+      <div class="sb-section">ทั่วไป</div>
+      <a class="sb-item" data-tab="settings" data-tip="ตั้งค่า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="sb-label">ตั้งค่า</span></a>
+    </nav>
+    <div style="position:relative">
+      <button class="sb-pin" id="navCtrlBtn" onclick="toggleNavPop(event)" title="การแสดงแถบเมนู"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="sb-pin-label">การแสดงแถบเมนู</span></button>
+      <div class="nav-pop" id="navPop">
+        <div class="nav-pop-h">การแสดงแถบเมนู</div>
+        <button class="nav-pop-i" data-nm="expanded" onclick="setNavMode('expanded')"><span class="nav-pop-dot"></span>ขยายค้างไว้</button>
+        <button class="nav-pop-i" data-nm="collapsed" onclick="setNavMode('collapsed')"><span class="nav-pop-dot"></span>หุบเป็นแถบไอคอน</button>
+        <button class="nav-pop-i" data-nm="hover" onclick="setNavMode('hover')"><span class="nav-pop-dot"></span>ขยายเมื่อชี้เมาส์</button>
       </div>
     </div>
-    <div class="nav-spacer"></div>
-    <div class="nav-group nav-bottom">
-      <div class="nav-div"></div>
-      <a class="nav-item" data-tab="settings" data-tip="ตั้งค่า"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="nav-lbl">ตั้งค่า</span></a>
-      <button class="nav-item nav-ctrl" id="navCtrlBtn" data-tip="Sidebar control" onclick="toggleNavPop(event)"><span class="nav-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg></span><span class="nav-lbl">Sidebar control</span></button>
-      <div id="syncBadge"><span class="sb-dot"></span><span class="sb-txt">เชื่อมต่อแล้ว</span></div>
-      <div class="nav-pop" id="navPop">
-        <div class="nav-pop-h">Sidebar control</div>
-        <button class="nav-pop-i" data-nm="expanded" onclick="setNavMode('expanded')"><span class="nav-pop-dot"></span>Expanded</button>
-        <button class="nav-pop-i" data-nm="collapsed" onclick="setNavMode('collapsed')"><span class="nav-pop-dot"></span>Collapsed</button>
-        <button class="nav-pop-i" data-nm="hover" onclick="setNavMode('hover')"><span class="nav-pop-dot"></span>Expand on hover</button>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">CE</div>
+        <div style="overflow:hidden;flex:1">
+          <div class="sb-uname">Civil ERP Team</div>
+          <div class="sb-urole" id="syncBadge"><span class="sb-txt">เชื่อมต่อแล้ว</span></div>
+        </div>
+        <button class="sb-logout" onclick="if(confirm('ออกจากระบบ?'))erpLogout()" title="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
       </div>
     </div>
   </aside>
 
   <div class="content">
-    <div class="topbar"><div class="brand"><img class="brand-logo" src="SMALL_CIVIL_LOGO.png" alt="Civil ERP"><span class="brand-wm">Civil ERP</span></div><div class="crumb">Project Implementation <span style="color:var(--red);font-weight:700">Oracle</span> Netsuite - Civil Engineering / <b id="crumbNow">ภาพรวม</b></div><div class="projtabs" id="projToggle"><span class="pjt-thumb"></span>
+    <div class="topbar"><div class="brand"><img class="brand-logo" src="SMALL_CIVIL_LOGO.png" alt="Civil ERP"><span class="brand-wm">Civil ERP</span></div><div class="tb-title" id="crumbNow">ภาพรวม</div><div class="projtabs" id="projToggle"><span class="pjt-thumb"></span>
         <button class="pjt on" data-pv="impl" onclick="setProjView('impl')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Implementation)</button>
         <button class="pjt" data-pv="reqs" onclick="setProjView('reqs')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> ความต้องการ (Requirements)</button>
         <button class="pjt" data-pv="action" onclick="setProjView('action')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Action Item</button>
       </div><div class="projtabs" id="brToggle"><span class="pjt-thumb"></span>
         <button class="pjt on" data-bv="table" onclick="setBrView('table')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> วิเคราะห์ FTE</button>
         <button class="pjt" data-bv="timeline" onclick="setBrView('timeline')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Timeline)</button>
-      </div><div class="tsp"></div><button class="tbtn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt">นำเสนอ</span></button><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button><button class="tbtn pri" id="addActBtn" style="display:none" onclick="actAdd()">+ เพิ่ม Action Item</button><button class="tbtn pri" id="addBrBtn" style="display:none" onclick="brAddRow()">+ เพิ่มรายการ</button><button class="tbtn tbtn-logout" onclick="if(confirm('ออกจากระบบ?'))erpLogout()" title="ออกจากระบบ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>ออกจากระบบ</button></div>
+      </div><div class="tb-right"><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button><button class="tbtn pri" id="addActBtn" style="display:none" onclick="actAdd()">+ เพิ่ม Action Item</button><button class="tbtn pri" id="addBrBtn" style="display:none" onclick="brAddRow()">+ เพิ่มรายการ</button><button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button></div></div>
     <div class="main">
 
     <section class="panel active" id="overview">
@@ -1633,10 +1698,10 @@ function renderCockpit(){if(GCTX!=='pi')return;renderPhaseTimeline();var es=docu
 
 var curProjView='impl';var curBrView='timeline';
 function brMoveThumb(){var seg=document.getElementById('brToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
-function setBrView(bv){curBrView=bv;document.querySelectorAll('.nav-subitem').forEach(function(s){s.classList.toggle('active-sub',s.dataset.bv===bv);});var _cb=document.getElementById('crumbNow');if(_cb)_cb.textContent={table:'Automation · วิเคราะห์ FTE',timeline:'Automation · แผนงาน (Timeline)'}[bv]||'Automation';document.querySelectorAll('#brToggle .pjt').forEach(function(b){b.classList.toggle('on',b.dataset.bv===bv);});requestAnimationFrame(brMoveThumb);var t=document.getElementById('brTimeline'),fv=document.getElementById('brTableView');if(t)t.style.display=bv==='timeline'?'':'none';if(fv)fv.style.display=bv==='table'?'':'none';if(bv==='timeline'){setGanttCtx('ap');piSwitchView('timeline');piGanttHover();setTimeout(piHome,60);}else{setGanttCtx('pi');renderBridge();}syncTopAdd();}
+function setBrView(bv){curBrView=bv;document.querySelectorAll('.nav-subitem').forEach(function(s){s.classList.toggle('active-sub',s.dataset.bv===bv);});var _cb=document.getElementById('crumbNow');if(_cb)_cb.textContent={table:'Automation · วิเคราะห์ FTE',timeline:'Automation · แผนงาน (Timeline)'}[bv]||'Automation';document.querySelectorAll('#brToggle .pjt').forEach(function(b){b.classList.toggle('on',b.dataset.bv===bv);});requestAnimationFrame(brMoveThumb);var t=document.getElementById('brTimeline'),fv=document.getElementById('brTableView');if(t)t.style.display=bv==='timeline'?'':'none';if(fv)fv.style.display=bv==='table'?'':'none';if(bv==='timeline'){setGanttCtx('ap');piSwitchView('timeline');piGanttHover();setTimeout(piHome,60);}else{setGanttCtx('pi');renderBridge();}syncTopAdd();if(typeof updateNavActive==='function')updateNavActive();}
 function piMoveThumb(){var seg=document.getElementById('projToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
 function syncTopAdd(){var p=document.querySelector('.panel.active');p=p?p.id:'';var show={addReqBtn:false,addActBtn:false,addBrBtn:false};if(p==='project'){if(curProjView==='reqs')show.addReqBtn=true;else if(curProjView==='action')show.addActBtn=true;}else if(p==='bridge'){if(curBrView==='table')show.addBrBtn=true;}Object.keys(show).forEach(function(k){var b=document.getElementById(k);if(b)b.style.display=show[k]?'':'none';});}
-function setProjView(pv){curProjView=pv;document.querySelectorAll('.nav-subitem').forEach(s=>s.classList.toggle('active-sub',s.dataset.pv===pv));var _cb=document.getElementById('crumbNow');if(_cb)_cb.textContent={impl:'แผนงาน (Implementation)',reqs:'ความต้องการ (Requirements)',action:'Action Item'}[pv]||'โปรเจค';document.querySelectorAll('#projToggle .pjt').forEach(b=>b.classList.toggle('on',b.dataset.pv===pv));requestAnimationFrame(piMoveThumb);var im=document.getElementById('implement'),rq=document.getElementById('reqs'),ac=document.getElementById('actionView');if(im)im.style.display=pv==='impl'?'':'none';if(rq)rq.style.display=pv==='reqs'?'':'none';if(ac)ac.style.display=pv==='action'?'':'none';var vt=document.getElementById('piViewTabs');if(vt)vt.style.display=pv==='impl'?'':'none';var rb=document.getElementById('projRibbon');if(rb)rb.style.display=pv==='impl'?'':'none';var rb2=document.getElementById('reqRibbon');if(rb2)rb2.style.display=pv==='reqs'?'':'none';syncTopAdd();if(pv==='impl'){renderPI();setTimeout(piHome,90);}else if(pv==='reqs'){renderAll();}else if(pv==='action'){renderActs();}}
+function setProjView(pv){curProjView=pv;document.querySelectorAll('.nav-subitem').forEach(s=>s.classList.toggle('active-sub',s.dataset.pv===pv));var _cb=document.getElementById('crumbNow');if(_cb)_cb.textContent={impl:'แผนงาน (Implementation)',reqs:'ความต้องการ (Requirements)',action:'Action Item'}[pv]||'โปรเจค';document.querySelectorAll('#projToggle .pjt').forEach(b=>b.classList.toggle('on',b.dataset.pv===pv));requestAnimationFrame(piMoveThumb);var im=document.getElementById('implement'),rq=document.getElementById('reqs'),ac=document.getElementById('actionView');if(im)im.style.display=pv==='impl'?'':'none';if(rq)rq.style.display=pv==='reqs'?'':'none';if(ac)ac.style.display=pv==='action'?'':'none';var vt=document.getElementById('piViewTabs');if(vt)vt.style.display=pv==='impl'?'':'none';var rb=document.getElementById('projRibbon');if(rb)rb.style.display=pv==='impl'?'':'none';var rb2=document.getElementById('reqRibbon');if(rb2)rb2.style.display=pv==='reqs'?'':'none';syncTopAdd();if(pv==='impl'){renderPI();setTimeout(piHome,90);}else if(pv==='reqs'){renderAll();}else if(pv==='action'){renderActs();}if(typeof updateNavActive==='function')updateNavActive();}
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};PIMPL.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);if(!a||!b)return;if(!phs[d.ph])phs[d.ph]={a:a,b:b};if(a<phs[d.ph].a)phs[d.ph].a=a;if(b>phs[d.ph].b)phs[d.ph].b=b;});
@@ -1646,10 +1711,10 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+' · อีก '+Math.max(0,Math.ceil((_nm.e-now)/86400000))+' วัน'):'ไม่มี milestone ข้างหน้า';
   el.innerHTML=[c('เฟสปัจจุบัน',curPh,'จากแผนงาน',PI_PHC[curPhKey]||''),c('สถานะเฟส',_pstat,_psub,_pcol),c('Milestone ถัดไป',_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'กำหนดขึ้นระบบจริง','#c79200')].join('');}
-function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});}
-document.querySelectorAll('.nav-item[data-tab]').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
-document.querySelectorAll('.nav-subitem').forEach(function(s){s.onclick=function(){var tab=s.dataset.tab,cur=document.querySelector('.panel.active');cur=cur?cur.id:'';if(tab!==cur){if(s.dataset.pv)curProjView=s.dataset.pv;else if(s.dataset.bv)curBrView=s.dataset.bv;showTab(tab);}else{if(s.dataset.pv)setProjView(s.dataset.pv);else if(s.dataset.bv)setBrView(s.dataset.bv);}};});
-function applyNavMode(m){m=(m==='expanded'||m==='collapsed'||m==='hover')?m:'hover';var nav=document.getElementById('nav');if(nav)nav.dataset.mode=m;var app=document.getElementById('app');if(app)app.style.setProperty('--nav-w',m==='expanded'?'210px':'54px');document.querySelectorAll('#navPop .nav-pop-i').forEach(function(b){b.classList.toggle('on',b.dataset.nm===m);});}
+function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
+function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});}
+document.querySelectorAll('.sb-item').forEach(function(el){el.onclick=function(){var tab=el.dataset.tab,pv=el.dataset.pv,bv=el.dataset.bv,cur=(document.querySelector('.panel.active')||{}).id||'';if(pv){if(tab!==cur){curProjView=pv;showTab(tab);}else{setProjView(pv);}}else if(bv){if(tab!==cur){curBrView=bv;showTab(tab);}else{setBrView(bv);}}else{showTab(tab);}};});
+function applyNavMode(m){m=(m==='expanded'||m==='collapsed'||m==='hover')?m:'hover';var nav=document.getElementById('nav');if(nav)nav.dataset.mode=m;var app=document.getElementById('app');if(app)app.style.setProperty('--nav-w',m==='expanded'?'248px':'64px');document.querySelectorAll('#navPop .nav-pop-i').forEach(function(b){b.classList.toggle('on',b.dataset.nm===m);});}
 function setNavMode(m){try{localStorage.setItem('erp_nav_mode',m);}catch(e){}applyNavMode(m);var p=document.getElementById('navPop');if(p)p.classList.remove('open');}
 applyNavMode((function(){try{return localStorage.getItem('erp_nav_mode');}catch(e){return null;}})()||'hover');
 function toggleNavPop(e){if(e){e.stopPropagation();}var p=document.getElementById('navPop');if(p)p.classList.toggle('open');}
