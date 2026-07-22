@@ -626,7 +626,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .sb-nav{padding:6px 0 8px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .sb-nav::-webkit-scrollbar{display:none}
 .sb-sep{height:1px;background:var(--line);margin:8px 12px}
-.sb-section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);padding:16px 22px 8px;white-space:nowrap;overflow:hidden}
+.sb-section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);padding:16px 22px 8px;white-space:nowrap;overflow:hidden;transition:color .18s ease}
 .sb-item{display:flex;align-items:center;gap:12px;padding:11px 22px;font-size:13.5px;color:var(--ink);font-weight:500;text-decoration:none;transition:background .15s,color .15s;position:relative;cursor:pointer;white-space:nowrap}
 .sb-item:hover{background:var(--mint);color:var(--ink)}
 .sb-item.active{background:var(--accent);color:#fff;font-weight:600}
@@ -652,8 +652,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .sb-logout svg{width:15px;height:15px}
 /* rail state (collapsed / hover-not-hovered) */
 #nav[data-mode="collapsed"] .sb-label,#nav[data-mode="hover"]:not(:hover) .sb-label{max-width:0;opacity:0;transform:translateX(-8px)}
-#nav[data-mode="collapsed"] .sb-section,#nav[data-mode="hover"]:not(:hover) .sb-section{opacity:0;height:10px;padding:0;pointer-events:none}
-#nav[data-mode="collapsed"] .sb-sep,#nav[data-mode="hover"]:not(:hover) .sb-sep{margin:6px 18px}
+#nav[data-mode="collapsed"] .sb-section,#nav[data-mode="hover"]:not(:hover) .sb-section{color:transparent;pointer-events:none}
 #nav[data-mode="collapsed"] .ws-text,#nav[data-mode="collapsed"] .ws-chevron,#nav[data-mode="hover"]:not(:hover) .ws-text,#nav[data-mode="hover"]:not(:hover) .ws-chevron,#nav[data-mode="collapsed"] .sb-pin-label,#nav[data-mode="hover"]:not(:hover) .sb-pin-label,#nav[data-mode="collapsed"] .sb-user>div:not(.sb-avatar),#nav[data-mode="collapsed"] .sb-logout,#nav[data-mode="hover"]:not(:hover) .sb-user>div:not(.sb-avatar),#nav[data-mode="hover"]:not(:hover) .sb-logout{display:none}
 #nav[data-mode="collapsed"] .sb-user,#nav[data-mode="hover"]:not(:hover) .sb-user,#nav[data-mode="collapsed"] .ws-chip,#nav[data-mode="hover"]:not(:hover) .ws-chip,#nav[data-mode="collapsed"] .sb-pin,#nav[data-mode="hover"]:not(:hover) .sb-pin{justify-content:center}
 #nav[data-mode="collapsed"] .sb-ws,#nav[data-mode="hover"]:not(:hover) .sb-ws,#nav[data-mode="collapsed"] .ws-chip,#nav[data-mode="hover"]:not(:hover) .ws-chip{padding:0}
