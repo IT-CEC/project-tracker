@@ -578,7 +578,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .di:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
 @media(max-width:760px){.dock{left:8px;gap:5px}.di{width:33px;height:33px}.di-ic{width:31px;height:31px;border-radius:9px}.di-ic svg{width:16px;height:16px}.di-lbl{display:none}}
 /* ===== Supabase-style sidebar ===== */
-.nav{position:fixed;left:0;top:var(--topbar-h);bottom:0;z-index:90;width:248px;background:var(--bg);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:0;overflow:visible;transition:width .22s cubic-bezier(.4,0,.2,1),box-shadow .22s ease}
+.nav{position:fixed;left:0;top:var(--topbar-h);bottom:0;height:auto;z-index:90;width:248px;background:var(--bg);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:0;overflow:visible;transition:width .22s cubic-bezier(.4,0,.2,1),box-shadow .22s ease}
 .nav-group{display:flex;flex-direction:column;gap:2px}
 .nav-spacer{flex:1}
 .nav-item{position:relative;display:flex;align-items:center;gap:11px;height:34px;margin:1px 8px;padding:0 9px;border-radius:8px;color:var(--ink2);cursor:pointer;background:none;border:0;font:inherit;font-size:13.5px;text-align:left;white-space:nowrap;overflow:hidden;transition:background .13s,color .13s}
@@ -623,7 +623,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .ws-title{font-size:12.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ws-sub{font-size:10px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ws-chevron{color:var(--ink3);flex-shrink:0;width:14px;height:14px}
-.sb-nav{padding:6px 0 8px;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+.sb-nav{padding:6px 0 8px;flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
 .sb-nav::-webkit-scrollbar{display:none}
 .sb-sep{height:1px;background:var(--line);margin:8px 12px}
 .sb-section{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ink2);padding:16px 22px 8px;white-space:nowrap;overflow:hidden}
