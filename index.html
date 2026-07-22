@@ -72,7 +72,9 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .topbar .crumb{font-size:13px;color:var(--ink);font-weight:700}.topbar .crumb b{color:var(--ink);font-weight:600}
 .brand{flex:none;width:var(--nav-w,64px);height:100%;display:flex;align-items:center;gap:11px;padding-left:16px;border-right:1px solid var(--line);overflow:hidden;transition:width .18s cubic-bezier(.32,.72,0,1)}
 .brand-logo{width:26px;height:26px;flex:none;object-fit:contain}
-.brand-wm{font-weight:700;font-size:14px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap}
+.brand-wm{font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--ink);white-space:nowrap;transition:opacity .13s}
+.app:has(#nav[data-mode="collapsed"]) .brand-wm,.app:has(#nav[data-mode="hover"]:not(:hover)) .brand-wm{opacity:0;pointer-events:none}
+.app:has(#nav[data-mode="hover"]:hover) .brand{width:248px}
 .topbar .tsp{flex:1}
 .tbtn{border:0;background:var(--chip);color:var(--ink);font-family:inherit;font-size:12.5px;font-weight:500;padding:8px 13px;border-radius:9px;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:6px}
 .tbtn-logout:hover{background:rgba(255,59,48,.12);color:var(--red)}
@@ -781,13 +783,6 @@ body.locked{overflow:hidden}
   -->
   <!-- ===== SIDEBAR (AI-Recruiting chrome) ===== -->
   <aside class="nav sidebar" id="nav" data-mode="hover">
-    <div class="sb-ws">
-      <button class="ws-chip" type="button" onclick="showTab('project')" title="Civil ERP · Oracle Netsuite">
-        <span class="ws-iconbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
-        <span class="ws-text"><span class="ws-title">Civil ERP</span><span class="ws-sub">Oracle Netsuite</span></span>
-        <svg class="ws-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-    </div>
     <nav class="sb-nav">
       <div class="sb-section">Oracle</div>
       <a class="sb-item" data-tab="project" data-pv="impl" data-tip="แผนงาน (Implementation)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label">แผนงาน (Implementation)</span></a>
@@ -1713,7 +1708,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   el.innerHTML=[c('เฟสปัจจุบัน',curPh,'จากแผนงาน',PI_PHC[curPhKey]||''),c('สถานะเฟส',_pstat,_psub,_pcol),c('Milestone ถัดไป',_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'กำหนดขึ้นระบบจริง','#c79200')].join('');}
 function showTab(id){document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));const cb=document.getElementById('crumbNow');if(cb)cb.textContent=CRUMB[id]||id;var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
 function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});}
-document.querySelectorAll('.sb-item').forEach(function(el){el.onclick=function(){var tab=el.dataset.tab,pv=el.dataset.pv,bv=el.dataset.bv,cur=(document.querySelector('.panel.active')||{}).id||'';if(pv){if(tab!==cur){curProjView=pv;showTab(tab);}else{setProjView(pv);}}else if(bv){if(tab!==cur){curBrView=bv;showTab(tab);}else{setBrView(bv);}}else{showTab(tab);}};});
+document.querySelectorAll('.sb-item').forEach(function(el){el.title=el.dataset.tip||'';el.onclick=function(){var tab=el.dataset.tab,pv=el.dataset.pv,bv=el.dataset.bv,cur=(document.querySelector('.panel.active')||{}).id||'';if(pv){if(tab!==cur){curProjView=pv;showTab(tab);}else{setProjView(pv);}}else if(bv){if(tab!==cur){curBrView=bv;showTab(tab);}else{setBrView(bv);}}else{showTab(tab);}};});
 function applyNavMode(m){m=(m==='expanded'||m==='collapsed'||m==='hover')?m:'hover';var nav=document.getElementById('nav');if(nav)nav.dataset.mode=m;var app=document.getElementById('app');if(app)app.style.setProperty('--nav-w',m==='expanded'?'248px':'64px');document.querySelectorAll('#navPop .nav-pop-i').forEach(function(b){b.classList.toggle('on',b.dataset.nm===m);});}
 function setNavMode(m){try{localStorage.setItem('erp_nav_mode',m);}catch(e){}applyNavMode(m);var p=document.getElementById('navPop');if(p)p.classList.remove('open');}
 applyNavMode((function(){try{return localStorage.getItem('erp_nav_mode');}catch(e){return null;}})()||'hover');
