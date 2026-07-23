@@ -2226,9 +2226,7 @@ function renderBrKpi(){if(!BR.length)return;
   var bk=document.getElementById('brKpi');if(!bk)return;
   bk.innerHTML=card('#2e6fd6',IC.layers,'กระบวนการทั้งหมด',n,'รายการ',ctrl+' ควบคุม · '+man+' เสริมมือ',false)
     +card('#1e8e4a',IC.trend,'ศักยภาพประหยัดแรงงาน',totFte.toFixed(2),'FTE/ปี','≈ '+ppl+' คนเต็มเวลา/ปี',true)
-    +card('#0d9488',IC.money,'มูลค่าที่ประหยัด','฿'+baht.toLocaleString(),'/ปี','ที่ '+(typeof FTE_COST!=='undefined'?FTE_COST.toLocaleString():'—')+' ฿/FTE',false)
-    +card('#d98a0b',IC.clock,'ชั่วโมงคนต่อปี',totHrs.toLocaleString(),'ชม.','≈ '+fteEq+' FTE เทียบเท่า',false)
-    +card('#6d4bd0',IC.act,'ความคืบหน้า',avgP,'%',rollSub,false);}
+    +card('#d98a0b',IC.clock,'ชั่วโมงคนต่อปี',totHrs.toLocaleString(),'ชม.','≈ '+fteEq+' FTE เทียบเท่า',false);}
 function renderBrTable(){if(!BR.length)return;
   var rows=filteredBr();var TYPES=[...new Set(BR.map(function(x){return x.type;}).filter(Boolean))];var CPLX=[...new Set(BR.map(function(x){return x.cplx;}).filter(Boolean))];if(!CPLX.length)CPLX=['Low','Medium','High'];var cnt=document.getElementById('brCount');if(cnt)cnt.innerHTML=(rows.length!==BR.length)?('แสดง <b>'+rows.length+'</b> / '+BR.length):'';
   var tb=document.querySelector('#brTable tbody');if(tb)tb.innerHTML=rows.map(b=>{var riskc=brRiskVal(b)==='High'?'<span class="chip" style="background:var(--red)1a;color:#ff3b30">High</span>':'<span class="chip" style="background:#28cd411a;color:#28cd41">Safe</span>';
