@@ -1637,7 +1637,7 @@ function renderActTable(){var rows=filteredActs();var tb=document.querySelector(
 function renderActs(){renderActKpi();renderActTable();}
 function actEdit(id,f,val){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;a[f]=val;actSaveOne(a);renderActs();if(window.toast)toast(T('saved'));}
 function actBind(){['actCat','actStatus','actStatus2','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderActTable);});document.querySelectorAll('#actTable th[data-asort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.asort;if(actSortK===k)actSortD=-actSortD;else{actSortK=k;actSortD=1;}renderActTable();};});}
-function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var st=a.status||'Not Started';
+function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var st=a.status||'Not Started',st2=a.status2||'Not Started';
   document.getElementById('mTitle').textContent='Action #'+a._id+(a.cat?' · '+a.cat:'');
   document.getElementById('mSub').textContent=(a.dept||'').replace(/\n/g,' ');
   var opt=function(cur,arr){return arr.map(function(x){return '<option '+(x===cur?'selected':'')+'>'+x+'</option>';}).join('');};
@@ -1645,10 +1645,14 @@ function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)retu
     <div class="dtwo">
       <div class="dleft">
         <div id="actStep" class="stepper"></div>
-        <div class="frow"><div class="fld"><label>สถานะ</label><select id="ea_status" onchange="actPaintStep(this.value)">${opt(st,ACT_STATUS)}</select></div><div class="fld"><label>Priority</label><select id="ea_pri">${opt(a.pri||'Low',['High','Low'])}</select></div></div>
+        <div class="frow"><div class="fld"><label>Priority</label><select id="ea_pri">${opt(a.pri||'Low',['High','Low'])}</select></div><div class="fld"><label>ผู้รับผิดชอบ</label><input id="ea_owner" value="${attr((a.owner||'').replace(/\n/g,' '))}"></div></div>
         <div class="frow"><div class="fld"><label>กำหนดส่ง (dd/mm/yyyy)</label><input id="ea_due" value="${attr(a.due||'')}"></div><div class="fld"><label>วันที่เสร็จ</label><input id="ea_done" value="${attr(a.done||'')}"></div></div>
-        <div class="fld"><label>ผู้รับผิดชอบ</label><input id="ea_owner" value="${attr((a.owner||'').replace(/\n/g,' '))}"></div>
-        <div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea id="ea_note" style="min-height:64px">${esc(a.note||'')}</textarea></div>
+        <div class="dsec">Civil</div>
+        <div class="fld"><label>Work Status</label><select id="ea_status" onchange="actPaintStep(this.value)">${opt(st,ACT_STATUS)}</select></div>
+        <div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea id="ea_note" style="min-height:56px">${esc(a.note||'')}</textarea></div>
+        <div class="dsec">PS Global</div>
+        <div class="fld"><label>Work Status</label><select id="ea_status2">${opt(st2,ACT_STATUS)}</select></div>
+        <div class="fld"><label>หมายเหตุ / ติดตาม</label><textarea id="ea_note2" style="min-height:56px">${esc(a.note2||'')}</textarea></div>
         ${a.cat?`<div class="srcline">หมวด: ${esc(a.cat)}</div>`:''}
       </div>
       <div class="dright">
@@ -1671,7 +1675,7 @@ function actPaintStep(sv){var el=document.getElementById('actStep');if(!el)retur
 function actReqToggle(id){var ta=document.getElementById('actReqTa'),vw=document.getElementById('actReqView'),btn=document.getElementById('actReqBtn');if(!ta||!vw)return;
   if(ta.style.display==='none'){vw.style.display='none';ta.style.display='block';if(btn)btn.innerHTML='<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> เสร็จ';autoGrow(ta);ta.focus();}
   else{vw.innerHTML=fmtReq(ta.value)||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';ta.style.display='none';vw.style.display='block';if(btn)btn.innerHTML='<svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข';}}
-function actSave(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var g=function(k){var el=document.getElementById(k);return el?el.value:undefined;};a.status=g('ea_status');a.pri=g('ea_pri');a.due=g('ea_due');a.done=g('ea_done');a.owner=g('ea_owner');a.note=g('ea_note');a.action=g('actReqTa');actSaveOne(a);renderActs();closeModal();if(window.toast)toast(T('saved'));}
+function actSave(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var g=function(k){var el=document.getElementById(k);return el?el.value:undefined;};a.status=g('ea_status');a.status2=g('ea_status2');a.pri=g('ea_pri');a.due=g('ea_due');a.done=g('ea_done');a.owner=g('ea_owner');a.note=g('ea_note');a.note2=g('ea_note2');a.action=g('actReqTa');actSaveOne(a);renderActs();closeModal();if(window.toast)toast(T('saved'));}
 function actAdd(){var nid=ACTS.reduce(function(m,a){return Math.max(m,a._id||0);},0)+1;var a={_id:nid,cat:'',dept:'',action:'รายการใหม่',pri:'Low',owner:'',due:'',status:'Not Started',status2:'Not Started',done:'',note:'',note2:''};ACTS.push(a);actNorm();actSaveOne(a);fillActFilters();renderActs();openAct(nid);}
 function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!confirm('ลบ Action #'+id+' ?'))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
 
