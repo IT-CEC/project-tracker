@@ -199,7 +199,7 @@ Firestore collection ใหม่ `report_levels` — per-item document, doc id 
 - **ไม่มี** dashboard ความพร้อม / gauge ความครบของข้อมูล — เมนูนี้เล่าเรื่องแคตาล็อก ไม่ใช่เรื่อง gap
 - **ไม่มี** โหมดพรีเซ้นเต็มจอเฉพาะทาง — แอปมีปุ่ม fullscreen อยู่แล้ว
 - ไม่ import ไฟล์ `.xlsx` ในแอป — seed ครั้งเดียวตอน deploy
-- ไฟล์ `.xlsx` ต้นทางไม่ commit เข้า repo (สอดคล้องกับที่ไม่ commit seed จริงตาม CLAUDE.md ข้อ 8)
+- `seed/report_levels.json` commit เข้า repo ตามแบบ `seed/action_items.json` (`.gitignore` กันเฉพาะ `seed/*.local.json`) ส่วนไฟล์ `.xlsx` ต้นทางไม่ commit
 
 ## การตรวจสอบ
 
