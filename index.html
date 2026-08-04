@@ -2950,6 +2950,52 @@ function rptBind(){
   ['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderRptTable);});
   document.querySelectorAll('#rptTable th[data-rsort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.rsort;if(rptSortK===k)rptSortD=-rptSortD;else{rptSortK=k;rptSortD=1;}renderRptTable();};});
 }
+function openRpt(id){
+  var r=RPTS.find(function(x){return x._id===id;});if(!r)return;
+  var opt=function(cur,arr){return arr.map(function(x){return '<option '+(x===cur?'selected':'')+'>'+esc(String(x))+'</option>';}).join('');};
+  var lvOpts=RPT_LV.slice();RPTS.forEach(function(x){if(x.level&&lvOpts.indexOf(x.level)<0)lvOpts.push(x.level);});
+  var dpOpts=rptDepts();if(r.dept&&dpOpts.indexOf(r.dept)<0)dpOpts.push(r.dept);
+  document.getElementById('mTitle').textContent='รายงาน #'+r._id+(r.dept?' · '+r.dept:'');
+  document.getElementById('mSub').textContent=[r.level,r.freq].filter(Boolean).join(' · ');
+  document.getElementById('mBody').innerHTML=`
+    <div class="dtwo">
+      <div class="dleft">
+        <div class="frow"><div class="fld"><label>แผนก</label><select id="er_dept">${opt(r.dept||'',dpOpts)}</select></div><div class="fld"><label>ระดับ</label><select id="er_level">${opt(r.level||'',lvOpts)}</select></div></div>
+        <div class="frow"><div class="fld"><label>ผู้ใช้หลัก</label><input id="er_user" value="${attr(r.user||'')}"></div><div class="fld"><label>ความถี่</label><input id="er_freq" value="${attr(r.freq||'')}"></div></div>
+        <div class="fld"><label>แหล่งข้อมูล (NetSuite)</label><input id="er_src" value="${attr(r.src||'')}"></div>
+        <div class="dsec">ตัวชี้วัด / ข้อมูลหลัก</div>
+        <div class="fld"><textarea id="er_kpi" style="min-height:64px">${esc(r.kpi||'')}</textarea></div>
+        <div class="dsec">ใช้ตัดสินใจอะไร</div>
+        <div class="fld"><textarea id="er_decide" style="min-height:64px">${esc(r.decide||'')}</textarea></div>
+      </div>
+      <div class="dright">
+        <div class="dsec dsec1">ชื่อรายงาน</div>
+        <div class="fld"><textarea id="er_name" style="min-height:56px">${esc(r.name||'')}</textarea></div>
+        <div class="dsec">ชื่อไฟล์ตัวอย่าง</div>
+        <div class="fld"><textarea id="er_sample" style="min-height:56px">${esc(r.sample||'')}</textarea></div>
+        <div class="dsec">กรณีไม่มีไฟล์ตัวอย่าง อยากเห็นข้อมูลอะไรบ้าง</div>
+        <div class="fld"><textarea id="er_want" style="min-height:88px">${esc(r.want||'')}</textarea></div>
+      </div>
+    </div>
+    <div class="mact"><button class="btn btn-pri" onclick="rptSave(${id})">${T('save')}</button><button class="btn btn-sec" onclick="closeModal()">${T('cancel')}</button><button class="btn btn-danger" onclick="rptDel(${id})">${T('delete')}</button></div>`;
+  document.getElementById('modal').classList.add('open');
+}
+function rptSave(id){
+  var r=RPTS.find(function(x){return x._id===id;});if(!r)return;
+  var g=function(k){var el=document.getElementById(k);return el?el.value:undefined;};
+  RPT_KEYS.forEach(function(k){var val=g('er_'+k);if(val!==undefined)r[k]=val;});
+  rptSaveOne(r);fillRptFilters();renderRpts();closeModal();if(window.toast)toast(T('saved'));
+}
+function rptAdd(){
+  var nid=RPTS.reduce(function(m,r){return Math.max(m,r._id||0);},0)+1;
+  var r={_id:nid,dept:(rptDepts()[0]||''),level:'Operational',name:'รายงานใหม่',user:'',freq:'',kpi:'',src:'',decide:'',sample:'',want:''};
+  RPTS.push(r);rptNorm();rptSaveOne(r);fillRptFilters();renderRpts();openRpt(nid);
+}
+function rptDel(id){
+  var r=RPTS.find(function(x){return x._id===id;});if(!r)return;
+  if(!confirm('ลบรายงาน #'+id+' ?'))return;
+  RPTS=RPTS.filter(function(x){return x._id!==id;});rptDelOne(id);fillRptFilters();renderRpts();closeModal();if(window.toast)toast('ลบแล้ว');
+}
 
 function fillAbout(){var el=document.getElementById('aboutStats');if(!el)return;var mods=new Set(REQS.map(function(r){return r.module;}));var subs=new Set(REQS.map(function(r){return (r.module||'')+'|'+(r.sub||'');}));el.textContent='Requirements '+REQS.length+' · กลุ่มงาน '+mods.size+' · กลุ่มงานย่อย '+subs.size+' · Automation 2026: '+BR.length+' กระบวนการ · ข้อมูลสด Firebase';}
 function subscribeReqs(){if(!window.DB)return;window.DB.subscribe(COL_REQ,function(docs){if(_reqFirst){_reqFirst=false;return;}REQS=docs;reqNorm();fillFilters();renderAll();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();fillAbout();});}
