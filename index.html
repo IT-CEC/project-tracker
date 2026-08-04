@@ -891,17 +891,24 @@ body.locked{overflow:hidden}
     </div>
     <style>
 .actkpi{display:flex;flex-direction:column;gap:8px;margin-top:2px}
-.actkrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.actkl{font-size:10.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;width:72px;flex:none;white-space:nowrap}
-.actk.actk-sp{visibility:hidden;pointer-events:none}
-.actk{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 16px;min-width:96px;box-shadow:var(--cardsh)}
-.actk.clk{cursor:pointer;transition:border-color .15s,transform .05s}
-.actk.clk:hover{border-color:var(--accent)}
-.actk-v{font-size:22px;font-weight:700;color:var(--ink);line-height:1}
-.actk-l{font-size:11.5px;color:var(--ink2);margin-top:4px}
+.mkpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.mkpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--cardsh);min-width:0}
+.mkpi.clk{cursor:pointer;transition:border-color .15s,background .15s}
+.mkpi.clk:hover{border-color:var(--accent)}
+.mkpi.on{border-color:var(--accent);background:var(--mint)}
+.mkpi-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.mkpi-ico svg{width:18px;height:18px}
+.mkpi-lab{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mkpi-val{font-size:30px;font-weight:700;color:var(--ink);line-height:1.15;margin-top:6px;font-variant-numeric:tabular-nums}
+.mkpi-cap{font-size:11px;color:var(--ink3);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mkpi-split{display:flex;gap:6px;margin-top:6px}
+.mkpi-half{flex:1;min-width:0;padding:4px 8px;margin:0 -2px;border-radius:10px;cursor:pointer;transition:background .15s}
+.mkpi-half:hover{background:var(--hover)}
+.mkpi-half.on{background:var(--mint)}
+.mkpi-half .mkpi-val{font-size:26px;margin-top:0}
+.mkpi-half .mkpi-cap{margin-top:3px}
 #actTable tr.act-over td{background:rgba(255,59,48,.06)}
 #actTable td.act-duered{color:#ff3b30;font-weight:600}
-.actk.on{border-color:var(--accent);background:var(--mint)}
 .mxnote{font-size:11px;color:var(--ink3);margin-top:8px}
 #rptTable td.rpt-empty{color:var(--ink3);opacity:.5}
 </style>
@@ -2275,6 +2282,9 @@ const RPT_LV_ALL=['Operational','Managerial','Executive','Managerial / Executive
 const RPT_LVC={'Operational':'#0071e3','Managerial':'#ff9500','Executive':'#5e5ce6'};
 const RPT_DEPTC={'HR':'#28cd41','FI':'#0071e3','MM':'#ff9500','PM':'#af52de','SD':'#ff3b30','PS':'#5e5ce6'};
 const RPT_FREQ=[['รายวัน','วัน'],['รายสัปดาห์','สัปดาห์'],['รายเดือน','เดือน'],['รายไตรมาส','ไตรมาส']];
+// นิยาม 3 ระดับจากไฟล์ต้นทาง — ใช้เป็นคำอธิบายใต้ตัวเลขบนการ์ด
+const RPT_LVCAP={'Operational':'หน้างานรายวัน','Managerial':'หัวหน้า/PM รายสัปดาห์-เดือน','Executive':'ผู้บริหาร รายเดือน-ไตรมาส'};
+const RPT_LVICO={'Operational':'activity','Managerial':'layers','Executive':'trend'};
 const RPT_KEYS=['dept','level','name','user','freq','kpi','src','decide','sample','want'];
 function rptBase(){return clone(RPT_SEED);}
 function rptNorm(){RPTS.sort(function(a,b){return (a._id||0)-(b._id||0);});RPTS.forEach(function(r){RPT_KEYS.forEach(function(k){if(r[k]==null)r[k]='';});});}
@@ -2829,26 +2839,55 @@ function fillActFilters(){setOpts('actCat',[...new Set(ACTS.map(a=>a.cat).filter
 function filteredActs(){var cs=vm('actCat'),sts=vm('actStatus'),st2s=vm('actStatus2'),prs=vm('actPri'),ows=vm('actOwner'),q=v('actSearch').toLowerCase().trim();
   var r=ACTS.filter(function(a){return (!cs.length||cs.includes(a.cat))&&(!sts.length||sts.includes(a.status||'Not Started'))&&(!st2s.length||st2s.includes(a.status2||'Not Started'))&&(!prs.length||prs.includes(a.pri))&&(!ows.length||ows.includes((a.owner||'').replace(/\n/g,' ').trim()))&&(!actFilt.overdue||actOverdue(a))&&(!actFilt.overdue2||actOverdue2(a))&&(!q||((a.action||'')+(a.dept||'')+(a.owner||'')+(a.note||'')+(a.note2||'')+(a.cat||'')).toLowerCase().includes(q));});
   if(actSortK){var k=actSortK;r=r.slice().sort(function(a,b){if(k==='_id')return ((a._id||0)-(b._id||0))*actSortD;if(k==='due'||k==='done')return ((actDue(a[k])||0)-(actDue(b[k])||0))*actSortD;return String(a[k]||'').localeCompare(String(b[k]||''),'th')*actSortD;});}return r;}
-function actClear(){actFilt.overdue=false;actFilt.overdue2=false;['actCat','actStatus','actStatus2','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderActTable();}
-function renderActKpi(){var el=document.getElementById('actKpi');if(!el)return;var tot=ACTS.length;
-  function n(f,st){return ACTS.filter(function(a){return (a[f]||'Not Started')===st;}).length;}
-  function c(lab,val,col,fn){return '<div class="actk clk" onclick="'+fn+'"><div class="actk-v"'+(col?' style="color:'+col+'"':'')+'>'+val+'</div><div class="actk-l">'+lab+'</div></div>';}
-  function row(lab,f,ovn,ovfn){return '<div class="actkrow"><span class="actkl">'+lab+'</span>'
-    +(f==='status'?c('ทั้งหมด',tot,'','actClear()'):'<div class="actk actk-sp"><div class="actk-v">'+tot+'</div><div class="actk-l">ทั้งหมด</div></div>')
-    +c('กำลังทำ',n(f,'In Process'),'#ff9500','actKfilter(&quot;'+f+'&quot;,&quot;In Process&quot;)')
-    +c('ยังไม่เริ่ม',n(f,'Not Started'),'#8e8e93','actKfilter(&quot;'+f+'&quot;,&quot;Not Started&quot;)')
-    +c('เสร็จแล้ว',n(f,'Done'),'#28cd41','actKfilter(&quot;'+f+'&quot;,&quot;Done&quot;)')
-    +c('เลยกำหนด',ovn,'#ff3b30',ovfn)+'</div>';}
-  el.innerHTML=row('Civil','status',ACTS.filter(actOverdue).length,'actKoverdue(&quot;status&quot;)')
-    +row('PS Global','status2',ACTS.filter(actOverdue2).length,'actKoverdue(&quot;status2&quot;)');}
-function actKfilter(f,st){var id=f==='status2'?'actStatus2':'actStatus';if(f==='status2')actFilt.overdue2=false;else actFilt.overdue=false;var e=document.getElementById(id);if(e){if(e.dataset.multi){if(!e._m)e._m=new Set();if(e._m.size===1&&e._m.has(st))e._m.clear();else{e._m.clear();e._m.add(st);}csSyncMulti(e);}else{e.value=(e.value===st?'':st);}}renderActTable();}
-function actKoverdue(f){if(f==='status2')actFilt.overdue2=!actFilt.overdue2;else actFilt.overdue=!actFilt.overdue;renderActTable();}
+function actClear(){actFilt.overdue=false;actFilt.overdue2=false;['actCat','actStatus','actStatus2','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderActs();}
+// ══ KPI card component (shared by Action Items + Report Levels) ══
+const KICO={
+  list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  play:'<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
+  circle:'<circle cx="12" cy="12" r="10"/>',
+  check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  alert:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  trend:'<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>'
+};
+function kIcon(name,col){var c=col||'#8e8e93';return '<div class="mkpi-ico" style="background:'+c+'1a;color:'+c+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(KICO[name]||KICO.circle)+'</svg></div>';}
+function kCard(o){
+  var vs=o.vcol?' style="color:'+o.vcol+'"':'';
+  var h='<div class="mkpi'+(o.fn?' clk':'')+(o.on?' on':'')+'"'+(o.fn?' onclick="'+o.fn+'"':'')+'>'+kIcon(o.ico,o.col)+'<div class="mkpi-lab">'+esc(o.lab)+'</div>';
+  if(o.split){h+='<div class="mkpi-split">'+o.split.map(function(s){
+      return '<div class="mkpi-half'+(s.on?' on':'')+'" onclick="'+s.fn+'"><div class="mkpi-val"'+vs+'>'+s.val+'</div><div class="mkpi-cap">'+esc(s.cap)+'</div></div>';
+    }).join('')+'</div>';}
+  else{h+='<div class="mkpi-val"'+vs+'>'+o.val+'</div><div class="mkpi-cap">'+esc(o.cap||'')+'</div>';}
+  return h+'</div>';
+}
+function renderActKpi(){var el=document.getElementById('actKpi');if(!el)return;
+  var n=function(f,st){return ACTS.filter(function(a){return (a[f]||'Not Started')===st;}).length;};
+  var selOf=function(f){return vm(f==='status2'?'actStatus2':'actStatus');};
+  var isOn=function(f,st){var s=selOf(f);return s.length===1&&s[0]===st;};
+  var pair=function(st){return [
+    {val:n('status',st),cap:'Civil',on:isOn('status',st),fn:'actKfilter(&quot;status&quot;,&quot;'+st+'&quot;)'},
+    {val:n('status2',st),cap:'PS Global',on:isOn('status2',st),fn:'actKfilter(&quot;status2&quot;,&quot;'+st+'&quot;)'}
+  ];};
+  var clean=(selOf('status').length===0&&selOf('status2').length===0&&!actFilt.overdue&&!actFilt.overdue2);
+  el.innerHTML='<div class="mkpi-grid">'
+    +kCard({ico:'list',col:'#8e8e93',lab:'ทั้งหมด · TOTAL',val:ACTS.length,cap:'Civil + PS Global',on:clean,fn:'actClear()'})
+    +kCard({ico:'play',col:'#ff9500',vcol:'#ff9500',lab:'กำลังทำ · IN PROCESS',split:pair('In Process')})
+    +kCard({ico:'circle',col:'#8e8e93',vcol:'#8e8e93',lab:'ยังไม่เริ่ม · NOT STARTED',split:pair('Not Started')})
+    +kCard({ico:'check',col:'#28cd41',vcol:'#28cd41',lab:'เสร็จแล้ว · DONE',split:pair('Done')})
+    +kCard({ico:'alert',col:'#ff3b30',vcol:'#ff3b30',lab:'เลยกำหนด · OVERDUE',split:[
+       {val:ACTS.filter(actOverdue).length,cap:'Civil',on:!!actFilt.overdue,fn:'actKoverdue(&quot;status&quot;)'},
+       {val:ACTS.filter(actOverdue2).length,cap:'PS Global',on:!!actFilt.overdue2,fn:'actKoverdue(&quot;status2&quot;)'}
+     ]})
+    +'</div>';}
+function actKfilter(f,st){var id=f==='status2'?'actStatus2':'actStatus';if(f==='status2')actFilt.overdue2=false;else actFilt.overdue=false;var e=document.getElementById(id);if(e){if(e.dataset.multi){if(!e._m)e._m=new Set();if(e._m.size===1&&e._m.has(st))e._m.clear();else{e._m.clear();e._m.add(st);}csSyncMulti(e);}else{e.value=(e.value===st?'':st);}}renderActs();}
+function actKoverdue(f){if(f==='status2')actFilt.overdue2=!actFilt.overdue2;else actFilt.overdue=!actFilt.overdue;renderActs();}
 function actChip(t,col){return t?'<span class="chip" style="background:'+col+'1f;color:'+col+'">'+esc(t)+'</span>':'';}
 function actStatusCell(a,f){var fd=f||'status',sv=a[fd]||'Not Started',cc=ACT_SC[sv]||'#8e8e93';return '<span class="stwrap" style="--sc:'+cc+'"><span class="stdot"></span><select class="selmini stsel" onclick="event.stopPropagation()" onchange="actEdit('+a._id+',&quot;'+fd+'&quot;,this.value)">'+ACT_STATUS.map(function(x){return '<option '+(x===sv?'selected':'')+'>'+x+'</option>';}).join('')+'</select></span>';}
 function renderActTable(){var rows=filteredActs();var tb=document.querySelector('#actTable tbody');if(!tb)return;tb.innerHTML=rows.map(function(a){var ov=actOverdue(a);return '<tr onclick="openAct('+a._id+')" style="cursor:pointer"'+(ov?' class="act-over"':'')+'><td class="muted">'+a._id+'</td><td>'+actChip(a.cat,ACT_CATC[a.cat]||'#8e8e93')+'</td><td><div class="truncate" style="max-width:290px;color:var(--ink)">'+esc((a.action||'').replace(/\n/g,' '))+'</div></td><td>'+actChip(a.pri,ACT_PRIC[a.pri]||'#8e8e93')+'</td><td><div class="truncate">'+esc((a.owner||'').replace(/\n/g,' '))+'</div></td><td class="'+(ov?'act-duered':'muted')+'">'+esc(a.due||'')+'</td><td class="muted">'+esc(a.done||'')+'</td><td>'+actStatusCell(a,'status')+'</td><td class="muted"><div class="truncate">'+esc((a.note||'').replace(/\n/g,' '))+'</div></td><td>'+actStatusCell(a,'status2')+'</td><td class="muted"><div class="truncate">'+esc((a.note2||'').replace(/\n/g,' '))+'</div></td></tr>';}).join('')||'<tr><td colspan="11" style="text-align:center;padding:40px" class="muted">ไม่พบรายการ</td></tr>';}
 function renderActs(){renderActKpi();renderActTable();}
 function actEdit(id,f,val){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;a[f]=val;actSaveOne(a);renderActs();if(window.toast)toast(T('saved'));}
-function actBind(){['actCat','actStatus','actStatus2','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderActTable);});document.querySelectorAll('#actTable th[data-asort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.asort;if(actSortK===k)actSortD=-actSortD;else{actSortK=k;actSortD=1;}renderActTable();};});}
+function actBind(){['actCat','actStatus','actStatus2','actPri','actOwner','actSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderActs);});document.querySelectorAll('#actTable th[data-asort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.asort;if(actSortK===k)actSortD=-actSortD;else{actSortK=k;actSortD=1;}renderActTable();};});}
 function openAct(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var st=a.status||'Not Started',st2=a.status2||'Not Started';
   document.getElementById('mTitle').textContent='Action #'+a._id+(a.cat?' · '+a.cat:'');
   document.getElementById('mSub').textContent=(a.dept||'').replace(/\n/g,' ');
@@ -2917,10 +2956,9 @@ function renderRptCards(){
   var el=document.getElementById('rptCards');if(!el)return;
   var nAll=RPTS.length,ls=vm('rptLevel');
   var cnt=function(l){return RPTS.filter(function(r){return rptLevels(r).indexOf(l)>=0;}).length;};
-  var card=function(lab,val,col,on,fn){return '<div class="actk clk'+(on?' on':'')+'" onclick="'+fn+'"><div class="actk-v"'+(col?' style="color:'+col+'"':'')+'>'+val+'</div><div class="actk-l">'+esc(lab)+'</div></div>';};
   var tl=RPT_LV.map(cnt);
-  var h='<div class="actkrow">'+card('ทั้งหมด',nAll,'',ls.length===0,'rptClear()');
-  RPT_LV.forEach(function(l,i){h+=card(l,tl[i],RPT_LVC[l]||'#8e8e93',ls.length===1&&ls[0]===l,'rptPickLv(&quot;'+l+'&quot;)');});
+  var h='<div class="mkpi-grid">'+kCard({ico:'list',col:'#8e8e93',lab:'ทั้งหมด · TOTAL',val:nAll,cap:rptDepts().length+' แผนก · นับไม่ซ้ำ',on:ls.length===0,fn:'rptClear()'});
+  RPT_LV.forEach(function(l,i){var c=RPT_LVC[l]||'#8e8e93';h+=kCard({ico:RPT_LVICO[l],col:c,vcol:c,lab:l,val:tl[i],cap:RPT_LVCAP[l]||'',on:ls.length===1&&ls[0]===l,fn:'rptPickLv(&quot;'+l+'&quot;)'});});
   h+='</div>';
   var multi=RPTS.filter(function(r){return rptLevels(r).length>1;}).length;
   if(multi)h+='<div class="mxnote">'+multi+' รายการครอบคลุมหลายระดับ จึงถูกนับซ้ำในการ์ดระดับ (รวม 3 ระดับ = '+tl.reduce(function(a,b){return a+b;},0)+' · รายงานทั้งหมด = '+nAll+')</div>';
