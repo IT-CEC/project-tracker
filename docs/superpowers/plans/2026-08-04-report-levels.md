@@ -368,6 +368,9 @@ git add index.html && git commit -m "feat(report): nav entry + empty report cata
 // ══ Report Levels — view ══
 let rptSortK='',rptSortD=1,rptSel={dept:'',lv:''};
 function rptChip(t,col){return t?'<span class="chip" style="background:'+col+'1f;color:'+col+'">'+esc(t)+'</span>':'';}
+// escape for a single-quoted JS string that sits inside a double-quoted HTML attribute (onclick)
+// attr() only guards `"` and is wrong here — a dept name containing an apostrophe would break the handler
+function rptJs(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 function fillRptFilters(){setOpts('rptDept',rptDepts(),'ทุกแผนก');setOpts('rptLevel',RPT_LV,'ทุกระดับ');setOpts('rptFreq',RPT_FREQ.map(function(p){return p[0];}),'ทุกความถี่');}
 function filteredRpts(){
   var ds=vm('rptDept'),ls=vm('rptLevel'),fs=vm('rptFreq'),q=v('rptSearch').toLowerCase().trim();
@@ -393,7 +396,7 @@ function renderRptMatrix(){
   RPT_LV.forEach(function(l){h+='<th class="mxh'+(!rptSel.dept&&rptSel.lv===l?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+l+'</th>';});
   h+='<th class="mxt">รวม</th></tr></thead><tbody>';
   depts.forEach(function(d){
-    var rs=RPTS.filter(function(r){return r.dept===d;}),da=attr(d);
+    var rs=RPTS.filter(function(r){return r.dept===d;}),da=rptJs(d);
     h+='<tr><th class="mxd'+(rptSel.dept===d&&!rptSel.lv?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+esc(d)+'</th>';
     RPT_LV.forEach(function(l){
       var n=cnt(rs,l),on=(rptSel.dept===d&&rptSel.lv===l);
@@ -489,7 +492,9 @@ o.emptyColspan=(function(){setSel('rptSearch','zzzznotfound');var td=document.qu
 return o;
 ```
 
-Expected: `cellPM_E:6` · `rowPS:14` · `colManag:37` · `afterClear` = `total` · `freqWeek:12` · `search:1` และ `searchId:"18"` · `emptyColspan:"7"` — และทุกค่าตรงกับ `o.expect` ตัวที่คู่กัน
+Expected: `cellPM_E:6` · `rowPS:14` · `colManag:37` · `afterClear` = `total` · `freqWeek:12` · `search:2` และ `searchId:"18"` · `emptyColspan:"7"` — และทุกค่าตรงกับ `o.expect` ตัวที่คู่กัน
+
+> คำค้น `AVAL` ตรง **2 รายการ** เพราะค้นครอบ 7 ฟิลด์ตาม §4 ของ spec — `#18` เจอใน `name`+`kpi` และ `#20` (รายงานตั๋วอาวัล/ตั๋วPN) เจอใน `kpi`+`decide` · `searchId` เป็น `"18"` เพราะเรียงตาม `_id`
 
 - [ ] **Step 6: Screenshot ตรวจสายตา**
 
@@ -655,7 +660,9 @@ Expected: `views` ทุกตัว `true` · `reqRows > 0` · `actRows > 0` ·
 - [ ] **Step 8: ลบไฟล์ screenshot ที่หลุดลง repo แล้ว commit**
 
 ```bash
-rm -f *.png && rm -rf .playwright-mcp
+# ลบเฉพาะ png ที่ไม่ได้ถูก track — อย่าใช้ `rm -f *.png` เด็ดขาด repo มี SMALL_CIVIL_LOGO.png ที่ track อยู่
+git clean -f -- '*.png' && rm -rf .playwright-mcp
+git status --short          # ต้องไม่มีไฟล์ที่ track หายไป
 git add index.html && git commit -m "feat(report): detail drawer + add/delete report entries"
 ```
 
