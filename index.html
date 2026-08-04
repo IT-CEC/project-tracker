@@ -839,7 +839,7 @@ body.locked{overflow:hidden}
       </div><div class="projtabs" id="brToggle"><span class="pjt-thumb"></span>
         <button class="pjt on" data-bv="table" onclick="setBrView('table')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> วิเคราะห์ FTE</button>
         <button class="pjt" data-bv="timeline" onclick="setBrView('timeline')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Timeline)</button>
-      </div><div class="tb-right"><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button><button class="tbtn pri" id="addActBtn" style="display:none" onclick="actAdd()" data-i18n="addAction">+ เพิ่ม Action Item</button><button class="tbtn pri" id="addRptBtn" style="display:none" onclick="rptAdd()">+ เพิ่มรายงาน</button><button class="tbtn pri" id="addBrBtn" style="display:none" onclick="brAddRow()" data-i18n="addItem">+ เพิ่มรายการ</button><button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button></div></div>
+      </div><div class="tb-right"><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button><button class="tbtn pri" id="addActBtn" style="display:none" onclick="actAdd()" data-i18n="addAction">+ เพิ่ม Action Item</button><button class="tbtn pri" id="addRptBtn" style="display:none" onclick="rptAdd()" data-i18n="addReport">+ เพิ่มรายงาน</button><button class="tbtn pri" id="addBrBtn" style="display:none" onclick="brAddRow()" data-i18n="addItem">+ เพิ่มรายการ</button><button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button></div></div>
     <div class="main">
 
     <section class="panel active" id="overview">
@@ -902,10 +902,10 @@ body.locked{overflow:hidden}
 .rptmx th,.rptmx td{padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 .rptmx thead th{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;text-align:center}
 .rptmx thead th.mxd{text-align:left}
-.rptmx th.mxd{text-align:left;font-weight:600;color:var(--ink);cursor:pointer}
+.rptmx th.mxd{text-align:left;font-weight:600;color:var(--ink)}
 .rptmx td.mxc{text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
-.rptmx td.mxc.clk,.rptmx th.mxd,.rptmx thead th:not(.mxd){cursor:pointer;transition:background .12s,color .12s}
-.rptmx td.mxc.clk:hover,.rptmx th.mxd:hover,.rptmx thead th:not(.mxd):hover{background:var(--hover)}
+.rptmx td.mxc.clk,.rptmx tbody th.mxd,.rptmx thead th.mxh{cursor:pointer;transition:background .12s,color .12s}
+.rptmx td.mxc.clk:hover,.rptmx tbody th.mxd:hover,.rptmx thead th.mxh:hover{background:var(--hover)}
 .rptmx td.mxc.zero{color:var(--ink3);opacity:.45}
 .rptmx td.mxc.on,.rptmx th.mxd.on,.rptmx thead th.mxh.on{background:var(--mint);color:var(--accent);font-weight:700}
 .rptmx .mxt{font-weight:700}
@@ -2278,6 +2278,7 @@ const RPT_SEED = [
 let RPTS = [];
 const COL_RPT='report_levels';
 const RPT_LV=['Operational','Managerial','Executive'];
+const RPT_LV_ALL=['Operational','Managerial','Executive','Managerial / Executive','Operational / Managerial / Executive'];
 const RPT_LVC={'Operational':'#0071e3','Managerial':'#ff9500','Executive':'#5e5ce6'};
 const RPT_DEPTC={'HR':'#28cd41','FI':'#0071e3','MM':'#ff9500','PM':'#af52de','SD':'#ff3b30','PS':'#5e5ce6'};
 const RPT_FREQ=[['รายวัน','วัน'],['รายสัปดาห์','สัปดาห์'],['รายเดือน','เดือน'],['รายไตรมาส','ไตรมาส']];
@@ -2290,7 +2291,7 @@ function rptLvColor(r){return RPT_LVC[rptTopLv(r)]||'#8e8e93';}
 function rptDeptColor(d){var k=String(d||'').trim().split(/\s+/)[0];return RPT_DEPTC[k]||'#8e8e93';}
 function rptFreqBucket(f){var s=String(f||'');return RPT_FREQ.filter(function(p){return s.indexOf(p[1])>=0;}).map(function(p){return p[0];});}
 function rptDepts(){var seen=[];RPTS.forEach(function(r){if(r.dept&&seen.indexOf(r.dept)<0)seen.push(r.dept);});return seen;}
-async function loadRpts(){try{var arr=await window.DB.loadAll(COL_RPT);if(!arr.length){arr=rptBase();await Promise.all(arr.map(function(r){return window.DB.saveItem(COL_RPT,r._id,r);}));}RPTS=arr;}catch(e){console.error('[rpt load]',e);RPTS=rptBase();if(window.toast)toast('โหลดรายงาน 3 ระดับ จาก Firebase ไม่ได้ · ใช้ข้อมูลตั้งต้น');}rptNorm();}
+async function loadRpts(){try{var arr=await window.DB.loadAll(COL_RPT);if(!arr.length){arr=rptBase();var res=await Promise.allSettled(arr.map(function(r){return window.DB.saveItem(COL_RPT,r._id,r).then(function(){return r._id;});}));if(res.some(function(x){return x.status==='rejected';})){var landed=res.filter(function(x){return x.status==='fulfilled';}).map(function(x){return x.value;});await Promise.allSettled(landed.map(function(id){return window.DB.deleteItem(COL_RPT,id);}));throw new Error('report seed partially failed');}}RPTS=arr;}catch(e){console.error('[rpt load]',e);RPTS=rptBase();if(window.toast)toast('โหลดรายงาน 3 ระดับ จาก Firebase ไม่ได้ · ใช้ข้อมูลตั้งต้น');}rptNorm();}
 function rptSaveOne(r){if(window.DB&&r&&r._id!=null)window.DB.saveItem(COL_RPT,r._id,r).catch(dbErr('report save'));}
 function rptDelOne(id){if(window.DB&&id!=null)window.DB.deleteItem(COL_RPT,id).catch(dbErr('report del'));}
 var _rptFirst=true;
@@ -2885,7 +2886,7 @@ function actAdd(){var nid=ACTS.reduce(function(m,a){return Math.max(m,a._id||0);
 function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!confirm('ลบ Action #'+id+' ?'))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
 
 // ══ Report Levels — view ══
-let rptSortK='',rptSortD=1,rptSel={dept:'',lv:''};
+let rptSortK='',rptSortD=1;
 function rptChip(t,col){return t?'<span class="chip" style="background:'+col+'1f;color:'+col+'">'+esc(t)+'</span>':'';}
 // escape for a single-quoted JS string that sits inside a double-quoted HTML attribute (onclick)
 // attr() only guards `"` and is wrong here — a dept name containing an apostrophe would break the handler
@@ -2894,8 +2895,6 @@ function fillRptFilters(){setOpts('rptDept',rptDepts(),'ทุกแผนก');
 function filteredRpts(){
   var ds=vm('rptDept'),ls=vm('rptLevel'),fs=vm('rptFreq'),q=v('rptSearch').toLowerCase().trim();
   var r=RPTS.filter(function(x){
-    if(rptSel.dept&&x.dept!==rptSel.dept)return false;
-    if(rptSel.lv&&rptLevels(x).indexOf(rptSel.lv)<0)return false;
     if(ds.length&&ds.indexOf(x.dept)<0)return false;
     if(ls.length&&!ls.some(function(l){return rptLevels(x).indexOf(l)>=0;}))return false;
     if(fs.length&&!fs.some(function(f){return rptFreqBucket(x.freq).indexOf(f)>=0;}))return false;
@@ -2905,27 +2904,29 @@ function filteredRpts(){
   if(rptSortK){var k=rptSortK;r=r.slice().sort(function(a,b){if(k==='_id')return ((a._id||0)-(b._id||0))*rptSortD;return String(a[k]||'').localeCompare(String(b[k]||''),'th')*rptSortD;});}
   return r;
 }
-function rptPick(d,l){rptSel.dept=d;rptSel.lv=l;renderRpts();}
-function rptClear(){rptSel.dept='';rptSel.lv='';['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderRpts();}
+function rptPick(d,l){var de=document.getElementById('rptDept'),le=document.getElementById('rptLevel');if(de)de.value=d;if(le)le.value=l;renderRpts();}
+function rptClear(){['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderRpts();}
 function renderRptMatrix(){
   var el=document.getElementById('rptMatrix');if(!el)return;
   var depts=rptDepts(),nAll=RPTS.length;
+  var ds=vm('rptDept'),ls=vm('rptLevel');
   var cnt=function(rows,l){return rows.filter(function(r){return rptLevels(r).indexOf(l)>=0;}).length;};
   var h='<table class="rptmx"><thead><tr><th class="mxd">แผนก</th>';
-  RPT_LV.forEach(function(l){h+='<th class="mxh'+(!rptSel.dept&&rptSel.lv===l?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+l+'</th>';});
+  RPT_LV.forEach(function(l){var colOn=(ls.length===1&&ls[0]===l&&ds.length===0);h+='<th class="mxh'+(colOn?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+l+'</th>';});
   h+='<th class="mxt">รวม</th></tr></thead><tbody>';
   depts.forEach(function(d){
     var rs=RPTS.filter(function(r){return r.dept===d;}),da=rptJs(d);
-    h+='<tr><th class="mxd'+(rptSel.dept===d&&!rptSel.lv?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+esc(d)+'</th>';
+    var rowOn=(ds.length===1&&ds[0]===d&&ls.length===0);
+    h+='<tr><th class="mxd'+(rowOn?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+esc(d)+'</th>';
     RPT_LV.forEach(function(l){
-      var n=cnt(rs,l),on=(rptSel.dept===d&&rptSel.lv===l);
+      var n=cnt(rs,l),on=(ds.indexOf(d)>=0&&ls.indexOf(l)>=0);
       h+=n?'<td class="mxc clk'+(on?' on':'')+'" onclick="rptPick(\''+da+'\',\''+l+'\')">'+n+'</td>':'<td class="mxc zero">–</td>';
     });
-    h+='<td class="mxc mxt clk'+(rptSel.dept===d&&!rptSel.lv?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+rs.length+'</td></tr>';
+    h+='<td class="mxc mxt clk'+(rowOn?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+rs.length+'</td></tr>';
   });
   var tl=RPT_LV.map(function(l){return cnt(RPTS,l);});
   h+='</tbody><tfoot><tr><th class="mxd">รวม</th>';
-  tl.forEach(function(n,i){h+='<td class="mxc clk'+(!rptSel.dept&&rptSel.lv===RPT_LV[i]?' on':'')+'" onclick="rptPick(\'\',\''+RPT_LV[i]+'\')">'+n+'</td>';});
+  tl.forEach(function(n,i){var l=RPT_LV[i],colOn=(ls.length===1&&ls[0]===l&&ds.length===0);h+='<td class="mxc clk'+(colOn?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+n+'</td>';});
   h+='<td class="mxc mxt clk" onclick="rptClear()">'+nAll+'</td></tr></tfoot></table>';
   var multi=RPTS.filter(function(r){return rptLevels(r).length>1;}).length;
   if(multi)h+='<div class="mxnote">'+multi+' รายการครอบคลุมหลายระดับ จึงถูกนับซ้ำในคอลัมน์ระดับ (รวมคอลัมน์ระดับ = '+tl.reduce(function(a,b){return a+b;},0)+' · รายงานทั้งหมด = '+nAll+')</div>';
@@ -2934,7 +2935,7 @@ function renderRptMatrix(){
 function renderRptTable(){
   var rows=filteredRpts(),tb=document.querySelector('#rptTable tbody');if(!tb)return;
   tb.innerHTML=rows.map(function(r){
-    return '<tr onclick="openRpt('+r._id+')" style="cursor:pointer">'
+    return '<tr onclick="openRpt('+Number(r._id)+')" style="cursor:pointer">'
       +'<td class="muted">'+r._id+'</td>'
       +'<td>'+rptChip(r.dept,rptDeptColor(r.dept))+'</td>'
       +'<td>'+rptChip(r.level,rptLvColor(r))+'</td>'
@@ -2947,13 +2948,13 @@ function renderRptTable(){
 }
 function renderRpts(){renderRptMatrix();renderRptTable();}
 function rptBind(){
-  ['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderRptTable);});
+  ['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderRpts);});
   document.querySelectorAll('#rptTable th[data-rsort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.rsort;if(rptSortK===k)rptSortD=-rptSortD;else{rptSortK=k;rptSortD=1;}renderRptTable();};});
 }
 function openRpt(id){
   var r=RPTS.find(function(x){return x._id===id;});if(!r)return;
   var opt=function(cur,arr){return arr.map(function(x){return '<option '+(x===cur?'selected':'')+'>'+esc(String(x))+'</option>';}).join('');};
-  var lvOpts=RPT_LV.slice();RPTS.forEach(function(x){if(x.level&&lvOpts.indexOf(x.level)<0)lvOpts.push(x.level);});
+  var lvOpts=RPT_LV_ALL.slice();RPTS.forEach(function(x){if(x.level&&lvOpts.indexOf(x.level)<0)lvOpts.push(x.level);});
   var dpOpts=rptDepts();if(r.dept&&dpOpts.indexOf(r.dept)<0)dpOpts.push(r.dept);
   document.getElementById('mTitle').textContent='รายงาน #'+r._id+(r.dept?' · '+r.dept:'');
   document.getElementById('mSub').textContent=[r.level,r.freq].filter(Boolean).join(' · ');
@@ -2981,7 +2982,7 @@ function openRpt(id){
   document.getElementById('modal').classList.add('open');
 }
 function rptSave(id){
-  var r=RPTS.find(function(x){return x._id===id;});if(!r)return;
+  var r=RPTS.find(function(x){return x._id===id;});if(!r){closeModal();if(window.toast)toast('รายการนี้ถูกลบไปแล้ว');return;}
   var g=function(k){var el=document.getElementById(k);return el?el.value:undefined;};
   RPT_KEYS.forEach(function(k){var val=g('er_'+k);if(val!==undefined)r[k]=val;});
   rptSaveOne(r);fillRptFilters();renderRpts();closeModal();if(window.toast)toast(T('saved'));
@@ -2992,7 +2993,7 @@ function rptAdd(){
   RPTS.push(r);rptNorm();rptSaveOne(r);fillRptFilters();renderRpts();openRpt(nid);
 }
 function rptDel(id){
-  var r=RPTS.find(function(x){return x._id===id;});if(!r)return;
+  var r=RPTS.find(function(x){return x._id===id;});if(!r){closeModal();if(window.toast)toast('รายการนี้ถูกลบไปแล้ว');return;}
   if(!confirm('ลบรายงาน #'+id+' ?'))return;
   RPTS=RPTS.filter(function(x){return x._id!==id;});rptDelOne(id);fillRptFilters();renderRpts();closeModal();if(window.toast)toast('ลบแล้ว');
 }
@@ -3652,7 +3653,7 @@ const TH={reqs:"Requirements",reqItems:"หัวข้อความต้อ�
 const ENx={reqs:"Requirements",reqItems:"requirement items",subgroups:"sub-groups",bridgeItems:"linked to Oracle",gapDone:"Fit-Gap assessed",allMod:"All modules",allSub:"All groups",allType:"All types",showing:"Showing {n} / {t}",nodata:"No data",done:"Assessed",notdone:"Not assessed",total:"items",addNew:"Add new requirement",save:"Save",cancel:"Cancel",delete:"Delete",saved:"Saved",added:"Added",exported:"Exported {n}",tplDone:"Template downloaded",imported:"Imported {n}",potential:"projected reduction",manualHrs:"current manual work",covered:"covered"};
 function T(k){return LANG==='en'?(ENx[k]||k):(TH[k]||k);}
 Object.assign(EN,{bridgeT:"Top Automation 2026",bridgeS:"Highest FTE-saving pain points",byType:"By Request Type",byTypeSub2:"Share of work to build",nextT:"Next Steps & Decisions",reqPrevT:"Latest Requirements",reqPrevS:"Sample — open Requirements tab for all",viewAll:"View all →",byModule:"By Group",matrix:"Group × Type"});
-Object.assign(EN,{addAction:"+ Add Action Item",addItem:"+ Add Item"});
+Object.assign(EN,{addAction:"+ Add Action Item",addItem:"+ Add Item",addReport:"+ Add Report"});
 Object.assign(EN,{fPhase:"Phase",fStatus:"Status",fTeam:"Team",today:"Today",railMode:"Menu display",searchTask:"Search tasks…",search:"Search…"});
 const THDEF={};
 const FLBL={module:{th:'กลุ่มงาน',en:'Module'},sub:{th:'กลุ่มงานย่อย',en:'Sub-Module'},process:{th:'กระบวนการ',en:'Process'},req:{th:'รายละเอียด',en:'Requirement'},type:{th:'ประเภทคำขอ',en:'Request Type'},type2:{th:'ประเภทรอง / แท็ก',en:'Secondary / Tag'},owner:{th:'ผู้รับผิดชอบ',en:'Owner'},gap:{th:'Fit-Gap (RFP)',en:'Fit-Gap (RFP)'},status:{th:'สถานะ',en:'Status'},statusWork:{th:'สถานะงาน',en:'Status'},remark:{th:'หมายเหตุ',en:'Remark'},secReq:{th:'รายละเอียดความต้องการ',en:'Requirement Detail'},edit:{th:'แก้ไข',en:'Edit'},done:{th:'เสร็จ',en:'Done'},dept:{th:'แผนก',en:'Department'},cycle:{th:'รอบงาน',en:'Cycle'},hrs:{th:'ชม./ปี',en:'Hrs/Yr'},ftesave:{th:'FTE Saving',en:'FTE Saving'},complexity:{th:'ความซับซ้อน',en:'Complexity'},risk:{th:'ความเสี่ยง',en:'Risk'},source:{th:'ที่มา',en:'Source'},kProc:{th:'กระบวนการ',en:'Processes'},kFteSave:{th:'ประหยัด FTE',en:'FTE Savings'},kHours:{th:'ชม./ปี',en:'Hrs/Year'},chProc:{th:'กระบวนการตามแผนก',en:'Processes by Department'},chFte:{th:'FTE Saving ตามแผนก',en:'FTE Savings by Department'}};
