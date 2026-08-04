@@ -2887,6 +2887,9 @@ function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)retur
 // ══ Report Levels — view ══
 let rptSortK='',rptSortD=1,rptSel={dept:'',lv:''};
 function rptChip(t,col){return t?'<span class="chip" style="background:'+col+'1f;color:'+col+'">'+esc(t)+'</span>':'';}
+// escape for a single-quoted JS string that sits inside a double-quoted HTML attribute (onclick)
+// attr() only guards `"` and is wrong here — a dept name containing an apostrophe would break the handler
+function rptJs(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 function fillRptFilters(){setOpts('rptDept',rptDepts(),'ทุกแผนก');setOpts('rptLevel',RPT_LV,'ทุกระดับ');setOpts('rptFreq',RPT_FREQ.map(function(p){return p[0];}),'ทุกความถี่');}
 function filteredRpts(){
   var ds=vm('rptDept'),ls=vm('rptLevel'),fs=vm('rptFreq'),q=v('rptSearch').toLowerCase().trim();
@@ -2912,7 +2915,7 @@ function renderRptMatrix(){
   RPT_LV.forEach(function(l){h+='<th class="mxh'+(!rptSel.dept&&rptSel.lv===l?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+l+'</th>';});
   h+='<th class="mxt">รวม</th></tr></thead><tbody>';
   depts.forEach(function(d){
-    var rs=RPTS.filter(function(r){return r.dept===d;}),da=attr(d);
+    var rs=RPTS.filter(function(r){return r.dept===d;}),da=rptJs(d);
     h+='<tr><th class="mxd'+(rptSel.dept===d&&!rptSel.lv?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+esc(d)+'</th>';
     RPT_LV.forEach(function(l){
       var n=cnt(rs,l),on=(rptSel.dept===d&&rptSel.lv===l);
