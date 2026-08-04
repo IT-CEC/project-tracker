@@ -2884,6 +2884,70 @@ function actSave(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)retu
 function actAdd(){var nid=ACTS.reduce(function(m,a){return Math.max(m,a._id||0);},0)+1;var a={_id:nid,cat:'',dept:'',action:'รายการใหม่',pri:'Low',owner:'',due:'',status:'Not Started',done:'',note:''};ACTS.push(a);actNorm();actSaveOne(a);fillActFilters();renderActs();openAct(nid);}
 function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!confirm('ลบ Action #'+id+' ?'))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
 
+// ══ Report Levels — view ══
+let rptSortK='',rptSortD=1,rptSel={dept:'',lv:''};
+function rptChip(t,col){return t?'<span class="chip" style="background:'+col+'1f;color:'+col+'">'+esc(t)+'</span>':'';}
+function fillRptFilters(){setOpts('rptDept',rptDepts(),'ทุกแผนก');setOpts('rptLevel',RPT_LV,'ทุกระดับ');setOpts('rptFreq',RPT_FREQ.map(function(p){return p[0];}),'ทุกความถี่');}
+function filteredRpts(){
+  var ds=vm('rptDept'),ls=vm('rptLevel'),fs=vm('rptFreq'),q=v('rptSearch').toLowerCase().trim();
+  var r=RPTS.filter(function(x){
+    if(rptSel.dept&&x.dept!==rptSel.dept)return false;
+    if(rptSel.lv&&rptLevels(x).indexOf(rptSel.lv)<0)return false;
+    if(ds.length&&ds.indexOf(x.dept)<0)return false;
+    if(ls.length&&!ls.some(function(l){return rptLevels(x).indexOf(l)>=0;}))return false;
+    if(fs.length&&!fs.some(function(f){return rptFreqBucket(x.freq).indexOf(f)>=0;}))return false;
+    if(q&&((x.name||'')+' '+(x.user||'')+' '+(x.kpi||'')+' '+(x.src||'')+' '+(x.decide||'')+' '+(x.sample||'')+' '+(x.want||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  if(rptSortK){var k=rptSortK;r=r.slice().sort(function(a,b){if(k==='_id')return ((a._id||0)-(b._id||0))*rptSortD;return String(a[k]||'').localeCompare(String(b[k]||''),'th')*rptSortD;});}
+  return r;
+}
+function rptPick(d,l){rptSel.dept=d;rptSel.lv=l;renderRpts();}
+function rptClear(){rptSel.dept='';rptSel.lv='';['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderRpts();}
+function renderRptMatrix(){
+  var el=document.getElementById('rptMatrix');if(!el)return;
+  var depts=rptDepts(),nAll=RPTS.length;
+  var cnt=function(rows,l){return rows.filter(function(r){return rptLevels(r).indexOf(l)>=0;}).length;};
+  var h='<table class="rptmx"><thead><tr><th class="mxd">แผนก</th>';
+  RPT_LV.forEach(function(l){h+='<th class="mxh'+(!rptSel.dept&&rptSel.lv===l?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+l+'</th>';});
+  h+='<th class="mxt">รวม</th></tr></thead><tbody>';
+  depts.forEach(function(d){
+    var rs=RPTS.filter(function(r){return r.dept===d;}),da=attr(d);
+    h+='<tr><th class="mxd'+(rptSel.dept===d&&!rptSel.lv?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+esc(d)+'</th>';
+    RPT_LV.forEach(function(l){
+      var n=cnt(rs,l),on=(rptSel.dept===d&&rptSel.lv===l);
+      h+=n?'<td class="mxc clk'+(on?' on':'')+'" onclick="rptPick(\''+da+'\',\''+l+'\')">'+n+'</td>':'<td class="mxc zero">–</td>';
+    });
+    h+='<td class="mxc mxt clk'+(rptSel.dept===d&&!rptSel.lv?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+rs.length+'</td></tr>';
+  });
+  var tl=RPT_LV.map(function(l){return cnt(RPTS,l);});
+  h+='</tbody><tfoot><tr><th class="mxd">รวม</th>';
+  tl.forEach(function(n,i){h+='<td class="mxc clk'+(!rptSel.dept&&rptSel.lv===RPT_LV[i]?' on':'')+'" onclick="rptPick(\'\',\''+RPT_LV[i]+'\')">'+n+'</td>';});
+  h+='<td class="mxc mxt clk" onclick="rptClear()">'+nAll+'</td></tr></tfoot></table>';
+  var multi=RPTS.filter(function(r){return rptLevels(r).length>1;}).length;
+  if(multi)h+='<div class="mxnote">'+multi+' รายการครอบคลุมหลายระดับ จึงถูกนับซ้ำในคอลัมน์ระดับ (รวมคอลัมน์ระดับ = '+tl.reduce(function(a,b){return a+b;},0)+' · รายงานทั้งหมด = '+nAll+')</div>';
+  el.innerHTML=h;
+}
+function renderRptTable(){
+  var rows=filteredRpts(),tb=document.querySelector('#rptTable tbody');if(!tb)return;
+  tb.innerHTML=rows.map(function(r){
+    return '<tr onclick="openRpt('+r._id+')" style="cursor:pointer">'
+      +'<td class="muted">'+r._id+'</td>'
+      +'<td>'+rptChip(r.dept,rptDeptColor(r.dept))+'</td>'
+      +'<td>'+rptChip(r.level,rptLvColor(r))+'</td>'
+      +'<td><div class="truncate" style="max-width:320px;color:var(--ink)">'+esc(r.name||'')+'</div></td>'
+      +'<td><div class="truncate">'+esc(r.user||'')+'</div></td>'
+      +'<td class="muted">'+esc(r.freq||'')+'</td>'
+      +'<td class="'+(String(r.src||'').trim()?'muted':'rpt-empty')+'"><div class="truncate">'+esc(String(r.src||'').replace(/\n/g,' ').trim()||'—')+'</div></td>'
+      +'</tr>';
+  }).join('')||'<tr><td colspan="7" style="text-align:center;padding:40px" class="muted">ไม่พบรายการ</td></tr>';
+}
+function renderRpts(){renderRptMatrix();renderRptTable();}
+function rptBind(){
+  ['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderRptTable);});
+  document.querySelectorAll('#rptTable th[data-rsort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.rsort;if(rptSortK===k)rptSortD=-rptSortD;else{rptSortK=k;rptSortD=1;}renderRptTable();};});
+}
+
 function fillAbout(){var el=document.getElementById('aboutStats');if(!el)return;var mods=new Set(REQS.map(function(r){return r.module;}));var subs=new Set(REQS.map(function(r){return (r.module||'')+'|'+(r.sub||'');}));el.textContent='Requirements '+REQS.length+' · กลุ่มงาน '+mods.size+' · กลุ่มงานย่อย '+subs.size+' · Automation 2026: '+BR.length+' กระบวนการ · ข้อมูลสด Firebase';}
 function subscribeReqs(){if(!window.DB)return;window.DB.subscribe(COL_REQ,function(docs){if(_reqFirst){_reqFirst=false;return;}REQS=docs;reqNorm();fillFilters();renderAll();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();fillAbout();});}
 function subscribeSettings(){if(!window.DB)return;window.DB.subscribe(COL_SET,function(docs){if(_setFirst){_setFirst=false;return;}var g=docs.find(function(x){return x.__docId==='global';})||docs[0];if(g&&g.fteCost!=null){FTE_COST=g.fteCost;if(window.renderCockpit)renderCockpit();}});}
@@ -3676,7 +3740,7 @@ document.addEventListener('click',function(){document.querySelectorAll('.cs').fo
 window.addEventListener('resize',function(){document.querySelectorAll('.cs').forEach(csClose);piMoveThumb();brMoveThumb();});
 
 window.startApp=async function(){
-var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
+var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillRptFilters();rptBind();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
 if(_ld)_ld.style.display='none';showTab('project');
 subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePhases('pi');subscribePhases('ap');subscribePlan();subscribeActs();subscribeRpts();
 var _syncS=null;function renderSyncBadge(){var _sb=document.getElementById('syncBadge');if(!_sb||!_syncS)return;var s=_syncS;_sb.querySelector('.sb-txt').textContent=!s.online?L('ออฟไลน์ — ยังไม่ซิงก์','Offline — not synced'):(s.saving?L('กำลังบันทึก…','Saving…'):L('เชื่อมต่อแล้ว','Connected'));}
