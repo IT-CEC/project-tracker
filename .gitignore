@@ -10,5 +10,8 @@ node_modules/
 .DS_Store
 *.log
 
+# ไฟล์ต้นฉบับรายงาน NetSuite ที่ใช้ extract ข้อมูล seed — ห้าม commit
+*.xlsx
+
 .superpowers/
 .playwright-mcp/
