@@ -901,18 +901,7 @@ body.locked{overflow:hidden}
 .actk-l{font-size:11.5px;color:var(--ink2);margin-top:4px}
 #actTable tr.act-over td{background:rgba(255,59,48,.06)}
 #actTable td.act-duered{color:#ff3b30;font-weight:600}
-.rptmx{border-collapse:separate;border-spacing:0;font-size:12.5px}
-.rptmx th,.rptmx td{padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
-.rptmx thead th{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;text-align:center}
-.rptmx thead th.mxd{text-align:left}
-.rptmx th.mxd{text-align:left;font-weight:600;color:var(--ink)}
-.rptmx td.mxc{text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
-.rptmx td.mxc.clk,.rptmx tbody th.mxd,.rptmx thead th.mxh{cursor:pointer;transition:background .12s,color .12s}
-.rptmx td.mxc.clk:hover,.rptmx tbody th.mxd:hover,.rptmx thead th.mxh:hover{background:var(--hover)}
-.rptmx td.mxc.zero{color:var(--ink3);opacity:.45}
-.rptmx td.mxc.on,.rptmx th.mxd.on,.rptmx thead th.mxh.on{background:var(--mint);color:var(--accent);font-weight:700}
-.rptmx .mxt{font-weight:700}
-.rptmx tfoot th,.rptmx tfoot td{border-bottom:0;border-top:2px solid var(--line2);font-weight:700}
+.actk.on{border-color:var(--accent);background:var(--mint)}
 .mxnote{font-size:11px;color:var(--ink3);margin-top:8px}
 #rptTable td.rpt-empty{color:var(--ink3);opacity:.5}
 </style>
@@ -932,7 +921,7 @@ body.locked{overflow:hidden}
       </table></div></div>
     </div>
     <div class="projview" id="reportView" style="display:none">
-      <div class="tablecard" style="padding:14px 16px"><div class="tscroll"><div id="rptMatrix"></div></div></div>
+      <div id="rptCards" class="actkpi"></div>
       <div class="bar" style="margin-top:10px">
         <span class="lbl">แผนก</span><select id="rptDept" data-multi="1"></select>
         <span class="lbl">ระดับ</span><select id="rptLevel" data-multi="1"></select>
@@ -2923,30 +2912,18 @@ function filteredRpts(){
 }
 function rptPick(d,l){var de=document.getElementById('rptDept'),le=document.getElementById('rptLevel');if(de)de.value=d;if(le)le.value=l;renderRpts();}
 function rptClear(){['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderRpts();}
-function renderRptMatrix(){
-  var el=document.getElementById('rptMatrix');if(!el)return;
-  var depts=rptDepts(),nAll=RPTS.length;
-  var ds=vm('rptDept'),ls=vm('rptLevel');
-  var cnt=function(rows,l){return rows.filter(function(r){return rptLevels(r).indexOf(l)>=0;}).length;};
-  var h='<table class="rptmx"><thead><tr><th class="mxd">แผนก</th>';
-  RPT_LV.forEach(function(l){var colOn=(ls.length===1&&ls[0]===l&&ds.length===0);h+='<th class="mxh'+(colOn?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+l+'</th>';});
-  h+='<th class="mxt">รวม</th></tr></thead><tbody>';
-  depts.forEach(function(d){
-    var rs=RPTS.filter(function(r){return r.dept===d;}),da=rptJs(d);
-    var rowOn=(ds.length===1&&ds[0]===d&&ls.length===0);
-    h+='<tr><th class="mxd'+(rowOn?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+esc(d)+'</th>';
-    RPT_LV.forEach(function(l){
-      var n=cnt(rs,l),on=(ds.indexOf(d)>=0&&ls.indexOf(l)>=0);
-      h+=n?'<td class="mxc clk'+(on?' on':'')+'" onclick="rptPick(\''+da+'\',\''+l+'\')">'+n+'</td>':'<td class="mxc zero">–</td>';
-    });
-    h+='<td class="mxc mxt clk'+(rowOn?' on':'')+'" onclick="rptPick(\''+da+'\',\'\')">'+rs.length+'</td></tr>';
-  });
-  var tl=RPT_LV.map(function(l){return cnt(RPTS,l);});
-  h+='</tbody><tfoot><tr><th class="mxd">รวม</th>';
-  tl.forEach(function(n,i){var l=RPT_LV[i],colOn=(ls.length===1&&ls[0]===l&&ds.length===0);h+='<td class="mxc clk'+(colOn?' on':'')+'" onclick="rptPick(\'\',\''+l+'\')">'+n+'</td>';});
-  h+='<td class="mxc mxt clk" onclick="rptClear()">'+nAll+'</td></tr></tfoot></table>';
+function rptPickLv(l){var le=document.getElementById('rptLevel');if(!le)return;var cur=vm('rptLevel');le.value=(cur.length===1&&cur[0]===l)?'':l;renderRpts();}
+function renderRptCards(){
+  var el=document.getElementById('rptCards');if(!el)return;
+  var nAll=RPTS.length,ls=vm('rptLevel');
+  var cnt=function(l){return RPTS.filter(function(r){return rptLevels(r).indexOf(l)>=0;}).length;};
+  var card=function(lab,val,col,on,fn){return '<div class="actk clk'+(on?' on':'')+'" onclick="'+fn+'"><div class="actk-v"'+(col?' style="color:'+col+'"':'')+'>'+val+'</div><div class="actk-l">'+esc(lab)+'</div></div>';};
+  var tl=RPT_LV.map(cnt);
+  var h='<div class="actkrow">'+card('ทั้งหมด',nAll,'',ls.length===0,'rptClear()');
+  RPT_LV.forEach(function(l,i){h+=card(l,tl[i],RPT_LVC[l]||'#8e8e93',ls.length===1&&ls[0]===l,'rptPickLv(&quot;'+l+'&quot;)');});
+  h+='</div>';
   var multi=RPTS.filter(function(r){return rptLevels(r).length>1;}).length;
-  if(multi)h+='<div class="mxnote">'+multi+' รายการครอบคลุมหลายระดับ จึงถูกนับซ้ำในคอลัมน์ระดับ (รวมคอลัมน์ระดับ = '+tl.reduce(function(a,b){return a+b;},0)+' · รายงานทั้งหมด = '+nAll+')</div>';
+  if(multi)h+='<div class="mxnote">'+multi+' รายการครอบคลุมหลายระดับ จึงถูกนับซ้ำในการ์ดระดับ (รวม 3 ระดับ = '+tl.reduce(function(a,b){return a+b;},0)+' · รายงานทั้งหมด = '+nAll+')</div>';
   el.innerHTML=h;
 }
 function renderRptTable(){
@@ -2963,7 +2940,7 @@ function renderRptTable(){
       +'</tr>';
   }).join('')||'<tr><td colspan="7" style="text-align:center;padding:40px" class="muted">ไม่พบรายการ</td></tr>';
 }
-function renderRpts(){renderRptMatrix();renderRptTable();}
+function renderRpts(){renderRptCards();renderRptTable();}
 function rptBind(){
   ['rptDept','rptLevel','rptFreq','rptSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.addEventListener('input',renderRpts);});
   document.querySelectorAll('#rptTable th[data-rsort]').forEach(function(th){th.style.cursor='pointer';th.onclick=function(){var k=th.dataset.rsort;if(rptSortK===k)rptSortD=-rptSortD;else{rptSortK=k;rptSortD=1;}renderRptTable();};});
