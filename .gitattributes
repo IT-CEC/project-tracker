@@ -1,0 +1,3 @@
+# ผังกระบวนการ Oracle เป็นไฟล์ต้นฉบับที่ต้องคงไว้ทุกไบต์ (ฝังผ่าน iframe แบบไม่แก้อะไรเลย)
+# กัน git ไม่ให้แปลง line ending เพื่อให้ hash ตรงกับต้นฉบับเสมอ
+Oracle_Process_Interactive.html -text
