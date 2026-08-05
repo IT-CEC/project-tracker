@@ -8,13 +8,14 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:var(--font-sans);background:var(--bg);color:var(--ink)}
 #top{position:fixed;top:0;left:0;right:0;min-height:52px;background:rgba(255,255,255,.72);-webkit-backdrop-filter:var(--glass);backdrop-filter:var(--glass);border-bottom:1px solid var(--line);z-index:30;display:flex;align-items:center;gap:10px;padding:6px 14px;flex-wrap:wrap}
-.ti{font-size:15px;font-weight:800;color:var(--navy);letter-spacing:-.02em} .ti b{color:var(--green)}
+ .ti b{color:var(--green)}
 .ctrl{display:flex;gap:4px;align-items:center}
 .ic{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px}
 .ctrl button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--navy);border:1px solid var(--line);border-radius:980px;padding:5px 11px;background:rgba(0,0,0,.03);transition:background .2s var(--ease),transform .2s var(--ease)}
 .ctrl button:hover{background:rgba(0,0,0,.07)} .ctrl button:active{transform:scale(.96)} .ctrl button.on{background:var(--green);color:#fff;border-color:var(--green)}
 #zpct{font-size:11px;color:var(--muted);min-width:38px;text-align:center}
-.searchwrap{margin-left:auto;position:relative}
+.topbreak{flex-basis:100%;height:0;margin:0}
+.searchwrap{position:relative}
 #searchicon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink3);pointer-events:none}
 #search{width:230px;padding:7px 52px 7px 33px;border:1px solid var(--line);border-radius:980px;font-family:inherit;font-size:13px;background:rgba(0,0,0,.04);outline:none;transition:box-shadow .2s var(--ease),background .2s var(--ease)}
 #search:focus{background:#fff;box-shadow:0 0 0 4px rgba(0,113,227,.18)}
@@ -80,7 +81,7 @@ body.present .hint{display:none}
  #panel{width:100%;height:62vh;top:auto;bottom:0;border-left:none;border-top:2px solid var(--line);transform:translateY(100%);transition:transform .25s}
  #panel.open{transform:translateY(0)}
  #pclose{display:block;position:absolute;right:14px;top:12px;font-size:22px;cursor:pointer;color:var(--muted)}
- #mini{display:none} .searchwrap{margin-left:0}
+ #mini{display:none} 
 }
 
 #pop{position:fixed;z-index:55;width:300px;max-height:64vh;overflow:auto;background:rgba(255,255,255,.92);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 44px rgba(0,0,0,.20);padding:13px 14px;opacity:0;transform:scale(.97);pointer-events:none;transition:opacity .14s var(--ease),transform .14s var(--ease)}
@@ -109,12 +110,12 @@ body.present .hint{display:none}
 </style></head>
 <body>
 <div id="top">
- <div class="ti"><b>Oracle</b> · ผัง+คำอธิบาย</div>
- <div class="ctrl"><button onclick="zfit()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>ฟิตจอ</button><button onclick="zadd(-1)" aria-label="ซูมออก"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></button><span id="zpct">100%</span><button onclick="zadd(1)" aria-label="ซูมเข้า"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg></button><button onclick="toggleFull()" id="fsBtn" aria-label="ขยายเต็มจอแบบพรีเซนต์"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg><span id="fsLbl">เต็มจอ</span></button></div>
- <div class="ctrl phasebar" id="phasebar"><span class="plabel">โซน LV0:</span></div><div class="ctrl"><button id="edgeBtn" onclick="toggleEdges()" class="on"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg><span id="edgeLbl">เส้น: ทั้งหมด</span></button><button onclick="clearFilters()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.013 3H2l8 9.46V19l4 2v-8.54l.9-1.055"/><path d="m22 3-5 5"/><path d="m17 3 5 5"/></svg>ล้างตัวกรอง</button></div>
- <div id="legend"></div>
+  <div class="ctrl"><button onclick="zfit()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>ฟิตจอ</button><button onclick="zadd(-1)" aria-label="ซูมออก"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M8 11h6"/></svg></button><span id="zpct">100%</span><button onclick="zadd(1)" aria-label="ซูมเข้า"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v6"/><path d="M8 11h6"/></svg></button><button onclick="toggleFull()" id="fsBtn" aria-label="ขยายเต็มจอแบบพรีเซนต์"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg><span id="fsLbl">เต็มจอ</span></button></div>
+ <div class="ctrl phasebar" id="phasebar"><span class="plabel">ภาพรวม:</span></div><div class="ctrl"><button id="edgeBtn" onclick="toggleEdges()" class="on"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></svg><span id="edgeLbl">เส้น: ทั้งหมด</span></button><button onclick="clearFilters()"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.013 3H2l8 9.46V19l4 2v-8.54l.9-1.055"/><path d="m22 3-5 5"/><path d="m17 3 5 5"/></svg>ล้างตัวกรอง</button></div>
+ <div class="topbreak"></div>
  <div class="searchwrap"><span id="searchicon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></span><input id="search" placeholder="ค้นหางาน... ( / )" autocomplete="off"><span id="scount"></span></div>
-</div>
+ <div id="legend"></div>
+ </div>
 <div id="laneheadbar"><div id="laneheadInner"></div></div>
 <div id="stage"><div id="wrap"><div id="canvas"><svg id="wires"><defs>
 <marker id="arG" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#aab4c0"/></marker>
