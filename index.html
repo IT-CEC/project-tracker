@@ -89,10 +89,11 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .reqright{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;justify-content:center}
 .reqright .bar{margin:0!important}
 .reqright .fgrow2{margin:0}.donutpanel{flex:0 0 320px;min-height:100px;box-sizing:border-box;background:var(--surface);border:1px solid var(--line2);border-radius:16px;padding:14px 16px;display:flex;gap:16px;align-items:center}.reqkpis{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.reqkpis .pjcard{display:flex;flex-direction:column;justify-content:center}.dpchart{flex:none}.dpring{width:124px;height:124px;border-radius:50%;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}.dphole{position:absolute;inset:21px;border-radius:50%;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center}.dphv{font-size:26px;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.02em}.dphl{font-size:10px;color:var(--ink3)}.dpleg{flex:1;min-width:0}.dpttl{font-size:10px;color:var(--ink3);font-weight:600;margin-bottom:5px;letter-spacing:.02em}.dpli{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.75}.dpdot{width:8px;height:8px;border-radius:50%;flex:none}.dpnm{flex:1;min-width:0;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dpn{font-weight:700;color:var(--ink)}.dppc{font-size:10px;color:var(--ink3);width:32px;text-align:right;flex:none}
-.pjcard{flex:1;min-width:128px;min-height:100px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;background:var(--surface);border:1px solid var(--line2);border-radius:16px;padding:12px 15px}
-.pjcard .pjk{font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.02em;white-space:nowrap}
-.pjcard .pjv{font-size:20px;font-weight:700;color:var(--ink);margin:4px 0 2px;letter-spacing:-.02em;line-height:1.1}
-.pjcard .pjs{font-size:11px;color:var(--ink3)}
+.pjcard{flex:1;min-width:128px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:flex-start}
+.pjcard .pjv{margin:6px 0 0;letter-spacing:-.02em}
+.pjcard .pjs{margin-top:5px}
+/* แผนงาน: ค่าเป็นข้อความยาว (Solution Definition (BRD)) จึงเล็กกว่าใบที่ค่าเป็นตัวเลข */
+#projRibbon .pjcard .pjv{font-size:20px}
 .kbrow{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:nowrap}.kbcol{flex:none}.kbdonutwrap{display:flex;align-items:center;gap:9px;min-width:0}.kbdonut{width:46px;height:46px;border-radius:50%;flex:none;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}.kbdonut::after{content:'';position:absolute;inset:13px;border-radius:50%;background:var(--surface)}.kbdleg{display:grid;grid-template-columns:auto auto;gap:1px 9px;min-width:0}.kbdlg{font-size:10px;color:var(--ink2);white-space:nowrap;display:flex;align-items:center;gap:4px;line-height:1.4}.kbdlg i{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block}.kbdlg b{font-weight:700;color:var(--ink)}
 .projhead{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;margin:0 0 13px}
 .projtabs{display:inline-flex;background:var(--chip);border-radius:999px;padding:4px;gap:2px;margin:0;box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
@@ -145,23 +146,25 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 /* KPI */
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
 #brKpi,#planKpi{grid-template-columns:repeat(4,1fr)}
-.kpi{background:var(--surface);border:1px solid var(--line2);border-radius:16px;box-shadow:var(--cardsh);padding:12px 16px}
-.kpi .kh{display:flex;align-items:center;justify-content:space-between;color:var(--ink2);font-size:13px;font-weight:500}
-.kpi .kh .dots{color:var(--ink3);letter-spacing:1px;cursor:default}
-.kpi .v{font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-top:5px;color:var(--ink)}
-.kpi .chip{margin-top:9px;background:var(--chip);color:var(--ink2);font-size:11px;font-weight:600;padding:5px 10px;border-radius:8px;display:inline-block}
+.kpi .kh{display:flex;align-items:center;justify-content:space-between}
+.kpi .kh .dots{color:var(--ink3);letter-spacing:1px;cursor:default;flex:none}
+.kpi .v{letter-spacing:-.03em;margin-top:6px}
+.kpi .chip{margin-top:5px;background:none;padding:0;border-radius:0;display:block}
 .brtoprow{display:grid;grid-template-columns:240px minmax(0,1fr);gap:12px;align-items:stretch;margin-bottom:14px}
 .brtoprow #brKpi{display:flex;flex-direction:column;gap:12px;margin:0}
 .brtoprow .brcharts{margin:0}
-:is(#brKpi,#planKpi) .kpi3{flex:1;display:flex;flex-direction:row;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line2);border-radius:16px;box-shadow:var(--cardsh);padding:12px 15px;min-height:0}
+:is(#brKpi,#planKpi) .kpi3{flex:1;display:flex;flex-direction:row;align-items:center;gap:12px;min-height:0}
+
 :is(#brKpi,#planKpi) .kpi3 .k3ic{flex:none;width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--kc) 13%,transparent);color:var(--kc);opacity:1}
 :is(#brKpi,#planKpi) .kpi3 .k3ic svg{width:21px;height:21px}
 :is(#brKpi,#planKpi) .kpi3 .k3body{min-width:0;flex:1}
-:is(#brKpi,#planKpi) .kpi3 .k3lab{font-size:11px;font-weight:600;letter-spacing:.03em;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-:is(#brKpi,#planKpi) .kpi3 .k3val{display:flex;align-items:baseline;gap:5px;font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin:1px 0;color:var(--ink);font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+:is(#brKpi,#planKpi) .kpi3 .k3val{display:flex;align-items:baseline;gap:5px;letter-spacing:-.03em;margin:5px 0 0}
+
 :is(#brKpi,#planKpi) .kpi3.hero .k3val{color:#1e8e4a}
 :is(#brKpi,#planKpi) .kpi3 .k3unit{font-size:12px;font-weight:600;color:var(--ink2);font-family:var(--font-sans)}
-:is(#brKpi,#planKpi) .kpi3 .k3sub{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+:is(#brKpi,#planKpi) .kpi3 .k3sub{margin-top:5px}
+
 @media(max-width:1080px){.brtoprow{grid-template-columns:1fr}.brtoprow #brKpi{flex-direction:row;flex-wrap:wrap}:is(#brKpi,#planKpi) .kpi3{flex:1 1 45%}}
 /* bento */
 .bento{display:grid;grid-template-columns:1fr 1.28fr 1fr;gap:16px;align-items:start}
@@ -323,13 +326,6 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .fght{font-size:13px;font-weight:700;color:var(--ink)}.fghsub{font-weight:500;color:var(--ink3)}
 .fgpct{font-size:12px;font-weight:600;background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green);padding:4px 12px;border-radius:980px}
 .fgband{display:flex;gap:16px;align-items:center;margin:0;flex-wrap:wrap}
-.fgcards{display:flex;gap:11px;flex:none}
-.fgc{min-width:116px;background:var(--surface2);border:none;border-left:3px solid var(--sc);border-radius:12px;padding:10px 15px;cursor:pointer;transition:.15s}
-.fgc:hover{box-shadow:var(--cardsh)}
-.fgc.on{background:color-mix(in srgb,var(--sc) 13%,var(--surface2))}
-.fgc .fgk{font-size:11px;color:var(--ink3);font-weight:600;white-space:nowrap}
-.fgc .fgv{font-size:26px;font-weight:700;color:var(--sc);letter-spacing:-.02em;line-height:1.2;font-family:var(--font-mono);font-variant-numeric:tabular-nums}
-.fgc .fgsm{font-size:11px;color:var(--ink3);white-space:nowrap}
 .fgbar{flex:1;min-width:260px;display:flex;flex-direction:column;justify-content:center;gap:9px}
 .fgseg{display:flex;height:20px;border-radius:7px;overflow:hidden;background:var(--chip);box-shadow:inset 0 0 0 1px var(--line2)}
 .fgseg-empty{align-items:center;justify-content:center;height:22px;overflow:visible}
@@ -782,7 +778,6 @@ body.locked{overflow:hidden}
 .nav[data-mode="hover"]:hover #syncBadge .sb-txt{opacity:1}
 </style>
 
-
 <div class="app" id="app">
   <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
   <!-- ===== ARCHIVED DOCK (2026-07-04). REVERT: uncomment this dock block AND comment out the .nav block below. ===== -->
@@ -895,14 +890,19 @@ body.locked{overflow:hidden}
     <style>
 .actkpi{display:flex;flex-direction:column;gap:8px;margin-top:2px}
 .mkpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
-.mkpi{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--cardsh);min-width:0}
+/* ══ KPI card — one pattern for every metric card in the app ══
+   Shell / label / value / caption are declared once and shared by all four
+   card families (.mkpi, .pjcard, .kpi, .kpi3) so the look can only be changed
+   in one place. Each family keeps its own layout and behaviour rules below. */
+.mkpi,.pjcard,.kpi,.kpi3{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--cardsh);min-width:0;box-sizing:border-box}
+.mkpi-lab,.pjcard .pjk,.kpi .kh,.kpi3 .k3lab{font-size:13px;font-weight:600;color:var(--ink);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mkpi-val,.pjcard .pjv,.kpi .v,.kpi3 .k3val{font-size:28px;font-weight:700;color:var(--ink);line-height:1.1;font-variant-numeric:tabular-nums}
+.mkpi-cap,.pjcard .pjs,.kpi .chip,.kpi3 .k3sub{font-size:11px;font-weight:400;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mkpi.clk{cursor:pointer;transition:border-color .15s,background .15s}
 .mkpi.clk:hover{border-color:var(--accent)}
 .mkpi.on{border-color:var(--accent);background:var(--mint)}
-.mkpi-lab{font-size:13px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mkpi-row{display:flex;align-items:baseline;gap:10px;margin-top:6px;min-width:0}
-.mkpi-val{font-size:28px;font-weight:700;color:var(--ink);line-height:1.1;font-variant-numeric:tabular-nums;flex:none}
-.mkpi-cap{font-size:11px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mkpi-val{flex:none}
 .mkpi-split{display:flex;gap:6px;margin-top:6px}
 .mkpi-half{flex:1;min-width:0;padding:4px 8px;border-radius:10px;cursor:pointer;transition:background .15s;display:flex;align-items:baseline;gap:8px}
 .mkpi-half:hover{background:var(--hover)}
