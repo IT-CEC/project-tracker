@@ -523,9 +523,9 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .depchip a{cursor:pointer;color:var(--ink3);font-weight:700;padding:0 2px;font-size:13px;line-height:1}.depchip a:hover{color:var(--red)}
 .g-open{position:sticky;right:0;flex:none;width:36px;align-self:stretch;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,transparent,var(--surface) 34%);border:0;border-left:1px solid var(--line2);color:var(--ink3);cursor:pointer;z-index:4;transition:color .15s}
 .g-open:hover{color:var(--accent)}.g-open svg{width:15px;height:15px}
-.g-mb{position:absolute;top:5px;font-size:10px;color:var(--ink3);font-weight:700;border-left:1px solid var(--line2);padding-left:4px;height:18px;overflow:hidden;white-space:nowrap}
+.g-mb{position:absolute;top:5px;font-size:12px;color:var(--ink);font-weight:700;border-left:1px solid var(--line2);padding-left:4px;height:18px;overflow:hidden;white-space:nowrap}
 .g-dnrow{position:absolute;top:25px;left:0;height:16px}
-.g-dnum{position:absolute;top:0;font-size:10px;color:var(--ink3);text-align:center}
+.g-dnum{position:absolute;top:0;font-size:10px;color:var(--ink3);text-align:center;font-weight:400}
 .g-binlab{position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:600;color:var(--ink);white-space:nowrap;pointer-events:none;z-index:1}
 .g-rsz{position:absolute;top:0;bottom:0;width:9px;cursor:ew-resize;z-index:3}.g-rsz.l{left:0}.g-rsz.r{right:0}
 .chk{font-size:12px;color:var(--ink2);display:inline-flex;align-items:center;gap:5px;cursor:pointer}
@@ -3515,8 +3515,13 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
   var DAY=86400000;var dayOf=dt=>Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-base)/DAY);
   var totalDays=dayOf(endP)+1;var zs=document.getElementById(ZOOMID);var dw=parseFloat((zs&&zs.value)||'5');var TW=Math.max(totalDays*dw,600);var tw=`width:${TW}px;min-width:${TW}px`;
   var MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var MFULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var mtxt=function(f,m,y){return f===0?MFULL[m]+' '+y:(f===1?MN[m]+' '+y:(f===2?MN[m]:''));};
+  var mons=[];for(var c0=new Date(base);c0<=endP;c0=new Date(c0.getFullYear(),c0.getMonth()+1,1))mons.push({d:new Date(c0),w:new Date(c0.getFullYear(),c0.getMonth()+1,0).getDate()*dw});
+  var MF=3,MS=10;(function(){for(var f=0;f<3;f++)for(var si=0;si<2;si++){var sz=[12,10][si];
+    if(mons.every(function(o){return mtxt(f,o.d.getMonth(),o.d.getFullYear()).length*sz*0.583+8<=o.w;})){MF=f;MS=sz;return;}}})();
   var now=new Date();var tx=dayOf(now)*dw+dw*(now.getHours()/24);
-  var hd='',cur=new Date(base);while(cur<=endP){var dim=new Date(cur.getFullYear(),cur.getMonth()+1,0).getDate();hd+=`<span class="g-mb" style="left:${dayOf(cur)*dw}px;width:${dim*dw}px">${MN[cur.getMonth()]} '${(''+cur.getFullYear()).slice(2)}</span>`;cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);}
+  var hd=mons.map(function(o){return `<span class="g-mb" style="left:${dayOf(o.d)*dw}px;width:${o.w}px;font-size:${MS}px">${mtxt(MF,o.d.getMonth(),o.d.getFullYear())}</span>`;}).join('');
   var stp=dw>=22?1:(dw>=11?2:(dw>=6?5:(dw>=2?10:0)));var dn='';
   if(stp){var ddt=new Date(base.getFullYear(),base.getMonth(),base.getDate());for(var k=0;k<totalDays;k++){var dt2=ddt;var isT=dt2.toDateString()===now.toDateString();var dim2=new Date(dt2.getFullYear(),dt2.getMonth()+1,0).getDate();if(dt2.getDate()===1||(dt2.getDate()%stp===0&&(dim2-dt2.getDate())>=Math.ceil(stp*0.5))||isT)dn+=`<span class="g-dnum" style="left:${dayOf(dt2)*dw}px;width:${dw}px">${isT?`<span class="g-tday">${dt2.getDate()}</span>`:dt2.getDate()}</span>`;ddt=new Date(ddt.getFullYear(),ddt.getMonth(),ddt.getDate()+1);}}
   var tcap=(stp===0&&tx>=0&&tx<=TW)?`<span class="g-tcap" style="left:${tx}px">${now.getDate()}</span>`:'';
