@@ -2831,8 +2831,8 @@ const ACT_SEED = [
 ];
 let ACTS = [];
 const COL_ACT='action_items';
-const ACT_STATUS=['Not Started','In Process','On Hold','Done'];
-const ACT_SC={'Not Started':'#8e8e93','In Process':'#ff9500','On Hold':'#af52de','Done':'#28cd41'};
+const ACT_STATUS=['Not Started','In Process','In Review','On Hold','Done'];
+const ACT_SC={'Not Started':'#8e8e93','In Process':'#ff9500','In Review':'#0071e3','On Hold':'#af52de','Done':'#28cd41'};
 const ACT_CATC={'BRD':'#0071e3','Report&Flow':'#5e5ce6','Forms':'#ff9500','Master Data':'#28cd41'};
 const ACT_PRIC={'High':'#ff3b30','Low':'#8e8e93'};
 function actBase(){return clone(ACT_SEED);}
@@ -2875,6 +2875,7 @@ function renderActKpi(){var el=document.getElementById('actKpi');if(!el)return;
     +kCard({lab:'ทั้งหมด · TOTAL',val:ACTS.length,cap:'Civil + PS Global',fn:'actClear()'})
     +kCard({vcol:'#ff9500',lab:'กำลังทำ · IN PROCESS',split:pair('In Process')})
     +kCard({vcol:'#8e8e93',lab:'ยังไม่เริ่ม · NOT STARTED',split:pair('Not Started')})
+    +kCard({vcol:'#0071e3',lab:'รอตรวจ · IN REVIEW',split:pair('In Review')})
     +kCard({vcol:'#28cd41',lab:'เสร็จแล้ว · DONE',split:pair('Done')})
     +kCard({vcol:'#ff3b30',lab:'เลยกำหนด · OVERDUE',split:[
        {val:ACTS.filter(actOverdue).length,cap:'Civil',on:!!actFilt.overdue,fn:'actKoverdue(&quot;status&quot;)'},
