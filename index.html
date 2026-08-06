@@ -9,13 +9,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-@font-face{font-family:'SF Pro Display';src:url('sf-pro-display/SFPRODISPLAYREGULAR.OTF') format('opentype');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'SF Pro Display';src:url('sf-pro-display/SFPRODISPLAYMEDIUM.OTF') format('opentype');font-weight:500 600;font-style:normal;font-display:swap}
-@font-face{font-family:'SF Pro Display';src:url('sf-pro-display/SFPRODISPLAYBOLD.OTF') format('opentype');font-weight:700 900;font-style:normal;font-display:swap}
+
+
+
 :root{--topbar-h:60px;
  --bg:#f5f5f7;--surface:#ffffff;--surface2:#fafafa;--ink:#1d1d1f;--ink2:#76767a;--ink3:#a1a1a6;
  --line:rgba(0,0,0,.10);--line2:rgba(0,0,0,.06);--side:#ffffff;--side-ink:#3c3c43;--hover:rgba(0,0,0,.04);
- --accent:#0071e3;--accent-d:#0066cc;--red:#ff3b30;--green:#28cd41;--orange:#ff9500;--purple:#af52de;--cyan:#32ade6;--mint:rgba(0,113,227,.08);--track:#e8e8ed;--chip:#e8e8ed;--shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.14);--cardsh:0 2px 10px rgba(16,24,40,.05);--font-ui:'SF Pro Display','Noto Sans Thai',sans-serif;--font-sans:'SF Pro Display','Noto Sans Thai',sans-serif;--font-mono:'SF Pro Display','Noto Sans Thai',sans-serif;--serif:'SF Pro Display','Noto Sans Thai',sans-serif;--wall:linear-gradient(160deg,#dfe3ea 0%,#cdd3dd 45%,#bcc3d0 100%);
+ --accent:#0071e3;--accent-d:#0066cc;--red:#ff3b30;--green:#28cd41;--orange:#ff9500;--purple:#af52de;--cyan:#32ade6;--mint:rgba(0,113,227,.08);--track:#e8e8ed;--chip:#e8e8ed;--shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.14);--cardsh:0 2px 10px rgba(16,24,40,.05);--font-ui:'Noto Sans Thai',sans-serif;--font-sans:'Noto Sans Thai',sans-serif;--font-mono:'Noto Sans Thai',sans-serif;--serif:'Noto Sans Thai',sans-serif;--wall:linear-gradient(160deg,#dfe3ea 0%,#cdd3dd 45%,#bcc3d0 100%);
 }
 [data-theme="dark"]{
  --bg:#232325;--surface:#2c2c2e;--surface2:#28282a;--ink:#f5f5f7;--ink2:#aeaeb2;--ink3:#8e8e93;
@@ -221,8 +221,8 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .tablecard{background:var(--surface);border:none;border-radius:20px;box-shadow:var(--cardsh);overflow:hidden}
 .tscroll{overflow:auto}
 .tscroll.prev{max-height:300px}
-/* tabular-nums: without it "1" is 27% narrower than "0" in SF Pro Display, so same-format
-   dates render up to 8px apart and No/date columns never line up row to row */
+/* tabular-nums: Noto Sans Thai already ships equal-width digits, so this is now insurance
+   for the sans-serif fallback, where a narrow "1" pulls same-format dates out of column */
 table.dt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
 table.dt thead th{position:sticky;top:0;background:var(--surface);color:var(--ink3);font-weight:600;text-align:left;padding:12px 14px;font-size:11px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;z-index:2;cursor:pointer;border-bottom:1px solid var(--line)}
 table.dt thead th .ar{font-size:10px;color:var(--accent)}
@@ -711,7 +711,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 <!-- ══ Login gate (ธีม ISO-DMS corporate navy) — คง id เดิมให้ auth.js ทำงาน · ไม่แตะ UI แอป ══ -->
 <style id="loginGateCss">
 body.locked{overflow:hidden}
-#loginGate{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:28px;font-family:'SF Pro Display','Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;background:#0f2f52}
+#loginGate{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:28px;font-family:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;background:#0f2f52}
 #loginGate .lg-card{position:relative;width:100%;max-width:400px;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(3,16,34,.45),0 2px 6px rgba(3,16,34,.18);padding:40px 36px 28px;text-align:center;animation:lgIn .5s cubic-bezier(.2,.7,.2,1) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 #loginGate .lg-logo{margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
@@ -765,7 +765,7 @@ body.locked{overflow:hidden}
 </div>
 <!-- ══ end login gate ══ -->
 <style>
-#appLoading{position:fixed;inset:0;z-index:99990;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);color:var(--ink2);font-family:'SF Pro Display','Noto Sans Thai',sans-serif}
+#appLoading{position:fixed;inset:0;z-index:99990;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);color:var(--ink2);font-family:'Noto Sans Thai',sans-serif}
 #appLoading .al-spin{width:30px;height:30px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:alspin .7s linear infinite}
 #appLoading .al-txt{font-size:13px;color:var(--ink2)}
 @keyframes alspin{to{transform:rotate(360deg)}}
@@ -773,7 +773,7 @@ body.locked{overflow:hidden}
 </style>
 <div id="appLoading"><div class="al-spin"></div><div class="al-txt">กำลังโหลดข้อมูลจาก Firebase…</div></div>
 <style>
-#syncBadge{position:static;margin:2px 8px 2px;padding:0 9px;height:30px;z-index:auto;display:none;align-items:center;gap:7px;border-radius:8px;background:none;border:0;box-shadow:none;font:600 11.5px/1 'SF Pro Display','Noto Sans Thai',sans-serif;color:var(--ink2)}
+#syncBadge{position:static;margin:2px 8px 2px;padding:0 9px;height:30px;z-index:auto;display:none;align-items:center;gap:7px;border-radius:8px;background:none;border:0;box-shadow:none;font:600 11.5px/1 'Noto Sans Thai',sans-serif;color:var(--ink2)}
 #syncBadge .sb-dot{width:8px;height:8px;flex:none;border-radius:50%;background:#28cd41}
 #syncBadge.off .sb-dot{background:#ff9500}
 #syncBadge.saving .sb-dot{background:#0a84ff}
@@ -888,8 +888,8 @@ body.locked{overflow:hidden}
     </div>
       <div class="projview" id="reqs" style="display:none">
       
-      <div class="tablecard"><div class="tscroll"><table class="dt" id="reqTable"><colgroup><col style="width:132px"><col style="width:180px"><col style="width:200px"><col style="width:280px"><col style="width:148px"><col style="width:122px"><col style="width:150px"><col style="width:116px"><col style="width:50px"></colgroup>
-        <thead><tr><th data-sort="module"><span data-fl="module">กลุ่มงาน</span> <span class="ar"></span></th><th data-sort="sub"><span data-fl="sub">กลุ่มงานย่อย</span> <span class="ar"></span></th><th data-sort="name"><span data-fl="process">กระบวนการ</span> <span class="ar"></span></th><th><span data-fl="req">รายละเอียด</span></th><th data-sort="type"><span data-fl="type">ประเภทคำขอ</span> <span class="ar"></span></th><th data-sort="gap">Fit-Gap <span class="ar"></span></th><th data-sort="owner"><span data-fl="owner">ผู้รับผิดชอบ</span> <span class="ar"></span></th><th data-sort="status"><span data-fl="status">สถานะ</span> <span class="ar"></span></th><th></th></tr></thead><tbody></tbody>
+      <div class="tablecard"><div class="tscroll"><table class="dt" id="reqTable"><colgroup><col style="width:132px"><col style="width:180px"><col style="width:200px"><col style="width:150px"><col style="width:148px"><col style="width:122px"><col style="width:116px"><col style="width:50px"></colgroup>
+        <thead><tr><th data-sort="module"><span data-fl="module">กลุ่มงาน</span> <span class="ar"></span></th><th data-sort="sub"><span data-fl="sub">กลุ่มงานย่อย</span> <span class="ar"></span></th><th data-sort="name"><span data-fl="process">กระบวนการ</span> <span class="ar"></span></th><th data-sort="owner"><span data-fl="owner">ผู้รับผิดชอบ</span> <span class="ar"></span></th><th data-sort="type"><span data-fl="type">ประเภทคำขอ</span> <span class="ar"></span></th><th data-sort="gap">Fit-Gap <span class="ar"></span></th><th data-sort="status"><span data-fl="status">สถานะ</span> <span class="ar"></span></th><th></th></tr></thead><tbody></tbody>
       </table></div><div class="pager" id="pager"></div></div>
     </div>
     <style>
@@ -3130,7 +3130,7 @@ function renderSwatches(){var el=document.getElementById('swatches');if(!el)retu
 document.querySelectorAll('.snav').forEach(function(b){b.onclick=function(){document.querySelectorAll('.snav').forEach(function(x){x.classList.toggle('active',x===b);});document.querySelectorAll('.ssec').forEach(function(x){x.classList.toggle('active',x.id==='sec-'+b.dataset.sec);});};});
 
 /* center text plugin for module doughnut */
-const centerText={id:'centerText',afterDraw(c,a,o){if(!o.text)return;const{ctx,chartArea:{left,right,top,bottom}}=c;ctx.save();const x=(left+right)/2,y=(top+bottom)/2;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#1d1d1f';ctx.font='700 30px "SF Pro Display",sans-serif';ctx.fillText(o.text,x,y-6);ctx.fillStyle='#86868b';ctx.font='500 12px "SF Pro Display",sans-serif';ctx.fillText(o.sub||'',x,y+18);ctx.restore();}};
+const centerText={id:'centerText',afterDraw(c,a,o){if(!o.text)return;const{ctx,chartArea:{left,right,top,bottom}}=c;ctx.save();const x=(left+right)/2,y=(top+bottom)/2;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#1d1d1f';ctx.font='700 30px "Noto Sans Thai",sans-serif';ctx.fillText(o.text,x,y-6);ctx.fillStyle='#86868b';ctx.font='500 12px "Noto Sans Thai",sans-serif';ctx.fillText(o.sub||'',x,y+18);ctx.restore();}};
 
 function renderKPI(){
   const mods=countBy(REQS,'module');const subs=uniq(REQS.map(r=>r.module+'|'+r.sub)).length;
@@ -3176,11 +3176,10 @@ function renderReqTable(){const all=filteredReqs();const pages=Math.max(1,Math.c
     return `<tr>
       <td><span class="chip" style="background:${(MOD_COLORS[r.module]||'#888')}1a;color:${MOD_COLORS[r.module]||'#888'}">${r.module||''}</span></td>
       <td class="muted ell" style="max-width:none" title="${attr(r.sub)}">${esc(r.sub)}</td>
-      <td><div class="truncate" style="color:var(--ink);font-weight:600;max-width:none" onclick="openModal(${r._id})">${esc(r.name)}</div></td>
-      <td><div class="truncate" style="max-width:none" onclick="openModal(${r._id})">${esc(r.req)}</div></td>
+      <td><div class="truncate" style="color:var(--ink);max-width:none" onclick="openModal(${r._id})">${esc(r.name)}</div></td>
+      <td class="muted ell" style="max-width:none" title="${attr(r.owner)}">${esc(r.owner)}</td>
       <td><span class="cellflex">${tdot}${tsel}</span></td>
       <td>${gsel}</td>
-      <td class="muted ell" style="max-width:none" title="${attr(r.owner)}">${esc(r.owner)}</td>
       <td>${statusCell(r)}</td>
       <td style="white-space:nowrap"><button class="icbtn" onclick="openModal(${r._id})" title="แก้ไข"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="icbtn del" onclick="delRow(${r._id})" title="ลบ"><svg class="fic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button></td>
     </tr>`;}).join('')||`<tr><td colspan="9" style="text-align:center;padding:44px" class="muted">${T('nodata')}</td></tr>`;
