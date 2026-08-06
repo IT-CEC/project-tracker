@@ -224,6 +224,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 /* tabular-nums: Noto Sans Thai already ships equal-width digits, so this is now insurance
    for the sans-serif fallback, where a narrow "1" pulls same-format dates out of column */
 table.dt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+table.dt td{font-weight:600}
 table.dt thead th{position:sticky;top:0;background:var(--surface);color:var(--ink3);font-weight:600;text-align:left;padding:12px 14px;font-size:11px;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;z-index:2;cursor:pointer;border-bottom:1px solid var(--line)}
 table.dt thead th .ar{font-size:10px;color:var(--accent)}
 table.dt thead th:not([data-sort]){cursor:default}
