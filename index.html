@@ -574,7 +574,19 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .btn{font-family:inherit;font-size:13px;font-weight:500;padding:10px 20px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:background .15s,box-shadow .15s,border-color .15s}
 .btn-pri{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(0,113,227,.28)}.btn-pri:hover{background:var(--accent-d);box-shadow:0 3px 10px rgba(0,113,227,.32)}
 .btn-sec{background:var(--surface);color:var(--ink);border-color:var(--line)}.btn-sec:hover{background:var(--chip)}
-.btn-danger{background:none;color:var(--red);margin-left:auto}.btn-danger:hover{background:rgba(255,59,48,.10)}
+.btn-danger{background:none;color:var(--red);margin-left:auto}
+.m-auto{font-size:11.5px;color:var(--ink3);display:inline-flex;align-items:center;gap:5px}
+.lgadd{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.lgadd textarea{flex:1;min-height:52px;resize:vertical;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;outline:none}
+.lgadd textarea:focus{border-color:var(--accent)}
+.lgadd .btn{flex:none;align-self:stretch}
+.lgi{border-left:2px solid var(--line2);padding:0 0 10px 10px;margin-bottom:2px}
+.lgt{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.lgx{border:0;background:none;color:var(--ink3);cursor:pointer;font-size:14px;line-height:1;padding:0 2px;display:none}
+.lgi:hover .lgx{display:inline-block}
+.lgx:hover{color:var(--red)}
+.lgm{font-size:13px;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.m-auto::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--green);flex:none}.btn-danger:hover{background:rgba(255,59,48,.10)}
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:var(--surface);padding:12px 22px;border-radius:14px;font-size:13px;font-weight:500;box-shadow:var(--shadow);opacity:0;transition:.3s;z-index:2000;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .foot{display:flex;justify-content:space-between;color:var(--ink3);font-size:12px;padding:22px 2px 0;margin-top:22px;border-top:1px solid var(--line2)}
@@ -3251,7 +3263,7 @@ function openModal(id){editId=id;const r=id?REQS.find(x=>x._id===id):{module:'�
   document.getElementById('modal').classList.add('open');
   setReqMode((id&&(r.req||'').trim())?'view':'edit');}
 function closeModal(){document.getElementById('modal').classList.remove('open');}
-document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')closeModal();};
+var _mdlDown=null;document.getElementById('modal').addEventListener('mousedown',function(e){_mdlDown=e.target;});document.getElementById('modal').onclick=function(e){if(e.target.id==='modal'&&_mdlDown&&_mdlDown.id==='modal')closeModal();_mdlDown=null;};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 function autoGrow(el){if(!el)return;el.style.height='auto';el.style.height=Math.min(el.scrollHeight+2,Math.round(window.innerHeight*0.54))+'px';}
 function fmtReq(t){t=t||'';const lines=t.split(/\r?\n/);const blocks=[];let cur=null;
@@ -3490,6 +3502,10 @@ function piFromISO(v){var p=(v||'').split('-');return p.length===3?(p[2]+'/'+p[1
 function piNextId(){return PIMPL.reduce(function(m,d){return Math.max(m,d._pi);},999)+1;}
 function piAddTask(ph){var nid=piNextId();var t=new Date();var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear();};var e=new Date(t.getTime()+7*86400000);var d={ph:ph,name:'งานใหม่',asg:['Everyone'],s:fmt(t),e:fmt(e),prog:0,st:'Not Started',pr:'Low',dep:[],_pi:nid,_key:'a'+nid};PIMPL.push(d);PI_STORE[GCTX]=PIMPL;piSaveTask(d);renderPI();openPI(nid);}
 function piDelSub(parentPid,subPid){var d=PIMPL.find(function(z){return z._pi===subPid;});if(!d)return;if(!confirm('ลบงานย่อย "'+d.name+'" ?'))return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();openPI(parentPid);}
+function piLogStamp(){var d=new Date(),z=function(n){return ('0'+n).slice(-2);};return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());}
+function piAddLog(pid){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var el=document.getElementById('piLogIn');if(!el)return;var m=(el.value||'').trim();if(!m)return;if(!Array.isArray(d.log))d.log=[];d.log.push({t:piLogStamp(),m:m});piSaveTask(d);el.value='';openPI(pid);}
+function piDelLog(pid,i){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log))return;if(!confirm('ลบบันทึกนี้?'))return;d.log.splice(i,1);piSaveTask(d);openPI(pid);}
+function piLogSection(d){var L=Array.isArray(d.log)?d.log:[];var items=L.map(function(e,i){return '<div class="lgi"><div class="lgt">'+esc(e.t)+'<button class="lgx" onclick="piDelLog('+d._pi+','+i+')" title="ลบบันทึก">&times;</button></div>'+'<div class="lgm">'+esc(e.m)+'</div></div>';}).reverse().join('');return '<div class="dsec">บันทึกความคืบหน้า ('+L.length+')</div>'+'<div class="lgadd"><textarea id="piLogIn" placeholder="เขียนสิ่งที่อัปเดต แล้วกดเพิ่ม…"></textarea>'+'<button class="btn btn-sec" onclick="piAddLog('+d._pi+')">เพิ่ม</button></div>'+(items||'<div class="roval" style="color:var(--ink3)">— ยังไม่มีบันทึก —</div>');}
 function piDeleteTask(pid){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);if(!confirm('ลบงาน "'+d.name+'"'+(desc.length?(' และงานย่อย '+desc.length+' รายการ'):'')+' ?'))return;var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();closeModal();toast('ลบแล้ว');}
 async function piResetNotion(){if(!confirm("⚠️ คืนค่าแผนงานทั้งหมดเป็นข้อมูลตั้งต้นบน Firebase — การแก้ไข/งานที่เพิ่มของทั้งทีมจะหาย\n\nยืนยันหรือไม่?"))return;await resetPITasks();fillPIFilters();renderPI();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();}
 function piSubSection(d){var ch=piChildren(d);var rows=ch.map(function(c){var sc=STATUS_COLORS[c.st]||'#888';return `<div class="subrow" onclick="openPI(${c._pi})"><span class="subname">${esc(c.name)}</span><span class="subchip" style="background:${sc}1f;color:${sc}">${c.st}</span><span class="subdate">${c.s} – ${c.e}</span><button class="subdel" onclick="event.stopPropagation();piDelSub(${d._pi},${c._pi})" title="ลบงานย่อย">×</button></div>`;}).join('');return `<div class="fld"><div class="subhd"><label style="margin:0">งานย่อย (${ch.length})</label><button class="btn btn-sec subadd" onclick="piAddSub(${d._pi})">+ เพิ่มงานย่อย</button></div>${ch.length?`<div class="sublist">${rows}</div>`:`<div class="submt">— ยังไม่มีงานย่อย —</div>`}</div>`;}
@@ -3588,16 +3604,17 @@ function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi==
   var rw=(l,vv)=>`<div class="fld"><label>${l}</label><div class="roval">${vv}</div></div>`;
   document.getElementById('mBody').innerHTML=`<div class="dtwo"><div class="dleft">
     <div class="fld"><label>ชื่องาน</label><input value="${attr(d.name)}" onchange="setPIName(${d._pi},this.value)"></div>
-    <div class="frow"><div class="fld"><label>สถานะ</label><select onchange="setPIField(${d._pi},'st',this.value);openPI(${d._pi})">${STATUS_LIST.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select></div>${d.st==='In Review'?`<div class="fld"><label>กำลังตรวจโดย</label><select onchange="setPIField(${d._pi},'rvw',this.value)">${REVIEW_SIDES.map(x=>`<option ${x===(d.rvw||'Civil')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class="fld"><label>Priority</label><select onchange="setPIField(${d._pi},'pr',this.value)">${Object.keys(PI_PRC).map(x=>`<option ${x===d.pr?'selected':''}>${x}</option>`).join('')}</select></div></div>
-    <div class="fld"><label>Progress (${_isSum?'จากงานย่อย':'ตามสถานะ'})</label><div class="roval">${piProg(_cp,STATUS_COLORS[d.st])}</div></div>
-    <div class="frow"><div class="fld"><label>Start Date</label><input type="text" inputmode="numeric" size="10" value="${d.s}" placeholder="วว/ดด/ปปปป" onchange="setPIDate(${d._pi},'s',this.value)"></div><div class="fld"><label>End Date</label><input type="text" inputmode="numeric" size="10" value="${d.e}" placeholder="วว/ดด/ปปปป" onchange="setPIDate(${d._pi},'e',this.value)"></div></div>
+    <div class="frow"><div class="fld"><label>สถานะ</label><select onchange="setPIField(${d._pi},'st',this.value);openPI(${d._pi})">${STATUS_LIST.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select></div>${d.st==='In Review'?`<div class="fld"><label>กำลังตรวจโดย</label><select onchange="setPIField(${d._pi},'rvw',this.value)">${REVIEW_SIDES.map(x=>`<option ${x===(d.rvw||'Civil')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class="fld"><label>ความสำคัญ (Priority)</label><select onchange="setPIField(${d._pi},'pr',this.value)">${Object.keys(PI_PRC).map(x=>`<option ${x===d.pr?'selected':''}>${x}</option>`).join('')}</select></div></div>
+    <div class="fld"><label>ความคืบหน้า (${_isSum?'จากงานย่อย':'ตามสถานะ'})</label><div class="roval">${piProg(_cp,STATUS_COLORS[d.st])}</div></div>
+    <div class="frow"><div class="fld"><label>วันเริ่ม</label><input type="text" inputmode="numeric" size="10" value="${d.s}" placeholder="วว/ดด/ปปปป" onchange="setPIDate(${d._pi},'s',this.value)"></div><div class="fld"><label>วันสิ้นสุด</label><input type="text" inputmode="numeric" size="10" value="${d.e}" placeholder="วว/ดด/ปปปป" onchange="setPIDate(${d._pi},'e',this.value)"></div></div>
     <div class="fld"><label>เฟส (Category)</label><select onchange="setPIField(${d._pi},'ph',this.value)">${Object.keys(PI_PHASES).map(k=>`<option value="${k}" ${k===d.ph?'selected':''}>${esc(PI_PHASES[k])}</option>`).join('')}</select></div>
-    <div class="fld"><label>Milestone (ใส่ชื่อถ้างานนี้เป็นหมุดหมาย)</label><input value="${attr(d.ms||'')}" placeholder="— ไม่ใช่ milestone —" onchange="setPIField(${d._pi},'ms',this.value)"></div>
-    <div class="fld"><label>Assigned To (คั่นด้วย ,)</label><input value="${attr(d.asg.join(', '))}" onchange="setPIAsg(${d._pi},this.value)"></div>
+    <div class="fld"><label>หมุดหมาย (Milestone)</label><input value="${attr(d.ms||'')}" placeholder="— ไม่ใช่ milestone —" onchange="setPIField(${d._pi},'ms',this.value)"></div>
+    <div class="fld"><label>ผู้รับผิดชอบ (คั่นด้วย ,)</label><input value="${attr(d.asg.join(', '))}" onchange="setPIAsg(${d._pi},this.value)"></div>
   </div><div class="dright">
     ${piSubSection(d)}
     ${rw('Blocked by (รอให้เสร็จก่อน)',piDepEditor(d))}
-  </div></div><div class="mact"><button class="btn btn-sec" style="color:var(--red)" onclick="piDeleteTask(${d._pi})">${LANG==='en'?'Delete':'ลบงาน'}</button><button class="btn btn-sec" onclick="closeModal()">${LANG==='en'?'Close':'ปิด'}</button></div>`;
+    ${piLogSection(d)}
+  </div></div><div class="mact"><span class="m-auto">${LANG==='en'?'Saved automatically':'บันทึกอัตโนมัติทุกครั้งที่แก้'}</span><button class="btn btn-sec" onclick="closeModal()">${LANG==='en'?'Close':'ปิด'}</button><button class="btn btn-danger" onclick="piDeleteTask(${d._pi})">${LANG==='en'?'Delete':'ลบงาน'}</button></div>`;
   document.getElementById('modal').classList.add('open');}
 function toggleGFocus(){var pid=GCTX==='ap'?'bridge':'project';var p=document.getElementById(pid);if(!p)return;p.classList.toggle('gfocus');var on=p.classList.contains('gfocus');var b=document.getElementById(GCTX==='ap'?'apFocusBtn':'gFocusBtn');if(b)b.classList.toggle('on',on);var m=document.querySelector('.main');if(m)m.classList.toggle('gffit',on);var gw=document.getElementById(GCTX==='ap'?'apGantt':'piGantt');if(gw&&on&&gw.dataset.origMaxH==null)gw.dataset.origMaxH=gw.style.maxHeight||'';var applyH=function(){if(!gw)return;if(p.classList.contains('gfocus')){if(m)m.scrollTop=0;var t=Math.round(gw.getBoundingClientRect().top);gw.style.maxHeight='calc(100vh - '+(t+16)+'px)';}else{gw.style.maxHeight=gw.dataset.origMaxH||'';delete gw.dataset.origMaxH;}};applyH();setTimeout(function(){applyH();piToday();},90);}
 function piGanttHover(){var gw=document.getElementById(PIGID);if(!gw||gw._hb)return;gw._hb=1;gw.addEventListener("mouseover",function(e){var hi=gw.querySelector(".g-hdrhi");if(!hi)return;var bar=e.target.closest?e.target.closest(".g-bar"):null;if(bar){hi.style.left=bar.dataset.hl+"px";hi.style.width=bar.dataset.hw+"px";hi.classList.add("on");}else{hi.classList.remove("on");}});}
