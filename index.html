@@ -832,6 +832,11 @@ body.locked{overflow:hidden}
   border:0;background:none;font-family:inherit;font-size:14px;font-weight:500;color:var(--tb-ink);
   cursor:pointer;white-space:nowrap;text-decoration:none;transition:color .15s}
 .tb-a:hover{color:var(--tb-red)}
+/* กรอบ focus มาตรฐานของเบราว์เซอร์เป็นสี่เหลี่ยมเต็มความสูงปุ่ม ทับขีดแดงด้านล่าง
+   จึงกำหนดเอง และใช้ :focus-visible เพื่อให้ขึ้นเฉพาะตอนใช้คีย์บอร์ด */
+.tb-a:focus{outline:none}
+.tb-a:focus-visible,.tb-user:focus-visible,.tb-ham:focus-visible,.topbar .icon-btn:focus-visible{
+  outline:2px solid var(--tb-red);outline-offset:-4px;border-radius:8px}
 .tb-a .plus{font-size:15px;line-height:1;font-weight:400;color:var(--tb-red)}
 .tb-a[aria-expanded="true"]{color:var(--tb-red)}
 .tb-a[aria-expanded="true"] .plus{visibility:hidden}
@@ -1100,7 +1105,7 @@ body.locked{overflow:hidden}
     </section>
     
     <section class="panel" id="settings">
-      <div class="phead"><h1>ตั้งค่า</h1><p>ปรับแต่งการแสดงผล ภาษา และจัดการข้อมูล</p></div>
+      <div class="phead"><p>ปรับแต่งการแสดงผล ภาษา และจัดการข้อมูล</p></div>
       <div class="setwrap">
         <div class="setnav">
           <button class="snav active" data-sec="appearance">การแสดงผล</button>
