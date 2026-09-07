@@ -12,7 +12,7 @@
 
 
 
-:root{--topbar-h:60px;
+:root{--topbar-h:64px;
  --bg:#f5f5f7;--surface:#ffffff;--surface2:#fafafa;--ink:#1d1d1f;--ink2:#76767a;--ink3:#a1a1a6;
  --line:rgba(0,0,0,.10);--line2:rgba(0,0,0,.06);--side:#ffffff;--side-ink:#3c3c43;--hover:rgba(0,0,0,.04);
  --accent:#0071e3;--accent-d:#0066cc;--red:#ff3b30;--green:#28cd41;--orange:#ff9500;--purple:#af52de;--cyan:#32ade6;--mint:rgba(0,113,227,.08);--track:#e8e8ed;--chip:#e8e8ed;--shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.14);--cardsh:0 2px 10px rgba(16,24,40,.05);--font-ui:'Noto Sans Thai',sans-serif;--font-sans:'Noto Sans Thai',sans-serif;--font-mono:'Noto Sans Thai',sans-serif;--serif:'Noto Sans Thai',sans-serif;--wall:linear-gradient(160deg,#dfe3ea 0%,#cdd3dd 45%,#bcc3d0 100%);
@@ -56,7 +56,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--ink);font-size:
 .profile .pn{font-size:13px;font-weight:600;line-height:1.1}
 .profile .pe{font-size:11px;color:var(--ink3)}
 /* content */
-.content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;padding-left:var(--nav-w,64px);padding-top:var(--topbar-h);transition:padding-left .18s cubic-bezier(.32,.72,0,1)}
+.content{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;padding-top:var(--topbar-h)}
 .topbar{flex:none;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;gap:12px;padding:0 20px 0 0;height:var(--topbar-h);background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.03)}
 .tb-title{font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.4px;line-height:1.2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-left:8px}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
@@ -292,6 +292,7 @@ table.dt tbody tr{transition:.12s}table.dt tbody tr:hover{background:var(--hover
 .morebtn{display:block;width:100%;text-align:center;padding:11px;font-size:13px;font-weight:600;color:var(--accent-d);background:var(--mint);border:0;cursor:pointer;font-family:inherit}.morebtn:hover{filter:brightness(.97)}
 .bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px}
 .barcenter{flex:1;display:flex;justify-content:center;min-width:0}
+.barAdd{margin-left:auto}
 .barright{display:flex;align-items:center;gap:16px;margin-left:auto}
 .lbl{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.02em;text-transform:uppercase}
 select,input[type=text]{font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 11px;outline:none}
@@ -594,8 +595,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .foot{display:flex;justify-content:space-between;color:var(--ink3);font-size:12px;padding:22px 2px 0;margin-top:22px;border-top:1px solid var(--line2)}
 .scrim{display:none}
 @media(max-width:1080px){.kpis,#brKpi,#planKpi{grid-template-columns:repeat(2,1fr)}.toprow{flex-direction:column}.ovrow3,.ovrow2{grid-template-columns:1fr}.bento{grid-template-columns:1fr}.brgrid{grid-template-columns:1fr}
- .sidebar{position:fixed;left:0;top:0;z-index:200;transform:translateX(-100%)}.app.side-open .sidebar{transform:none}.topbar .ham{display:block}
- .app.side-open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150}}
+}
 
 /* macOS-style floating dock */
 .main{}
@@ -807,10 +807,82 @@ body.locked{overflow:hidden}
 .sb-txt{transition:opacity .13s;white-space:nowrap}
 .nav[data-mode="collapsed"] #syncBadge .sb-txt,.nav[data-mode="hover"] #syncBadge .sb-txt{opacity:0}
 .nav[data-mode="hover"]:hover #syncBadge .sb-txt{opacity:1}
+/* ══════════ TITLE BAR NAVIGATION (2026-09-07) ══════════
+   ย้ายการนำทางจาก sidebar ซ้ายขึ้นมาไว้บนแถบหัว ดีไซน์ตามเว็บบริษัท
+   civilengineering.co.th — พื้นขาว ตัวอักษรน้ำเงิน จุดเน้นสีแดง
+
+   เมนูย่อยในดรอปดาวน์ยังใช้คลาส .sb-item และ data-tab/data-pv/data-bv
+   ชุดเดิมทั้งหมด updateNavActive() กับตัวจับคลิกที่ผูกกับ .sb-item
+   จึงทำงานต่อได้โดยไม่ต้องแก้ */
+:root{--tb-bg:#fff;--tb-ink:#002453;--tb-red:#eb0029;--tb-hover:rgba(0,36,83,.05)}
+[data-theme="dark"]{--tb-bg:#1c1c1e;--tb-ink:#e8eef6;--tb-red:#ff5470;--tb-hover:rgba(255,255,255,.07)}
+.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:0;padding:0 26px;
+  background:var(--tb-bg);box-shadow:0 2px 12px rgba(0,36,83,.10)}
+.tb-left{display:flex;align-items:center;gap:13px;min-width:0}
+.tb-logo{height:29px;width:auto;flex:none;cursor:pointer;display:block}
+.tb-vd{width:1px;height:22px;background:var(--line);flex:none}
+/* โลโก้เป็นไฟล์สีเข้มสำหรับพื้นขาว ธีมมืดจึงกลับค่าความสว่าง
+   invert(1) hue-rotate(180deg) กลับสว่าง-มืดโดยคงเฉดสีเดิม เครื่องหมายจึงยังแดง */
+[data-theme="dark"] .tb-logo{filter:invert(1) hue-rotate(180deg)}
+.tb-sys{font-size:14px;font-weight:600;color:var(--tb-ink);white-space:nowrap;letter-spacing:-.01em;
+  overflow:hidden;text-overflow:ellipsis}
+/* ── เมนูกลาง ── */
+.tb-nav{display:flex;align-items:center;gap:2px;height:100%;justify-self:center}
+.tb-a{position:relative;height:100%;display:inline-flex;align-items:center;gap:6px;padding:0 14px;
+  border:0;background:none;font-family:inherit;font-size:14px;font-weight:500;color:var(--tb-ink);
+  cursor:pointer;white-space:nowrap;text-decoration:none;transition:color .15s}
+.tb-a:hover{color:var(--tb-red)}
+.tb-a .plus{font-size:15px;line-height:1;font-weight:400;color:var(--tb-red)}
+.tb-a[aria-expanded="true"]{color:var(--tb-red)}
+.tb-a[aria-expanded="true"] .plus{visibility:hidden}
+.tb-a[aria-expanded="true"]::before{content:"";position:absolute;right:15px;width:7px;height:7px;
+  border-radius:50%;background:var(--tb-red)}
+.tb-a.on{color:var(--tb-red);font-weight:600}
+.tb-a.on::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:3px;
+  background:var(--tb-red);border-radius:2px 2px 0 0}
+/* ── กลุ่มขวา ── */
+.tb-right{margin-left:0;justify-self:end;display:flex;align-items:center;gap:8px}
+.tb-user{display:flex;align-items:center;gap:8px;padding:4px 11px 4px 4px;border:1px solid var(--line);
+  border-radius:999px;background:none;cursor:pointer;font-family:inherit;position:relative}
+.tb-user:hover{background:var(--tb-hover)}
+.tb-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#5ac8fa,#0071e3);
+  color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.tb-un{font-size:12px;font-weight:600;color:var(--tb-ink);white-space:nowrap}
+.tb-ham{display:flex;flex-direction:column;justify-content:space-between;width:24px;height:16px;
+  padding:5px 3px;border:0;background:none;cursor:pointer;box-sizing:content-box}
+.tb-ham i{display:block;height:2.5px;background:var(--tb-ink);border-radius:2px;transition:transform .22s,opacity .15s}
+.tb-ham[aria-expanded="true"] i:nth-child(1){transform:translateY(6.75px) rotate(45deg)}
+.tb-ham[aria-expanded="true"] i:nth-child(2){opacity:0}
+.tb-ham[aria-expanded="true"] i:nth-child(3){transform:translateY(-6.75px) rotate(-45deg)}
+/* ── ดรอปดาวน์ ── */
+.tb-pop{position:fixed;top:var(--topbar-h);z-index:99;background:var(--surface);
+  border:1px solid var(--line);border-top:0;border-radius:0 0 14px 14px;
+  box-shadow:0 18px 44px rgba(0,36,83,.18);padding:8px;display:none;max-height:calc(100vh - var(--topbar-h) - 20px);overflow:auto}
+.tb-pop.open{display:block}
+.tb-pop .sb-item{padding:10px 12px;border-radius:10px;gap:11px;font-size:13px;white-space:nowrap}
+.tb-pop .sb-item:hover{background:var(--hover);color:var(--tb-red)}
+.tb-pop .sb-item.active{background:var(--mint);color:var(--accent);font-weight:600}
+.tb-pop .sb-item.active::before{display:none}
+.tb-pop .sb-item.active svg{color:var(--accent)}
+.tb-pop .sb-label{max-width:none}
+#tbAll{left:26px;right:26px;padding:16px 20px 18px;display:none;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px 26px}
+#tbAll.open{display:grid}
+#tbAll .sb-item{padding:8px 10px}
+.tb-grp{grid-column:auto;display:flex;flex-direction:column;gap:2px}
+.tb-grp>.sb-section{padding:2px 10px 8px}
+.app.tb-open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.16);z-index:98}
+/* ── หัวหน้าเนื้อหา (เดิม #crumbNow อยู่บนแถบหัว) ── */
+.pagehead{display:flex;align-items:center;gap:12px;margin:0 0 15px;min-height:30px}
+.pagehead .tb-title{font-size:22px}
+/* ── จอแคบ ── */
+@media(max-width:1240px){.tb-sys,.tb-vd{display:none}}
+@media(max-width:1080px){.tb-nav{display:none}.tb-un{display:none}.topbar{padding:0 16px}
+  #tbAll{left:10px;right:10px}}
 </style>
 
 <div class="app" id="app">
-  <div class="scrim" onclick="document.getElementById('app').classList.remove('side-open')"></div>
+  <div class="scrim" onclick="tbClose()"></div>
   <!-- ===== ARCHIVED DOCK (2026-07-04). REVERT: uncomment this dock block AND comment out the .nav block below. ===== -->
   <!--
   <aside class="dock">
@@ -822,55 +894,63 @@ body.locked{overflow:hidden}
 <div class="di" data-tip="ตั้งค่า" data-tab="settings"><span class="di-ic "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="di-lbl">ตั้งค่า</span></div>
 </aside>
   -->
-  <!-- ===== SIDEBAR (AI-Recruiting chrome) ===== -->
-  <aside class="nav sidebar" id="nav" data-mode="hover">
-    <nav class="sb-nav">
-      <div class="sb-section" data-nav="secOracle">PROJECT ORACLE IMPLEMENTATION</div>
-      <a class="sb-item" data-tab="project" data-pv="impl" data-tip="ภาพรวมแผนงานโครงการ (Overall Project Plan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label" data-nav="impl">ภาพรวมแผนงานโครงการ</span></a>
-      <a class="sb-item" data-tab="project" data-pv="reqs" data-tip="รายการความต้องการ (Requirements)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span class="sb-label" data-nav="reqs">รายการความต้องการ</span></a>
-      <a class="sb-item" data-tab="project" data-pv="report" data-tip="รายการรายงาน 3 ระดับ (3-Level Reports)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg><span class="sb-label" data-nav="report">รายการรายงาน 3 ระดับ</span></a>
-      <a class="sb-item" data-tab="project" data-pv="action" data-tip="ติดตามสถานะ (Tracking)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="sb-label" data-nav="action">ติดตามสถานะ</span></a>
-      <a class="sb-item" data-tab="oracle" data-tip="กระบวนการของ Oracle (Oracle Workflow)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><path d="M10 6.5h4a2 2 0 0 1 2 2V14"/><path d="M6.5 10v4a2 2 0 0 0 2 2H14"/></svg><span class="sb-label" data-nav="oracle">กระบวนการของ Oracle</span></a>
-      <div class="sb-sep"></div>
-      <div class="sb-section" data-nav="secAuto">PROJECT AUTOMATION [IT]</div>
-      <a class="sb-item" data-tab="bridge" data-bv="timeline" data-tip="ภาพรวมแผนงานโครงการ (Overall Project Plan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label" data-nav="timeline">ภาพรวมแผนงานโครงการ</span></a>
-      <a class="sb-item" data-tab="bridge" data-bv="table" data-tip="วิเคราะห์ผลความคุ้มค่า (ROI Analysis)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg><span class="sb-label" data-nav="fte">วิเคราะห์ผลความคุ้มค่า</span></a>
-      <div class="sb-sep"></div>
-      <div class="sb-section" data-nav="general">ทั่วไป</div>
-      <a class="sb-item" data-tab="settings" data-tip="ตั้งค่า"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="sb-label" data-nav="settings">ตั้งค่า</span></a>
-    </nav>
-    <div style="position:relative">
-      <button class="sb-pin" id="navCtrlBtn" onclick="toggleNavPop(event)" title="การแสดงแถบเมนู"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg><span class="sb-pin-label" data-i18n="railMode">การแสดงแถบเมนู</span></button>
-      <div class="nav-pop" id="navPop">
-        <div class="nav-pop-h">การแสดงแถบเมนู</div>
-        <button class="nav-pop-i" data-nm="expanded" onclick="setNavMode('expanded')"><span class="nav-pop-dot"></span>ขยายค้างไว้</button>
-        <button class="nav-pop-i" data-nm="collapsed" onclick="setNavMode('collapsed')"><span class="nav-pop-dot"></span>หุบเป็นแถบไอคอน</button>
-        <button class="nav-pop-i" data-nm="hover" onclick="setNavMode('hover')"><span class="nav-pop-dot"></span>ขยายเมื่อชี้เมาส์</button>
+
+  <div class="content">
+    <div class="topbar">
+      <div class="tb-left">
+        <img class="tb-logo" src="CIVIL_LOGO_ENG_Full color.png" alt="Civil Engineering Public Company Limited" title="ไปหน้าแผนงานโครงการ" onclick="showTab('project')">
+        <span class="tb-vd"></span><span class="tb-sys">ระบบติดตามงาน ERP</span>
+      </div>
+      <nav class="tb-nav">
+        <button class="tb-a" data-pop="tbPlan" aria-expanded="false" aria-controls="tbPlan">แผนงานโครงการ <span class="plus">+</span></button>
+        <button class="tb-a" data-goto="oracle">กระบวนการ Oracle</button>
+        <button class="tb-a" data-pop="tbAuto" aria-expanded="false" aria-controls="tbAuto">Automation <span class="plus">+</span></button>
+        <button class="tb-a" data-goto="settings">ตั้งค่า</button>
+      </nav>
+      <div class="tb-right">
+        <button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button>
+        <button class="tb-user" data-pop="tbUser" aria-expanded="false" aria-controls="tbUser" aria-label="เมนูผู้ใช้"><span class="tb-av">CE</span><span class="tb-un">Civil ERP Team</span></button>
+        <button class="tb-ham" data-pop="tbAll" aria-expanded="false" aria-controls="tbAll" aria-label="เมนูทั้งหมด" title="เมนูทั้งหมด"><i></i><i></i><i></i></button>
       </div>
     </div>
-    <div class="sb-footer">
-      <div class="sb-user">
+    <div class="tb-pop" id="tbPlan">
+        <a class="sb-item" data-tab="project" data-pv="impl" data-tip="ภาพรวมแผนงานโครงการ (Overall Project Plan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label" data-nav="impl">ภาพรวมแผนงานโครงการ</span></a>
+        <a class="sb-item" data-tab="project" data-pv="reqs" data-tip="รายการความต้องการ (Requirements)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg><span class="sb-label" data-nav="reqs">รายการความต้องการ</span></a>
+        <a class="sb-item" data-tab="project" data-pv="report" data-tip="รายการรายงาน 3 ระดับ (3-Level Reports)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg><span class="sb-label" data-nav="report">รายการรายงาน 3 ระดับ</span></a>
+        <a class="sb-item" data-tab="project" data-pv="action" data-tip="ติดตามสถานะ (Tracking)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span class="sb-label" data-nav="action">ติดตามสถานะ</span></a>
+    </div>
+    <div class="tb-pop" id="tbAuto">
+        <a class="sb-item" data-tab="bridge" data-bv="timeline" data-tip="ภาพรวมแผนงานโครงการ (Overall Project Plan)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sb-label" data-nav="timeline">ภาพรวมแผนงานโครงการ</span></a>
+        <a class="sb-item" data-tab="bridge" data-bv="table" data-tip="วิเคราะห์ผลความคุ้มค่า (ROI Analysis)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg><span class="sb-label" data-nav="fte">วิเคราะห์ผลความคุ้มค่า</span></a>
+    </div>
+    <div class="tb-pop" id="tbUser" style="right:26px">
+      <div class="sb-user" style="padding:6px 10px 10px">
         <div class="sb-avatar">CE</div>
         <div style="overflow:hidden;flex:1">
           <div class="sb-uname">Civil ERP Team</div>
           <div class="sb-urole" id="syncBadge"><span class="sb-txt">เชื่อมต่อแล้ว</span></div>
         </div>
-        <button class="sb-logout" onclick="if(confirm('ออกจากระบบ?'))erpLogout()" title="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></button>
+      </div>
+      <a class="sb-item" onclick="if(confirm('ออกจากระบบ?'))erpLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="sb-label">ออกจากระบบ</span></a>
+    </div>
+    <div class="tb-pop" id="tbAll">
+      <div class="tb-grp"><div class="sb-section" data-nav="secOracle">PROJECT ORACLE IMPLEMENTATION</div>
+          <a class="sb-item" data-tab="project" data-pv="impl" data-tip="ภาพรวมแผนงานโครงการ (Overall Project Plan)"><span class="sb-label" data-nav="impl">ภาพรวมแผนงานโครงการ</span></a>
+          <a class="sb-item" data-tab="project" data-pv="reqs" data-tip="รายการความต้องการ (Requirements)"><span class="sb-label" data-nav="reqs">รายการความต้องการ</span></a>
+          <a class="sb-item" data-tab="project" data-pv="report" data-tip="รายการรายงาน 3 ระดับ (3-Level Reports)"><span class="sb-label" data-nav="report">รายการรายงาน 3 ระดับ</span></a>
+          <a class="sb-item" data-tab="project" data-pv="action" data-tip="ติดตามสถานะ (Tracking)"><span class="sb-label" data-nav="action">ติดตามสถานะ</span></a>
+          <a class="sb-item" data-tab="oracle" data-tip="กระบวนการของ Oracle (Oracle Workflow)"><span class="sb-label" data-nav="oracle">กระบวนการของ Oracle</span></a>
+      </div>
+      <div class="tb-grp"><div class="sb-section" data-nav="secAuto">PROJECT AUTOMATION [IT]</div>
+          <a class="sb-item" data-tab="bridge" data-bv="timeline" data-tip="ภาพรวมแผนงานโครงการ (Overall Project Plan)"><span class="sb-label" data-nav="timeline">ภาพรวมแผนงานโครงการ</span></a>
+          <a class="sb-item" data-tab="bridge" data-bv="table" data-tip="วิเคราะห์ผลความคุ้มค่า (ROI Analysis)"><span class="sb-label" data-nav="fte">วิเคราะห์ผลความคุ้มค่า</span></a>
+      </div>
+      <div class="tb-grp"><div class="sb-section" data-nav="general">ทั่วไป</div>
+          <a class="sb-item" data-tab="settings" data-tip="ตั้งค่า"><span class="sb-label" data-nav="settings">ตั้งค่า</span></a>
       </div>
     </div>
-  </aside>
-
-  <div class="content">
-    <div class="topbar"><div class="brand"><img class="brand-logo" src="SMALL_CIVIL_LOGO.png" alt="Civil ERP"><span class="brand-wm">Civil ERP</span></div><div class="tb-title" id="crumbNow">ภาพรวม</div><div class="projtabs" id="projToggle"><span class="pjt-thumb"></span>
-        <button class="pjt on" data-pv="impl" onclick="setProjView('impl')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Implementation)</button>
-        <button class="pjt" data-pv="reqs" onclick="setProjView('reqs')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> ความต้องการ (Requirements)</button>
-        <button class="pjt" data-pv="action" onclick="setProjView('action')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Action Item</button>
-        <button class="pjt" data-pv="report" onclick="setProjView('report')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg> รายงาน 3 ระดับ</button>
-      </div><div class="projtabs" id="brToggle"><span class="pjt-thumb"></span>
-        <button class="pjt on" data-bv="table" onclick="setBrView('table')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> วิเคราะห์ FTE</button>
-        <button class="pjt" data-bv="timeline" onclick="setBrView('timeline')"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> แผนงาน (Timeline)</button>
-      </div><div class="tb-right"><button class="tbtn pri" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button><button class="tbtn pri" id="addActBtn" style="display:none" onclick="actAdd()" data-i18n="addAction">+ เพิ่ม Action Item</button><button class="tbtn pri" id="addRptBtn" style="display:none" onclick="rptAdd()" data-i18n="addReport">+ เพิ่มรายงาน</button><button class="tbtn pri" id="addBrBtn" style="display:none" onclick="brAddRow()" data-i18n="addItem">+ เพิ่มรายการ</button><button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button></div></div>
     <div class="main">
+    <div class="pagehead"><h1 class="tb-title" id="crumbNow">ภาพรวม</h1></div>
 
     <section class="panel active" id="overview">
       
@@ -892,6 +972,7 @@ body.locked{overflow:hidden}
         <input type="text" id="fSearch" placeholder="ค้นหา…" data-i18n-ph="search" style="display:none">
         <button class="tbtn" onclick="clearFilters()" data-i18n="clear">ล้าง</button>
         <span class="count" id="reqCount"></span>
+        <button class="tbtn pri barAdd" id="addReqBtn" style="display:none" onclick="openModal(null)" data-i18n="addRow">+ เพิ่ม Requirement</button>
       </div><div class="fgrow2"><div class="ststrip"><span class="rlbl" data-fl="status">สถานะ</span><div class="kgroup" id="statusStrip"></div></div><div class="fgstrip"><span class="fglbl">Fit-Gap <span class="fghsub" id="fgGroup">· ทุกกลุ่มงาน</span></span><div class="fgbar2" id="reqGapBar"></div><span class="fgpct" id="fgPct">ประเมินแล้ว 0%</span></div></div></div></div>
       <div class="projview" id="implement">
       <div class="bar" style="margin-top:2px">
@@ -955,6 +1036,7 @@ body.locked{overflow:hidden}
         <span class="lbl">ผู้รับผิดชอบ</span><select id="actOwner" data-multi="1"></select>
         <input type="text" id="actSearch" placeholder="ค้นหา…" data-i18n-ph="search" style="width:180px;flex:none">
         <button class="tbtn" onclick="actClear()">ล้าง</button>
+        <button class="tbtn pri barAdd" id="addActBtn" style="display:none" onclick="actAdd()" data-i18n="addAction">+ เพิ่ม Action Item</button>
       </div>
       <div class="tablecard"><div class="tscroll"><table class="dt" id="actTable"><colgroup><col style="width:52px"><col style="width:118px"><col style="width:300px"><col style="width:86px"><col style="width:150px"><col style="width:100px"><col style="width:100px"><col style="width:132px"><col style="width:180px"><col style="width:140px"><col style="width:180px"></colgroup>
         <thead><tr><th data-asort="_id">No <span class="ar"></span></th><th data-asort="cat">หมวด <span class="ar"></span></th><th>Action Request</th><th data-asort="pri">Priority <span class="ar"></span></th><th>ผู้รับผิดชอบ</th><th data-asort="due">กำหนดส่ง <span class="ar"></span></th><th data-asort="done">วันที่เสร็จ <span class="ar"></span></th><th data-asort="status">Civil Work Status <span class="ar"></span></th><th>Civil : หมายเหตุ / ติดตาม</th><th data-asort="status2">PS Global Work Status <span class="ar"></span></th><th>PS Global : หมายเหตุ / ติดตาม</th></tr></thead><tbody></tbody>
@@ -968,6 +1050,7 @@ body.locked{overflow:hidden}
         <span class="lbl">ความถี่</span><select id="rptFreq" data-multi="1"></select>
         <input type="text" id="rptSearch" placeholder="ค้นหา…" data-i18n-ph="search" style="width:180px;flex:none">
         <button class="tbtn" onclick="rptClear()">ล้าง</button>
+        <button class="tbtn pri barAdd" id="addRptBtn" style="display:none" onclick="rptAdd()" data-i18n="addReport">+ เพิ่มรายงาน</button>
       </div>
       <div class="tablecard"><div class="tscroll"><table class="dt" id="rptTable"><colgroup><col style="width:52px"><col style="width:150px"><col style="width:130px"><col style="width:330px"><col style="width:170px"><col style="width:110px"><col style="width:160px"></colgroup>
         <thead><tr><th data-rsort="_id">No <span class="ar"></span></th><th data-rsort="dept">แผนก <span class="ar"></span></th><th data-rsort="level">ระดับ <span class="ar"></span></th><th data-rsort="name">ชื่อรายงาน <span class="ar"></span></th><th>ผู้ใช้หลัก</th><th data-rsort="freq">ความถี่ <span class="ar"></span></th><th>แหล่งข้อมูล</th></tr></thead><tbody></tbody>
@@ -1006,6 +1089,7 @@ body.locked{overflow:hidden}
         <input type="text" id="brSearch" placeholder="ค้นหา…" data-i18n-ph="search">
         <button class="tbtn" onclick="clearBrFilters()" data-i18n="clear">ล้าง</button>
         <span class="count" id="brCount" style="margin-left:auto"></span>
+        <button class="tbtn pri barAdd" id="addBrBtn" style="display:none" onclick="brAddRow()" data-i18n="addItem">+ เพิ่มรายการ</button>
         <select id="brStatus" style="display:none"><option value="">ทุกสถานะ</option><option>Not Started</option><option>In Progress</option><option>In Review</option><option>On Hold</option><option>Delayed</option><option>Completed</option></select>
       </div>
       <div class="sumribbon"><span class="rlbl" data-fl="status">สถานะ</span><div class="kgroup" id="brStatusStrip"></div></div>
@@ -3114,14 +3198,35 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+L(' · อีก ',' · in ')+Math.max(0,Math.ceil((_nm.e-now)/86400000))+L(' วัน',' days')):L('ไม่มี milestone ข้างหน้า','No upcoming milestone');
   el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,L('จากแผนงาน','from plan'),curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol),c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,L('กำหนดขึ้นระบบจริง','go-live date'),'#c79200')].join('');}
-function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('side-open');var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
-function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});}
+function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('tb-open');if(typeof tbClose==='function')tbClose();var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
+function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});
+  document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
+    :(a.dataset.pop==='tbPlan'?tab==='project':a.dataset.pop==='tbAuto'?tab==='bridge':false);
+    a.classList.toggle('on',on);});}
 document.querySelectorAll('.sb-item').forEach(function(el){el.title=el.dataset.tip||'';el.onclick=function(){var tab=el.dataset.tab,pv=el.dataset.pv,bv=el.dataset.bv,cur=(document.querySelector('.panel.active')||{}).id||'';if(pv){if(tab!==cur){curProjView=pv;showTab(tab);}else{setProjView(pv);}}else if(bv){if(tab!==cur){curBrView=bv;showTab(tab);}else{setBrView(bv);}}else{showTab(tab);}};});
-function applyNavMode(m){m=(m==='expanded'||m==='collapsed'||m==='hover')?m:'hover';var nav=document.getElementById('nav');if(nav)nav.dataset.mode=m;var app=document.getElementById('app');if(app)app.style.setProperty('--nav-w',m==='expanded'?'248px':'64px');document.querySelectorAll('#navPop .nav-pop-i').forEach(function(b){b.classList.toggle('on',b.dataset.nm===m);});}
-function setNavMode(m){try{localStorage.setItem('erp_nav_mode',m);}catch(e){}applyNavMode(m);var p=document.getElementById('navPop');if(p)p.classList.remove('open');}
-applyNavMode((function(){try{return localStorage.getItem('erp_nav_mode');}catch(e){return null;}})()||'hover');
-function toggleNavPop(e){if(e){e.stopPropagation();}var p=document.getElementById('navPop');if(p)p.classList.toggle('open');}
-document.addEventListener('click',function(e){var p=document.getElementById('navPop');if(p&&p.classList.contains('open')&&!e.target.closest('#navPop')&&!e.target.closest('#navCtrlBtn'))p.classList.remove('open');});
+/* ══════════ แถบนำทางด้านบน — เปิด/ปิดดรอปดาวน์ ══════════
+   เมนูย่อยในดรอปดาวน์คือ .sb-item ชุดเดิมที่ย้ายมาจาก sidebar ทั้งดุ้น
+   ตัวจับคลิกด้านบนจึงยังผูกกับมันอยู่แล้ว ที่นี่เพิ่มแค่การปิดดรอปดาวน์ */
+function tbClose(){
+  document.querySelectorAll('.tb-pop.open').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.topbar [data-pop]').forEach(function(b){b.setAttribute('aria-expanded','false');});
+  var app=document.getElementById('app');if(app)app.classList.remove('tb-open');}
+function tbToggle(btn){
+  var pop=document.getElementById(btn.dataset.pop),wasOpen=btn.getAttribute('aria-expanded')==='true';
+  tbClose();if(wasOpen||!pop)return;
+  btn.setAttribute('aria-expanded','true');pop.classList.add('open');
+  document.getElementById('app').classList.add('tb-open');
+  if(btn.dataset.pop!=='tbAll'&&btn.dataset.pop!=='tbUser'){   /* จัดให้ตรงกับปุ่ม แต่ไม่ล้นจอ */
+    var r=btn.getBoundingClientRect();
+    pop.style.left=Math.max(10,Math.min(r.left-8,window.innerWidth-pop.offsetWidth-10))+'px';}}
+document.querySelectorAll('.topbar [data-pop]').forEach(function(b){
+  b.addEventListener('click',function(e){e.stopPropagation();tbToggle(b);});});
+document.querySelectorAll('.topbar [data-goto]').forEach(function(b){
+  b.addEventListener('click',function(){tbClose();showTab(b.dataset.goto);});});
+document.querySelectorAll('.tb-pop .sb-item').forEach(function(el){el.addEventListener('click',tbClose);});
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.tb-pop')&&!e.target.closest('.topbar'))tbClose();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')tbClose();});
 /* ARCHIVED DOCK magnification — revert with the dock block above.
 (function(){const dock=document.querySelector('.dock');if(!dock)return;const ics=[...dock.querySelectorAll('.di-ic')];const n=ics.length;
 let cy=[],B=35,cur=ics.map(()=>1),tgt=ics.map(()=>1),my=null,raf=null;const SIG=46,BOOST=0.85;
