@@ -512,7 +512,14 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .main.gffit{padding-bottom:16px}
 .gtbtn.on{background:var(--accent);border-color:var(--accent);color:#fff}
 .gtbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;transition:.15s;line-height:1}
-.gtbtn:hover{background:var(--chip);color:var(--ink)}.gtoolbar #piZoom{margin-left:4px}
+.gtbtn:hover{background:var(--chip);color:var(--ink)}
+/* ไอคอนสองชุดในปุ่มเดียว สลับตามว่าตอนนี้หุบหมดหรือยัง
+   ลูกศรชี้เข้าหากัน = กดแล้วหุบ · ชี้ออกจากกัน = กดแล้วกาง */
+.gtfold{padding:5px 9px;display:inline-flex;align-items:center}
+.gtfold svg{width:15px;height:15px;display:block}
+.gtfold .fd{display:none}
+.gtfold.allcol .fu{display:none}
+.gtfold.allcol .fd{display:inline}.gtoolbar #piZoom{margin-left:4px}
 .g-body{position:relative}
 .g-vline{position:absolute;top:0;bottom:0;width:2px;background:var(--red);opacity:.6;z-index:1;pointer-events:none}
 .g-grid,.g-past,.g-todaycol{position:absolute;top:0;bottom:0;z-index:0;pointer-events:none}
@@ -1043,7 +1050,7 @@ body.locked{overflow:hidden}
         
         <input type="text" id="piSearch" placeholder="ค้นหางาน…" data-i18n-ph="searchTask" style="width:170px;flex:none">
         <button class="tbtn" onclick="clearPI()" data-i18n="clear">ล้าง</button>
-        <div class="barright"><span class="gtbar" id="piGtoolbar"><button class="gtbtn" id="gFocusBtn" onclick="toggleGFocus()" title="ขยาย Gantt เต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="piZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="piViewTabs">
+        <div class="barright"><span class="gtbar" id="piGtoolbar"><button class="gtbtn gtfold" id="piFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="gFocusBtn" onclick="toggleGFocus()" title="ขยาย Gantt เต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="piZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="piViewTabs">
         <button class="bvt on" data-piv="timeline">Timeline</button>
         <button class="bvt" data-piv="status">Status</button>
         <button class="bvt" data-piv="priority">Priority</button>
@@ -1127,7 +1134,7 @@ body.locked{overflow:hidden}
           <span class="lbl">ทีม</span><select id="apAsg" data-multi="1"></select>
           <input type="text" id="apSearch" placeholder="ค้นหางาน…" data-i18n-ph="searchTask" style="width:170px;flex:none">
           <button class="tbtn" onclick="clearPI()">ล้าง</button>
-          <div class="barright"><span class="gtbar" id="apGtoolbar"><button class="gtbtn" id="apFocusBtn" onclick="toggleGFocus()" title="ขยายเต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="apZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="apViewTabs">
+          <div class="barright"><span class="gtbar" id="apGtoolbar"><button class="gtbtn gtfold" id="apFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="apFocusBtn" onclick="toggleGFocus()" title="ขยายเต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="apZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="apViewTabs">
           <button class="bvt on" data-piv="timeline">Timeline</button>
           <button class="bvt" data-piv="status">Status</button>
           <button class="bvt" data-piv="priority">Priority</button>
@@ -3253,7 +3260,28 @@ function setProjView(pv){curProjView=pv;document.querySelectorAll('.nav-subitem'
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};PIMPL.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);if(!a||!b)return;if(!phs[d.ph])phs[d.ph]={a:a,b:b};if(a<phs[d.ph].a)phs[d.ph].a=a;if(b>phs[d.ph].b)phs[d.ph].b=b;});
-  var _cnt={};PIMPL.forEach(d=>{if(d.st==='In Progress')_cnt[d.ph]=(_cnt[d.ph]||0)+1;});var curPhKey='',_best=0;Object.keys(_cnt).sort().forEach(p=>{if(_cnt[p]>_best){_best=_cnt[p];curPhKey=p;}});if(!curPhKey)Object.keys(phs).sort().forEach(p=>{if(!curPhKey&&now>=phs[p].a&&now<=phs[p].b)curPhKey=p;});var curPh=curPhKey?PI_PHASES[curPhKey].replace(/^\d+_/,''):'—';var _pe=phs[curPhKey],_pstat='—',_pcol='#8e8e93',_psub='';if(curPhKey&&_pe){var _pl=PIMPL.filter(function(d){return d.ph===curPhKey&&piChildren(d).length===0;});var _ptw=0,_psw=0;_pl.forEach(function(d){var w=piDurOf(d);_ptw+=w;_psw+=piCalcProg(d)*w;});var _pprog=_ptw?Math.round(_psw/_ptw):0;var _dl=PIMPL.some(function(d){return d.ph===curPhKey&&d.st==='Delayed';});var _DAY=86400000;if(_pprog>=100){_pstat=L('เสร็จแล้ว','Done');_pcol='#28cd41';_psub=L('ความคืบหน้า 100%','100% complete');}else if(now>_pe.b){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('เลยกำหนด ','Overdue ')+Math.ceil((now-_pe.b)/_DAY)+L(' วัน',' days');}else if(_dl){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('มีงานสถานะ Delayed','Has delayed tasks');}else if(now<_pe.a){_pstat=L('ยังไม่เริ่ม','Not Started');_pcol='#8e8e93';_psub=L('เริ่ม ','Starts ')+fmtDMY(_pe.a);}else{var _exp=Math.max(0,Math.min(100,Math.round((now-_pe.a)/(_pe.b-_pe.a)*100)));if(_pprog<_exp-15){_pstat=L('เสี่ยง','At Risk');_pcol='#ff9500';}else{_pstat=L('ตามแผน','On Track');_pcol='#28cd41';}_psub=L('จริง ','Actual ')+_pprog+L('% · แผน ','% · Plan ')+_exp+'%';}}
+  /* ══ เฟสปัจจุบันตัดสินจากวันที่ ไม่ใช่จากสถานะของงาน ══
+     ของเดิมนับงานที่สถานะเป็น 'In Progress' ต่อเฟส แล้วเอาเฟสที่มากที่สุด
+     พอผู้ใช้เปลี่ยนงานเป็น Delayed งานนั้นหลุดจากการนับทันที เฟสปัจจุบันจึงกระโดด
+     พิสูจน์แล้ว: ตั้งเฟส 02 เป็น Delayed ทั้งเฟส การ์ดเด้งไปเฟส 03 ที่ยังไม่เริ่ม
+     ทั้งที่วันนี้ยังอยู่ในช่วงของเฟส 02  (ตัวสำรองที่ใช้วันที่มีอยู่ แต่ทำงานเฉพาะตอน
+     ไม่มีเฟสไหนเลยที่มีงาน In Progress ซึ่งแทบไม่เกิด)
+
+     และการนับเดิมใช้ PIMPL.forEach ซึ่งรวมงานแม่ด้วย เฟสที่มีงานแม่จึงได้เปรียบ
+     — ฟังก์ชันเดียวกันนี้ตอนคำนวณ progress กรองงานแม่ออกอยู่แล้ว (_pl ข้างล่าง)
+
+     เกณฑ์ใหม่: วันนี้อยู่ในช่วงไหน → เฟสนั้น · ถ้ายังไม่ถึงเฟสไหนเลย → เฟสถัดไปที่จะเริ่ม
+     · ถ้าเลยทุกเฟสแล้ว → เฟสสุดท้าย  เรียงตาม PI_PORDER เหมือนที่ผังใช้ ไม่ใช่เรียงตามชื่อ */
+  var _pk=Object.keys(phs).sort(function(a,b){
+    var oa=(PI_PORDER[a]!=null?PI_PORDER[a]:9999),ob=(PI_PORDER[b]!=null?PI_PORDER[b]:9999);
+    return oa-ob||(a<b?-1:a>b?1:0);});
+  var curPhKey='';
+  _pk.forEach(function(p){if(!curPhKey&&now>=phs[p].a&&now<=phs[p].b)curPhKey=p;});
+  if(!curPhKey)_pk.forEach(function(p){if(!curPhKey&&now<phs[p].a)curPhKey=p;});
+  if(!curPhKey&&_pk.length)curPhKey=_pk[_pk.length-1];var curPh=curPhKey?PI_PHASES[curPhKey].replace(/^\d+_/,''):'—';var _pe=phs[curPhKey],_pstat='—',_pcol='#8e8e93',_psub='';if(curPhKey&&_pe){var _pl=PIMPL.filter(function(d){return d.ph===curPhKey&&piChildren(d).length===0;});var _ptw=0,_psw=0;_pl.forEach(function(d){var w=piDurOf(d);_ptw+=w;_psw+=piCalcProg(d)*w;});var _pprog=_ptw?Math.round(_psw/_ptw):0;/* นับเฉพาะงานใบให้ตรงกับ _pl ที่ใช้คิด progress — งานแม่รับสถานะมาจากลูกอยู่แล้ว
+       ถ้านับด้วยจะกลายเป็นนับซ้ำ */
+    var _dlN=_pl.filter(function(d){return d.st==='Delayed';}).length,_dl=_dlN>0;var _DAY=86400000;if(_pprog>=100){_pstat=L('เสร็จแล้ว','Done');_pcol='#28cd41';_psub=L('ความคืบหน้า 100%','100% complete');}else if(now>_pe.b){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('เลยกำหนด ','Overdue ')+Math.ceil((now-_pe.b)/_DAY)+L(' วัน',' days');}else if(_dl){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';
+      _psub=L('งาน Delayed ','Delayed ')+_dlN+L(' จาก ',' of ')+_pl.length+L(' งาน',' tasks');}else if(now<_pe.a){_pstat=L('ยังไม่เริ่ม','Not Started');_pcol='#8e8e93';_psub=L('เริ่ม ','Starts ')+fmtDMY(_pe.a);}else{var _exp=Math.max(0,Math.min(100,Math.round((now-_pe.a)/(_pe.b-_pe.a)*100)));if(_pprog<_exp-15){_pstat=L('เสี่ยง','At Risk');_pcol='#ff9500';}else{_pstat=L('ตามแผน','On Track');_pcol='#28cd41';}_psub=L('จริง ','Actual ')+_pprog+L('% · แผน ','% · Plan ')+_exp+'%';}}
   var glR=PIMPL.find(d=>/go live/i.test(d.name)&&d.s===d.e);var glD=glR?piDate(glR.e):(PIMPL.map(d=>piDate(d.e)).filter(Boolean).sort((a,b)=>b-a)[0]||null),golive=glD?fmtDMY(glD):'—';
   var tot=REQS.length,as=REQS.filter(gapAssessed).length,pctA=tot?Math.round(as/tot*100):0,dev=REQS.filter(x=>x.gap==='3. Customization'||x.gap==='5. Not supported').length;
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
@@ -3785,6 +3813,25 @@ function piTreeOrder(list){var byKey={};list.forEach(function(d){byKey[d._key]=d
 function piCollectDesc(key,acc){PIMPL.filter(function(x){return x.parent===key;}).forEach(function(c){acc.push(c);piCollectDesc(c._key,acc);});}
 function piAddSub(pid){var p=PIMPL.find(function(z){return z._pi===pid;});if(!p)return;var nid=piNextId();var sp=piSpan(p);var t=new Date();var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear();};var s=sp.s||fmt(t);var e=sp.e||fmt(new Date(t.getTime()+7*86400000));var d={ph:p.ph,parent:p._key,name:'งานย่อยใหม่',asg:p.asg.slice(),s:s,e:e,prog:0,st:'Not Started',pr:'Low',dep:[],_pi:nid,_key:'a'+nid};PIMPL.push(d);PI_STORE[GCTX]=PIMPL;piSaveTask(d);renderPI();openPI(pid);}
 function piMoveTask(pid,dir){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var vis=filteredPI();var sib=vis.filter(function(z){return (z.parent||'')===(d.parent||'')&&z.ph===d.ph;});sib.sort(function(a,b){return piOrdOf(a)-piOrdOf(b);});var i=sib.indexOf(d);if(i<0)return;var j=i+dir;if(j<0||j>=sib.length)return;var ra=piOrdOf(sib[i]),rb=piOrdOf(sib[j]);sib[i].ord=rb;sib[j].ord=ra;piSaveTask(sib[i]);piSaveTask(sib[j]);PIMPL=piNorm(PIMPL);renderPI();}
+/* ══ หุบ/กางทุกเฟสในคลิกเดียว ══
+   piCollapsed อยู่ในหน่วยความจำอย่างเดียว ไม่ persist ที่ไหน กดแล้วไม่มีการเขียนข้อมูล
+   ถ้ายังมีเฟสไหนกางอยู่ = หุบทั้งหมด · ถ้าหุบหมดแล้ว = กางทั้งหมด */
+function piAllPhaseKeys(){
+  var ks={};(PI_STORE[GCTX]||[]).forEach(function(d){if(d.ph)ks[d.ph]=1;});
+  Object.keys(PI_PHASES||{}).forEach(function(k){ks[k]=1;});
+  return Object.keys(ks);}
+function piToggleAllPhases(){
+  var ks=piAllPhaseKeys(),anyOpen=ks.some(function(k){return !piCollapsed[k];});
+  ks.forEach(function(k){piCollapsed[k]=anyOpen;});
+  renderPIGantt();}
+/* แถบเครื่องมือเป็น HTML คงที่ ไม่ได้ถูกวาดใหม่พร้อมผัง จึงต้องซิงก์สถานะปุ่มเอง
+   เรียกท้าย renderPIGantt() ปุ่มจึงถูกต้องเสมอ แม้ผู้ใช้จะกดหุบทีละเฟส */
+function piSyncFoldBtn(){
+  var ks=piAllPhaseKeys(),allCol=ks.length&&ks.every(function(k){return piCollapsed[k];});
+  var b=document.getElementById(GCTX==='ap'?'apFoldBtn':'piFoldBtn');
+  if(!b)return;
+  b.classList.toggle('allcol',!!allCol);
+  b.title=allCol?'กางทุกเฟส':'หุบทุกเฟส';}
 function piTogglePhase(p){piCollapsed[p]=!piCollapsed[p];renderPIGantt();}
 function piToggleTask(k){piTaskCol[k]=!piTaskCol[k];renderPIGantt();}
 function fmtDMY(dt){return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear();}
@@ -3901,7 +3948,7 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
   var deco=`<div class="g-grid" style="left:250px;width:${TW}px">${gridLines}</div>`;
   if(tx>0)deco+=`<div class="g-past" style="left:250px;width:${Math.min(tx,TW)}px"></div>`;
   if(tx>=0&&tx<=TW)deco+=`<div class="g-todaycol" style="left:${250+dayOf(now)*dw}px;width:${dw}px"></div>`;
-  gw.innerHTML='<div class="g-body">'+deco+head+body+todayLine+'</div>';gw.dataset.dw=dw;gw.dataset.tx=(250+tx);gw.dataset.firstx=dayOf(minD)*dw;drawPIDeps();}
+  gw.innerHTML='<div class="g-body">'+deco+head+body+todayLine+'</div>';gw.dataset.dw=dw;gw.dataset.tx=(250+tx);gw.dataset.firstx=dayOf(minD)*dw;drawPIDeps();piSyncFoldBtn();}
 function piToday(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-gw.clientWidth/2),behavior:'smooth'});}
 function piHome(){var gw=document.getElementById(PIGID);if(!gw)return;gw.scrollTo({left:0});}
 function piFocusTasks(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-290),behavior:'smooth'});}
