@@ -3260,7 +3260,28 @@ function setProjView(pv){curProjView=pv;document.querySelectorAll('.nav-subitem'
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};PIMPL.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);if(!a||!b)return;if(!phs[d.ph])phs[d.ph]={a:a,b:b};if(a<phs[d.ph].a)phs[d.ph].a=a;if(b>phs[d.ph].b)phs[d.ph].b=b;});
-  var _cnt={};PIMPL.forEach(d=>{if(d.st==='In Progress')_cnt[d.ph]=(_cnt[d.ph]||0)+1;});var curPhKey='',_best=0;Object.keys(_cnt).sort().forEach(p=>{if(_cnt[p]>_best){_best=_cnt[p];curPhKey=p;}});if(!curPhKey)Object.keys(phs).sort().forEach(p=>{if(!curPhKey&&now>=phs[p].a&&now<=phs[p].b)curPhKey=p;});var curPh=curPhKey?PI_PHASES[curPhKey].replace(/^\d+_/,''):'—';var _pe=phs[curPhKey],_pstat='—',_pcol='#8e8e93',_psub='';if(curPhKey&&_pe){var _pl=PIMPL.filter(function(d){return d.ph===curPhKey&&piChildren(d).length===0;});var _ptw=0,_psw=0;_pl.forEach(function(d){var w=piDurOf(d);_ptw+=w;_psw+=piCalcProg(d)*w;});var _pprog=_ptw?Math.round(_psw/_ptw):0;var _dl=PIMPL.some(function(d){return d.ph===curPhKey&&d.st==='Delayed';});var _DAY=86400000;if(_pprog>=100){_pstat=L('เสร็จแล้ว','Done');_pcol='#28cd41';_psub=L('ความคืบหน้า 100%','100% complete');}else if(now>_pe.b){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('เลยกำหนด ','Overdue ')+Math.ceil((now-_pe.b)/_DAY)+L(' วัน',' days');}else if(_dl){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('มีงานสถานะ Delayed','Has delayed tasks');}else if(now<_pe.a){_pstat=L('ยังไม่เริ่ม','Not Started');_pcol='#8e8e93';_psub=L('เริ่ม ','Starts ')+fmtDMY(_pe.a);}else{var _exp=Math.max(0,Math.min(100,Math.round((now-_pe.a)/(_pe.b-_pe.a)*100)));if(_pprog<_exp-15){_pstat=L('เสี่ยง','At Risk');_pcol='#ff9500';}else{_pstat=L('ตามแผน','On Track');_pcol='#28cd41';}_psub=L('จริง ','Actual ')+_pprog+L('% · แผน ','% · Plan ')+_exp+'%';}}
+  /* ══ เฟสปัจจุบันตัดสินจากวันที่ ไม่ใช่จากสถานะของงาน ══
+     ของเดิมนับงานที่สถานะเป็น 'In Progress' ต่อเฟส แล้วเอาเฟสที่มากที่สุด
+     พอผู้ใช้เปลี่ยนงานเป็น Delayed งานนั้นหลุดจากการนับทันที เฟสปัจจุบันจึงกระโดด
+     พิสูจน์แล้ว: ตั้งเฟส 02 เป็น Delayed ทั้งเฟส การ์ดเด้งไปเฟส 03 ที่ยังไม่เริ่ม
+     ทั้งที่วันนี้ยังอยู่ในช่วงของเฟส 02  (ตัวสำรองที่ใช้วันที่มีอยู่ แต่ทำงานเฉพาะตอน
+     ไม่มีเฟสไหนเลยที่มีงาน In Progress ซึ่งแทบไม่เกิด)
+
+     และการนับเดิมใช้ PIMPL.forEach ซึ่งรวมงานแม่ด้วย เฟสที่มีงานแม่จึงได้เปรียบ
+     — ฟังก์ชันเดียวกันนี้ตอนคำนวณ progress กรองงานแม่ออกอยู่แล้ว (_pl ข้างล่าง)
+
+     เกณฑ์ใหม่: วันนี้อยู่ในช่วงไหน → เฟสนั้น · ถ้ายังไม่ถึงเฟสไหนเลย → เฟสถัดไปที่จะเริ่ม
+     · ถ้าเลยทุกเฟสแล้ว → เฟสสุดท้าย  เรียงตาม PI_PORDER เหมือนที่ผังใช้ ไม่ใช่เรียงตามชื่อ */
+  var _pk=Object.keys(phs).sort(function(a,b){
+    var oa=(PI_PORDER[a]!=null?PI_PORDER[a]:9999),ob=(PI_PORDER[b]!=null?PI_PORDER[b]:9999);
+    return oa-ob||(a<b?-1:a>b?1:0);});
+  var curPhKey='';
+  _pk.forEach(function(p){if(!curPhKey&&now>=phs[p].a&&now<=phs[p].b)curPhKey=p;});
+  if(!curPhKey)_pk.forEach(function(p){if(!curPhKey&&now<phs[p].a)curPhKey=p;});
+  if(!curPhKey&&_pk.length)curPhKey=_pk[_pk.length-1];var curPh=curPhKey?PI_PHASES[curPhKey].replace(/^\d+_/,''):'—';var _pe=phs[curPhKey],_pstat='—',_pcol='#8e8e93',_psub='';if(curPhKey&&_pe){var _pl=PIMPL.filter(function(d){return d.ph===curPhKey&&piChildren(d).length===0;});var _ptw=0,_psw=0;_pl.forEach(function(d){var w=piDurOf(d);_ptw+=w;_psw+=piCalcProg(d)*w;});var _pprog=_ptw?Math.round(_psw/_ptw):0;/* นับเฉพาะงานใบให้ตรงกับ _pl ที่ใช้คิด progress — งานแม่รับสถานะมาจากลูกอยู่แล้ว
+       ถ้านับด้วยจะกลายเป็นนับซ้ำ */
+    var _dlN=_pl.filter(function(d){return d.st==='Delayed';}).length,_dl=_dlN>0;var _DAY=86400000;if(_pprog>=100){_pstat=L('เสร็จแล้ว','Done');_pcol='#28cd41';_psub=L('ความคืบหน้า 100%','100% complete');}else if(now>_pe.b){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('เลยกำหนด ','Overdue ')+Math.ceil((now-_pe.b)/_DAY)+L(' วัน',' days');}else if(_dl){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';
+      _psub=L('งาน Delayed ','Delayed ')+_dlN+L(' จาก ',' of ')+_pl.length+L(' งาน',' tasks');}else if(now<_pe.a){_pstat=L('ยังไม่เริ่ม','Not Started');_pcol='#8e8e93';_psub=L('เริ่ม ','Starts ')+fmtDMY(_pe.a);}else{var _exp=Math.max(0,Math.min(100,Math.round((now-_pe.a)/(_pe.b-_pe.a)*100)));if(_pprog<_exp-15){_pstat=L('เสี่ยง','At Risk');_pcol='#ff9500';}else{_pstat=L('ตามแผน','On Track');_pcol='#28cd41';}_psub=L('จริง ','Actual ')+_pprog+L('% · แผน ','% · Plan ')+_exp+'%';}}
   var glR=PIMPL.find(d=>/go live/i.test(d.name)&&d.s===d.e);var glD=glR?piDate(glR.e):(PIMPL.map(d=>piDate(d.e)).filter(Boolean).sort((a,b)=>b-a)[0]||null),golive=glD?fmtDMY(glD):'—';
   var tot=REQS.length,as=REQS.filter(gapAssessed).length,pctA=tot?Math.round(as/tot*100):0,dev=REQS.filter(x=>x.gap==='3. Customization'||x.gap==='5. Not supported').length;
   function c(k,v,sub,col){return `<div class="pjcard"><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div><div class="pjs">${sub}</div></div>`;}
