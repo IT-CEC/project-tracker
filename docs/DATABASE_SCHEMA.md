@@ -105,6 +105,27 @@
 
 ---
 
+## 7. `audit_log/{auto}`  (ประวัติการใช้งาน — เขียนอย่างเดียว ไม่มีใน localStorage เดิม)
+
+| field | ชนิด | ความหมาย |
+|---|---|---|
+| `ts` | number | เวลา (ms) ใช้เรียงและ query |
+| `at` | string | `วว/ดด/ปปปป ชช:นน` สำหรับแสดง |
+| `who` | string | ชื่อเครื่องที่ผู้ใช้ตั้งเอง (`localStorage.erp_device`) |
+| `ua` | string | `Windows 10/11 · Edge 131` |
+| `act` | string | `login` · `logout` · `add` · `edit` · `del` |
+| `col` / `id` | string | collection + doc id ที่ถูกแตะ (ว่างสำหรับ login/logout) |
+| `name` | string | ชื่อที่คนอ่านรู้เรื่อง |
+| `ch` | array | `[{f,a,b}]` เฉพาะ `act='edit'` — ช่อง · ค่าก่อน · ค่าหลัง |
+
+เขียนโดย `js/db.js` ที่ `saveItem`/`updateItem`/`deleteItem` แบบ fire-and-forget
+ผ่าน `addDoc` **ไม่ผ่าน `saveItem`** (ไม่งั้นจะ log ตัวเองวนไม่จบ)
+
+อ่านด้วย `DB.loadRecent('audit_log', 300)` เท่านั้น — **ไม่ subscribe** เพราะทุกเครื่อง
+จะกินโควตาอ่านทุกครั้งที่มีใครแก้อะไร
+
+> รายละเอียด: `docs/superpowers/specs/2026-09-11-audit-log-design.md`
+
 ## แนวทางเขียน (per-item, concurrency-safe)
 - แก้ 1 field → `updateDoc(doc(db,'ap_tasks',key), { st:'Done', updatedAt: serverTimestamp() })`
 - เพิ่มงาน → `setDoc(doc(db,'ap_tasks',newKey), {...})`
