@@ -2,25 +2,52 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── บัญชีทีมที่ได้รับอนุญาต (ต้องตรงกับ TEAM_EMAIL ใน js/firebase-config.js) ──
-    // จำกัดเฉพาะ "email ทีม" เท่านั้น — กันคนที่เอา config ไปสมัคร email อื่นแล้วเข้าถึงข้อมูล
-    // ถ้าเปลี่ยน/เพิ่ม email ทีม แก้ที่นี่ (เพิ่มเป็น list ได้ เช่น in ['a@x','b@x'])
-    function isTeam() {
-      return request.auth != null && request.auth.token.email == 'team@civil.co.th';
+    // ══════════════════════════════════════════════════════════════════
+    //  สองระดับสิทธิ์ (2026-09-11)
+    //
+    //  admin@civil.co.th  →  แก้แผนงานโครงการและ Automation ได้
+    //  team@civil.co.th   →  ดูอย่างเดียวสำหรับสองส่วนนั้น ที่เหลือแก้ได้
+    //
+    //  Firebase ผูกรหัสผ่านกับบัญชี หนึ่งบัญชีมีรหัสเดียว — จะมีสองรหัสจึงต้อง
+    //  มีสองบัญชี ไม่ใช่เช็ครหัสในฝั่งหน้าเว็บ เพราะใครกด F12 ก็ข้ามได้
+    //  ตัวบังคับจริงคือไฟล์นี้ ซึ่งทำงานบนเซิร์ฟเวอร์ของ Google
+    // ══════════════════════════════════════════════════════════════════
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.email in ['team@civil.co.th', 'admin@civil.co.th'];
+    }
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'admin@civil.co.th';
     }
 
-    // อ่าน/เขียนได้เฉพาะบัญชีทีม
-    // ครอบคลุมทุก collection: requirements, bridge, pi_tasks, ap_tasks, plan, settings
-    match /{document=**} {
-      allow read, write: if isTeam();
-    }
+    // ── แผนงานโครงการ + Automation : เฉพาะ admin แก้ได้ ──────────────
+    match /pi_tasks/{id}   { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /pi_phases/{id}  { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /ap_tasks/{id}   { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /ap_groups/{id}  { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /bridge/{id}     { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /plan/{id}       { allow read: if signedIn(); allow write: if isAdmin(); }
 
-    // ── (ทางเลือก) เข้มขึ้น: จำกัดเฉพาะ collection ที่รู้จัก ──
-    // match /requirements/{id} { allow read, write: if request.auth != null; }
-    // match /bridge/{id}       { allow read, write: if request.auth != null; }
-    // match /pi_tasks/{id}     { allow read, write: if request.auth != null; }
-    // match /ap_tasks/{id}     { allow read, write: if request.auth != null; }
-    // match /plan/{id}         { allow read, write: if request.auth != null; }
-    // match /settings/{id}     { allow read, write: if request.auth != null; }
+    // ── ประวัติการใช้งาน : เพิ่มได้ แก้/ลบไม่ได้แม้แต่ admin ─────────
+    // ถ้าลบได้ ประวัติก็ไม่มีความหมาย เพราะคนที่อยากปิดร่องรอยลบทิ้งได้เอง
+    match /audit_log/{id}  { allow read, create: if signedIn(); allow update, delete: if false; }
+
+    // ── ที่เหลือ : ทุกคนที่ล็อกอินแก้ได้ตามเดิม ──────────────────────
+    match /requirements/{id}  { allow read, write: if signedIn(); }
+    match /action_items/{id}  { allow read, write: if signedIn(); }
+    match /report_levels/{id} { allow read, write: if signedIn(); }
+    match /settings/{id}      { allow read, write: if signedIn(); }
+
+    // ══════════════════════════════════════════════════════════════════
+    //  ไม่มี match /{document=**} โดยตั้งใจ
+    //
+    //  กฎ Firestore เป็น OR กัน ไม่ใช่การเขียนทับ — ถ้ามี catch-all ที่ให้
+    //  ทุกคนเขียนได้ มันจะ "ปลดล็อก" ทุกกฎที่เข้มกว่าข้างบนทันที
+    //  ผลคือ pi_tasks กลับมาแก้ได้ทุกคนโดยที่กฎข้างบนดูเหมือนยังอยู่
+    //
+    //  ข้อแลกเปลี่ยน: collection ที่ไม่ได้เขียนถึงจะถูกปฏิเสธทั้งอ่านและเขียน
+    //  เพิ่ม collection ใหม่เมื่อไหร่ ต้องมาเพิ่มที่นี่ด้วย
+    //  ปัจจุบันมี 11 ตัว ครบตามรายการข้างบน
+    // ══════════════════════════════════════════════════════════════════
   }
 }

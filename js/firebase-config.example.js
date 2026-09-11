@@ -15,3 +15,8 @@ export const firebaseConfig = {
 
 // บัญชีทีมที่ใช้ร่วมกัน (สร้างใน Authentication → Users)
 export const TEAM_EMAIL = "team@civil.co.th";
+
+// บัญชีผู้ดูแล (สร้างเพิ่มใน Authentication → Users อีกหนึ่งบัญชี คนละรหัสกับ TEAM_EMAIL)
+// คนที่ล็อกอินด้วยบัญชีนี้เท่านั้นที่แก้แผนงานโครงการและ Automation ได้
+// ถ้าไม่ใส่ ระบบจะถือว่าไม่มีระดับผู้ดูแล ทุกคนเป็นผู้ดูอย่างเดียวสำหรับสองส่วนนั้น
+export const ADMIN_EMAIL = "admin@civil.co.th";

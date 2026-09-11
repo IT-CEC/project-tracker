@@ -871,6 +871,20 @@ body.locked{overflow:hidden}
   color:var(--ink2);background:var(--chip);border-radius:980px;padding:2px 7px 2px 5px}
 .g-duechip svg{width:11px;height:11px}
 
+/* ── สิทธิ์ดูอย่างเดียว ──
+   ซ่อนเฉพาะปุ่มในแผนงานโครงการกับ Automation — หน้าอื่นทุกคนยังแก้ได้
+   นี่เป็นแค่การซ่อนปุ่ม ความปลอดภัยจริงอยู่ที่ firestore.rules */
+.robadge{display:inline-flex;align-items:center;font-size:11px;font-weight:700;color:var(--ink2);
+  background:var(--chip);border-radius:980px;padding:3px 10px;white-space:nowrap}
+body.ro #implement .g-addph-btn,body.ro #implement .g-add,body.ro #implement .g-phedit,
+body.ro #implement .g-phdel,body.ro #implement .g-tacts,
+body.ro #brTimeline .g-addph-btn,body.ro #brTimeline .g-add,body.ro #brTimeline .g-phedit,
+body.ro #brTimeline .g-phdel,body.ro #brTimeline .g-tacts,
+body.ro #addBrBtn,body.ro #brTableView .rowdel,body.ro #brTableView .rowadd{display:none!important}
+body.ro #implement .g-bar,body.ro #brTimeline .g-bar{cursor:default}
+body.ro #implement .g-rsz,body.ro #implement .g-link,
+body.ro #brTimeline .g-rsz,body.ro #brTimeline .g-link{display:none!important}
+.mb-ro input,.mb-ro select,.mb-ro textarea{opacity:.72;cursor:not-allowed}
 /* ── ประวัติการใช้งาน ── */
 /* หน้าตั้งค่าจำกัดความกว้าง 880px ซึ่งพอสำหรับการ์ดตั้งค่า แต่บีบตารางประวัติจน
    คอลัมน์ "สิ่งที่เปลี่ยน" ตัดบรรทัดรัว — ขยายเฉพาะตอนเปิดแท็บนี้ */
@@ -1012,6 +1026,7 @@ body.locked{overflow:hidden}
         <button class="tb-a" data-goto="settings"><span data-nav="settings">ตั้งค่า</span></button>
       </nav>
       <div class="tb-right">
+        <span class="robadge" id="roBadge" style="display:none" title="แผนงานโครงการและ Automation แก้ได้เฉพาะผู้ดูแล IT">ดูอย่างเดียว</span>
         <button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button>
         <button class="tb-user" data-pop="tbUser" aria-expanded="false" aria-controls="tbUser" aria-label="เมนูผู้ใช้"><span class="tb-av">CE</span><span class="tb-un">Civil ERP Team</span></button>
         <button class="tb-ham" data-pop="tbAll" aria-expanded="false" aria-controls="tbAll" aria-label="เมนูทั้งหมด" title="เมนูทั้งหมด"><i></i><i></i><i></i></button>
@@ -1339,7 +1354,11 @@ function clone(x){return JSON.parse(JSON.stringify(x));}
 function loadState(){const ls=localStorage.getItem(LSKEY);if(ls){try{REQS=JSON.parse(ls);}catch(e){REQS=clone(DATA.reqs);}}else{REQS=clone(DATA.reqs);try{var old=JSON.parse(localStorage.getItem('erp_req_dashboard_v9')||localStorage.getItem('erp_req_dashboard_v8')||localStorage.getItem('erp_req_dashboard_v7')||localStorage.getItem('erp_req_dashboard_v6')||localStorage.getItem('erp_req_dashboard_v5')||localStorage.getItem('erp_req_dashboard_v4')||'null');if(old&&old.length){var mp={};old.forEach(o=>{mp[(o.module||'')+'|'+(o.name||'')]={status:o.status,gap:o.gap};});REQS.forEach(r=>{var o=mp[(r.module||'')+'|'+(r.name||'')];if(o){if(o.status)r.status=o.status;if(o.gap)r.gap=o.gap;}});}}catch(e){}}REQS.forEach(r=>r.gap=normGap(r.gap));maxId=REQS.reduce((m,r)=>Math.max(m,r._id||0),0);}
 function save(){/* deprecated: requirements ย้ายไป Firestore แบบ per-item แล้ว (ดู reqSaveOne/reqDelOne) */}
 var _dbErrAt=0;
-function dbErr(what){return function(e){console.error('['+what+']',e);var now=+new Date();if(now-_dbErrAt>3000){_dbErrAt=now;if(window.toast)toast('บันทึกขึ้น Firebase ไม่สำเร็จ ('+what+') — ตรวจการเชื่อมต่อแล้วลองใหม่');}};}
+function dbErr(what){return function(e){console.error('['+what+']',e);var now=+new Date();if(now-_dbErrAt>3000){_dbErrAt=now;
+  /* แยกกรณี "ไม่มีสิทธิ์" ออกจาก "เน็ตมีปัญหา" — คนละเรื่องและแก้คนละทาง */
+  var denied=e&&(e.code==='permission-denied'||/permission/i.test(String(e.message||'')));
+  if(window.toast)toast(denied?'ไม่มีสิทธิ์แก้ส่วนนี้ — แผนงานโครงการและ Automation แก้ได้เฉพาะผู้ดูแล IT'
+    :'บันทึกขึ้น Firebase ไม่สำเร็จ ('+what+') — ตรวจการเชื่อมต่อแล้วลองใหม่');}};}
 // ══ Firestore persistence: settings + requirements (แทน localStorage) — loadState ด้านล่าง override ตัวเดิม ══
 const COL_REQ='requirements', COL_SET='settings';
 function reqBase(){return clone(DATA.reqs).map(function(r,i){r._id=i+1;r.gap=normGap(r.gap);return r;});}
@@ -3570,8 +3589,8 @@ function brSaveOne(b){if(window.DB&&b&&b._key)window.DB.saveItem(COL_BR,b._key,b
 var _brFirst=true;
 function subscribeBr(){if(!window.DB)return;window.DB.subscribe(COL_BR,function(docs){if(_brFirst){_brFirst=false;return;}brBuild(docs);fillBrFilters();renderBridge();fillAbout();});}
 function setBrField(bid,field,val){var b=BR.find(x=>x._bid===bid);if(!b)return;var sv=(field==='risk')?(val==='High'?'Yes':'No'):val;b[field]=sv;brSaveOne(b);if(field==='name'){var mt=document.getElementById('mTitle');if(mt)mt.textContent=sv||'(ไม่มีชื่อ)';}renderBrKpi();renderBrTable();renderBrCharts();}
-async function brAddRow(){brNid++;var nk='a'+brNid;var nb={_key:nk,_nid:brNid,module:'(ใหม่)',name:'รายการใหม่',type:'',cycle:'',hrs:'',save:'',fteNow:'',cplx:'',risk:'No',status:'Not Started',req:'',dept:'',owner:'',app:'',cat:'',src:nk};if(window.DB)await window.DB.saveItem(COL_BR,nk,nb);await loadBR();fillBrFilters();renderBridge();var a=BR.find(x=>x._key===nk);if(a)openBridge(a._bid);toast(T('added'));}
-async function brDelRow(bid){var b=BR.find(x=>x._bid===bid);if(!b)return;if(!confirm('ลบรายการนี้?'))return;if(window.DB)await window.DB.deleteItem(COL_BR,b._key);await loadBR();fillBrFilters();closeModal();renderBridge();toast('ลบแล้ว');}
+async function brAddRow(){if(erpDenyEdit())return;brNid++;var nk='a'+brNid;var nb={_key:nk,_nid:brNid,module:'(ใหม่)',name:'รายการใหม่',type:'',cycle:'',hrs:'',save:'',fteNow:'',cplx:'',risk:'No',status:'Not Started',req:'',dept:'',owner:'',app:'',cat:'',src:nk};if(window.DB)await window.DB.saveItem(COL_BR,nk,nb);await loadBR();fillBrFilters();renderBridge();var a=BR.find(x=>x._key===nk);if(a)openBridge(a._bid);toast(T('added'));}
+async function brDelRow(bid){if(erpDenyEdit())return;var b=BR.find(x=>x._bid===bid);if(!b)return;if(!confirm('ลบรายการนี้?'))return;if(window.DB)await window.DB.deleteItem(COL_BR,b._key);await loadBR();fillBrFilters();closeModal();renderBridge();toast('ลบแล้ว');}
 function brSel(bid,field,val,opts){return '<select class="selmini" onclick="event.stopPropagation()" onchange="setBrField('+bid+',&quot;'+field+'&quot;,this.value)">'+opts.map(function(o){return '<option value="'+attr(o)+'" '+(String(o)===String(val||'')?'selected':'')+'>'+(o===''?'—':esc(o))+'</option>';}).join('')+'</select>';}
 function brNum(x){const n=parseFloat(x);return isNaN(n)?0:n;}
 function brRiskVal(b){return (b.risk||'').includes('Yes')?'High':'Safe';}
@@ -3739,14 +3758,14 @@ function applyPhaseMap(which){var m=PH_STORE[which]||defaultPhaseDocs(which);var
 function subscribePhases(which){if(!window.DB)return;window.DB.subscribe(COL_PH[which],function(docs){if(_phFirst[which]){_phFirst[which]=false;return;}var m={};docs.forEach(function(d){if(d&&d.key)m[d.key]=phNorm(d);});PH_STORE[which]=m;if(GCTX===which){applyPhaseMap(which);renderPI();if(window.renderProjRibbon)renderProjRibbon();}});}
 function piPhSave(which,doc){if(window.DB&&doc&&doc.key)window.DB.saveItem(COL_PH[which],doc.key,doc).catch(dbErr('phase save'));}
 function piNextPhKey(){var m=PH_STORE[GCTX]||{};var n=1;while(m['p'+n])n++;return 'p'+n;}
-function piMovePhase(key,dir){var m=PH_STORE[GCTX]||{};var ks=Object.keys(m).sort(function(a,b){var oa=(m[a].order!=null?m[a].order:9999),ob=(m[b].order!=null?m[b].order:9999);return oa-ob||(a<b?-1:a>b?1:0);});var i=ks.indexOf(key);if(i<0)return;var j=i+dir;if(j<0||j>=ks.length)return;var t=ks[i];ks[i]=ks[j];ks[j]=t;ks.forEach(function(k,n){if(m[k].order!==n){m[k].order=n;piPhSave(GCTX,m[k]);}});applyPhaseMap(GCTX);renderPI();if(window.renderProjRibbon)renderProjRibbon();}
-function piAddPhase(nm){nm=(nm||'').trim();if(!nm)return;var m=PH_STORE[GCTX]=PH_STORE[GCTX]||defaultPhaseDocs(GCTX);var key=piNextPhKey();var maxo=0;Object.keys(m).forEach(function(k){if(m[k].order>maxo)maxo=m[k].order;});var doc={key:key,name:nm,color:PH_PALETTE[Object.keys(m).length%PH_PALETTE.length],order:maxo+1};m[key]=doc;piPhSave(GCTX,doc);applyPhaseMap(GCTX);renderPI();if(window.toast)toast(GCTX==='ap'?'เพิ่มกลุ่มแล้ว':'เพิ่มเฟสแล้ว');}
-function piAddPhaseInline(el){var wrap=el.parentNode;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.placeholder=(GCTX==='ap'?'ชื่อกลุ่มใหม่…':'ชื่อเฟสใหม่…');wrap.innerHTML='';wrap.appendChild(inp);inp.focus();var done=false;var fin=function(ok){if(done)return;done=true;var v=ok?inp.value.trim():'';if(v)piAddPhase(v);else renderPI();};inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
-function piRenamePhase(key,nm){var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;nm=(nm||'').trim();if(!nm||nm===cur.name){renderPI();return;}cur.name=nm;piPhSave(GCTX,cur);applyPhaseMap(GCTX);renderPI();if(window.renderProjRibbon)renderProjRibbon();}
-function piSetPhaseDates(key,sv,ev){var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;sv=(sv||'').trim();ev=(ev||'').trim();var msg;if(!sv&&!ev){delete cur.s;delete cur.e;msg='กลับไปคำนวณจากงาน';}else if(!sv||!ev){if(window.toast)toast('ต้องกรอกทั้งวันเริ่มและวันจบ');renderPI();return;}else{var a=piDate(sv),b=piDate(ev);if(!a||!b){if(window.toast)toast('รูปแบบวันที่ต้องเป็น dd/mm/yyyy');renderPI();return;}if(b<a){var t=sv;sv=ev;ev=t;msg='ตั้งวันที่เฟสแล้ว (สลับวันเริ่ม-จบให้)';}else{msg='ตั้งวันที่เฟสแล้ว';}cur.s=sv;cur.e=ev;}piPhSave(GCTX,cur);renderPI();if(window.toast)toast(msg);}
-function piPhDatesInline(btn,key){var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var d=(PH_STORE[GCTX]||{})[key]||{};var wrap=document.createElement('span');wrap.className='g-phdt';var mk=function(v,ph2){var i2=document.createElement('input');i2.className='g-inl-inp g-dtin';i2.type='text';i2.value=v||'';i2.placeholder=ph2;return i2;};var a=mk(d.s,'dd/mm/yyyy'),b=mk(d.e,'dd/mm/yyyy');wrap.appendChild(a);wrap.appendChild(document.createTextNode(' → '));wrap.appendChild(b);nameEl.textContent='';nameEl.appendChild(wrap);a.focus();a.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piSetPhaseDates(key,a.value,b.value);else renderPI();};[a,b].forEach(function(el){el.onmousedown=function(e){e.stopPropagation();};el.onclick=function(e){e.stopPropagation();};el.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};el.onblur=function(){setTimeout(function(){if(document.activeElement!==a&&document.activeElement!==b)fin(true);},0);};});}
-function piRenameInline(btn,key){var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var cur=(PH_STORE[GCTX]&&PH_STORE[GCTX][key])?PH_STORE[GCTX][key].name:nameEl.textContent;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.value=cur;nameEl.textContent='';nameEl.appendChild(inp);inp.focus();inp.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piRenamePhase(key,inp.value);else renderPI();};inp.onmousedown=function(e){e.stopPropagation();};inp.onclick=function(e){e.stopPropagation();};inp.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
-function piDeletePhase(key){if(PIMPL.some(function(d){return d.ph===key;})){if(window.toast)toast(GCTX==='ap'?'ลบไม่ได้ — กลุ่มยังมีงาน':'ลบไม่ได้ — เฟสยังมีงาน');return;}var m=PH_STORE[GCTX]||{};if(!m[key])return;delete m[key];if(window.DB)window.DB.deleteItem(COL_PH[GCTX],key).catch(dbErr('phase del'));applyPhaseMap(GCTX);renderPI();if(window.toast)toast('ลบแล้ว');}
+function piMovePhase(key,dir){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var ks=Object.keys(m).sort(function(a,b){var oa=(m[a].order!=null?m[a].order:9999),ob=(m[b].order!=null?m[b].order:9999);return oa-ob||(a<b?-1:a>b?1:0);});var i=ks.indexOf(key);if(i<0)return;var j=i+dir;if(j<0||j>=ks.length)return;var t=ks[i];ks[i]=ks[j];ks[j]=t;ks.forEach(function(k,n){if(m[k].order!==n){m[k].order=n;piPhSave(GCTX,m[k]);}});applyPhaseMap(GCTX);renderPI();if(window.renderProjRibbon)renderProjRibbon();}
+function piAddPhase(nm){if(erpDenyEdit())return;nm=(nm||'').trim();if(!nm)return;var m=PH_STORE[GCTX]=PH_STORE[GCTX]||defaultPhaseDocs(GCTX);var key=piNextPhKey();var maxo=0;Object.keys(m).forEach(function(k){if(m[k].order>maxo)maxo=m[k].order;});var doc={key:key,name:nm,color:PH_PALETTE[Object.keys(m).length%PH_PALETTE.length],order:maxo+1};m[key]=doc;piPhSave(GCTX,doc);applyPhaseMap(GCTX);renderPI();if(window.toast)toast(GCTX==='ap'?'เพิ่มกลุ่มแล้ว':'เพิ่มเฟสแล้ว');}
+function piAddPhaseInline(el){if(erpDenyEdit())return;var wrap=el.parentNode;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.placeholder=(GCTX==='ap'?'ชื่อกลุ่มใหม่…':'ชื่อเฟสใหม่…');wrap.innerHTML='';wrap.appendChild(inp);inp.focus();var done=false;var fin=function(ok){if(done)return;done=true;var v=ok?inp.value.trim():'';if(v)piAddPhase(v);else renderPI();};inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
+function piRenamePhase(key,nm){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;nm=(nm||'').trim();if(!nm||nm===cur.name){renderPI();return;}cur.name=nm;piPhSave(GCTX,cur);applyPhaseMap(GCTX);renderPI();if(window.renderProjRibbon)renderProjRibbon();}
+function piSetPhaseDates(key,sv,ev){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;sv=(sv||'').trim();ev=(ev||'').trim();var msg;if(!sv&&!ev){delete cur.s;delete cur.e;msg='กลับไปคำนวณจากงาน';}else if(!sv||!ev){if(window.toast)toast('ต้องกรอกทั้งวันเริ่มและวันจบ');renderPI();return;}else{var a=piDate(sv),b=piDate(ev);if(!a||!b){if(window.toast)toast('รูปแบบวันที่ต้องเป็น dd/mm/yyyy');renderPI();return;}if(b<a){var t=sv;sv=ev;ev=t;msg='ตั้งวันที่เฟสแล้ว (สลับวันเริ่ม-จบให้)';}else{msg='ตั้งวันที่เฟสแล้ว';}cur.s=sv;cur.e=ev;}piPhSave(GCTX,cur);renderPI();if(window.toast)toast(msg);}
+function piPhDatesInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var d=(PH_STORE[GCTX]||{})[key]||{};var wrap=document.createElement('span');wrap.className='g-phdt';var mk=function(v,ph2){var i2=document.createElement('input');i2.className='g-inl-inp g-dtin';i2.type='text';i2.value=v||'';i2.placeholder=ph2;return i2;};var a=mk(d.s,'dd/mm/yyyy'),b=mk(d.e,'dd/mm/yyyy');wrap.appendChild(a);wrap.appendChild(document.createTextNode(' → '));wrap.appendChild(b);nameEl.textContent='';nameEl.appendChild(wrap);a.focus();a.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piSetPhaseDates(key,a.value,b.value);else renderPI();};[a,b].forEach(function(el){el.onmousedown=function(e){e.stopPropagation();};el.onclick=function(e){e.stopPropagation();};el.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};el.onblur=function(){setTimeout(function(){if(document.activeElement!==a&&document.activeElement!==b)fin(true);},0);};});}
+function piRenameInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var cur=(PH_STORE[GCTX]&&PH_STORE[GCTX][key])?PH_STORE[GCTX][key].name:nameEl.textContent;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.value=cur;nameEl.textContent='';nameEl.appendChild(inp);inp.focus();inp.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piRenamePhase(key,inp.value);else renderPI();};inp.onmousedown=function(e){e.stopPropagation();};inp.onclick=function(e){e.stopPropagation();};inp.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
+function piDeletePhase(key){if(erpDenyEdit())return;if(PIMPL.some(function(d){return d.ph===key;})){if(window.toast)toast(GCTX==='ap'?'ลบไม่ได้ — กลุ่มยังมีงาน':'ลบไม่ได้ — เฟสยังมีงาน');return;}var m=PH_STORE[GCTX]||{};if(!m[key])return;delete m[key];if(window.DB)window.DB.deleteItem(COL_PH[GCTX],key).catch(dbErr('phase del'));applyPhaseMap(GCTX);renderPI();if(window.toast)toast('ลบแล้ว');}
 function buildAP(){var d0=new Date(2026,6,1);var base=(DATA.bridge||[]).map(function(b){return {ph:(b.module||"อื่นๆ"),name:b.name||"(ไม่มีชื่อ)",asg:(b.owner?[b.owner]:[""]),s:"",e:"",prog:0,st:(b.status||"Not Started"),pr:(b.cplx==="High"?"High":"Low"),dep:[]};});var seq={};base.forEach(function(d,i){d._pi=i;d._key="b"+i;var dp=d.ph;var k=(seq[dp]=(seq[dp]||0));seq[dp]++;var st=new Date(d0.getTime()+k*14*86400000);var seg=10,p=st.getTime();var r0=new Date(p),r1=new Date(p+seg*864e5),v0=new Date(p+(seg+1)*864e5),v1=new Date(p+(2*seg+1)*864e5),u0=new Date(p+(2*seg+2)*864e5),u1=new Date(p+(3*seg+2)*864e5);d.stages=[{k:'req',s:fmtDMY(r0),e:fmtDMY(r1),st:'Not Started'},{k:'dev',s:fmtDMY(v0),e:fmtDMY(v1),st:'Not Started'},{k:'uat',s:fmtDMY(u0),e:fmtDMY(u1),st:'Not Started'}];d.gld=fmtDMY(new Date(u1.getTime()+3*864e5));d.s=fmtDMY(st);d.e=fmtDMY(u1);});AP_BASE=base;var depts=[...new Set((DATA.bridge||[]).map(function(b){return b.module||"อื่นๆ";}))];AP_GROUPS={};AP_PHC={};depts.forEach(function(dp){AP_GROUPS[dp]=dp;AP_PHC[dp]=deptColor(dp);});}
 var AP_STG={req:['Req','#2563eb','#e6edff'],dev:['Dev + Test','#7c3aed','#efe6fd'],uat:['UAT','#0d9488','#d6f2ec']};
 var AP_STCLR={'Not Started':'#8e8e93','In Progress':'#ff9500','Partial Done':'#2f6fed','Blocker':'#e0322b','Done':'#28cd41'};
@@ -3775,10 +3794,10 @@ function openAP(id){var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _b=brByKey(
     +'</div><div class="mact"><button class="btn btn-sec del" onclick="piDeleteTask('+id+')">ลบกระบวนการ</button><button class="btn btn-sec" onclick="closeModal()">ปิด</button></div>';
   document.getElementById('modal').classList.add('open');}
 function setGanttCtx(which){GCTX=which;if(which==="ap"){PIBASE=AP_BASE;PIEKEY="erp_ap_edits_v1";PIADDKEY="erp_ap_add_v1";PIDELKEY="erp_ap_del_v1";PIGID="apGantt";ZOOMID="apZoom";GP="ap";}else{PIBASE=PI_BASE0;PIEKEY="erp_pi_edits_v1";PIADDKEY="erp_pi_add_v1";PIDELKEY="erp_pi_del_v1";PIGID="piGantt";ZOOMID="piZoom";GP="pi";}applyPhaseMap(which);piTaskCol={};piCollapsed={};PIMPL=PI_STORE[which]||[];fillPIFilters();}
-function setPIField(pid,f,val){var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);if(f==='st'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;piRollStatus(_par);piSaveTask(_par);_cur=_par;}}renderPI();if(window.renderProjRibbon)renderProjRibbon();}
-function setPIName(pid,val){setPIField(pid,'name',val);var t=document.getElementById('mTitle');if(t)t.textContent=val;}
-function setPIAsg(pid,str){setPIField(pid,'asg',(str||'').split(',').map(function(x){return x.trim();}).filter(Boolean));}
-function setPIDate(pid,f,val){
+function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);if(f==='st'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;piRollStatus(_par);piSaveTask(_par);_cur=_par;}}renderPI();if(window.renderProjRibbon)renderProjRibbon();}
+function setPIName(pid,val){if(erpDenyEdit())return;setPIField(pid,'name',val);var t=document.getElementById('mTitle');if(t)t.textContent=val;}
+function setPIAsg(pid,str){if(erpDenyEdit())return;setPIField(pid,'asg',(str||'').split(',').map(function(x){return x.trim();}).filter(Boolean));}
+function setPIDate(pid,f,val){if(erpDenyEdit())return;
   /* เว้นว่าง = ยังไม่กำหนด (TBD) — อนุญาตเฉพาะวันสิ้นสุด เพราะ piSpan() ถอยไปใช้
      ขอบเขตของงานย่อยแทนได้ ส่วนวันเริ่มถ้าหายไปจะไม่มีจุดอ้างอิงให้วาดบาร์ */
   if(f==='e'&&!(val||'').trim()){setPIField(pid,'e','');return;}
@@ -3786,12 +3805,12 @@ function setPIDate(pid,f,val){
 function piToISO(x){var p=(x||'').split('/');if(p.length!==3)return '';var z=function(n){return (''+n).padStart(2,'0');};return p[2]+'-'+z(p[1])+'-'+z(p[0]);}
 function piFromISO(v){var p=(v||'').split('-');return p.length===3?(p[2]+'/'+p[1]+'/'+p[0]):'';}
 function piNextId(){return PIMPL.reduce(function(m,d){return Math.max(m,d._pi);},999)+1;}
-function piAddTask(ph){var nid=piNextId();var t=new Date();var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear();};var e=new Date(t.getTime()+7*86400000);var d={ph:ph,name:'งานใหม่',asg:['Everyone'],s:fmt(t),e:fmt(e),prog:0,st:'Not Started',pr:'Low',dep:[],_pi:nid,_key:'a'+nid};PIMPL.push(d);PI_STORE[GCTX]=PIMPL;piSaveTask(d);renderPI();openPI(nid);}
+function piAddTask(ph){if(erpDenyEdit())return;var nid=piNextId();var t=new Date();var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear();};var e=new Date(t.getTime()+7*86400000);var d={ph:ph,name:'งานใหม่',asg:['Everyone'],s:fmt(t),e:fmt(e),prog:0,st:'Not Started',pr:'Low',dep:[],_pi:nid,_key:'a'+nid};PIMPL.push(d);PI_STORE[GCTX]=PIMPL;piSaveTask(d);renderPI();openPI(nid);}
 function piDelSub(parentPid,subPid){var d=PIMPL.find(function(z){return z._pi===subPid;});if(!d)return;if(!confirm('ลบงานย่อย "'+d.name+'" ?'))return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();openPI(parentPid);}
 function piLogStamp(){var d=new Date(),z=function(n){return ('0'+n).slice(-2);};return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());}
-function piAddLog(pid){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var el=document.getElementById('piLogIn');if(!el)return;var m=(el.value||'').trim();if(!m)return;if(!Array.isArray(d.log))d.log=[];d.log.push({t:piLogStamp(),m:m});piSaveTask(d);el.value='';openPI(pid);}
-function piDelLog(pid,i){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log))return;if(!confirm('ลบบันทึกนี้?'))return;d.log.splice(i,1);piSaveTask(d);openPI(pid);}
-function piEditLog(pid,i,el){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log)||!d.log[i])return;if(el.querySelector('textarea'))return;var cur=d.log[i].m;var ta=document.createElement('textarea');ta.className='lgedit';ta.value=cur;el.textContent='';el.appendChild(ta);ta.focus();ta.select();var done=false;var fin=function(ok){if(done)return;done=true;var v=(ta.value||'').trim();if(ok&&v&&v!==cur){d.log[i].m=v;piSaveTask(d);}openPI(pid);};ta.onkeydown=function(e){e.stopPropagation();if(e.key==='Escape'){e.preventDefault();fin(false);}};ta.onblur=function(){fin(true);};ta.onclick=function(e){e.stopPropagation();};}
+function piAddLog(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var el=document.getElementById('piLogIn');if(!el)return;var m=(el.value||'').trim();if(!m)return;if(!Array.isArray(d.log))d.log=[];d.log.push({t:piLogStamp(),m:m});piSaveTask(d);el.value='';openPI(pid);}
+function piDelLog(pid,i){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log))return;if(!confirm('ลบบันทึกนี้?'))return;d.log.splice(i,1);piSaveTask(d);openPI(pid);}
+function piEditLog(pid,i,el){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log)||!d.log[i])return;if(el.querySelector('textarea'))return;var cur=d.log[i].m;var ta=document.createElement('textarea');ta.className='lgedit';ta.value=cur;el.textContent='';el.appendChild(ta);ta.focus();ta.select();var done=false;var fin=function(ok){if(done)return;done=true;var v=(ta.value||'').trim();if(ok&&v&&v!==cur){d.log[i].m=v;piSaveTask(d);}openPI(pid);};ta.onkeydown=function(e){e.stopPropagation();if(e.key==='Escape'){e.preventDefault();fin(false);}};ta.onblur=function(){fin(true);};ta.onclick=function(e){e.stopPropagation();};}
 function piLogSection(d){var L=Array.isArray(d.log)?d.log:[];var items=L.map(function(e,i){return '<div class="lgi"><div class="lgt">'+esc(e.t)+'<button class="lgx" onclick="piDelLog('+d._pi+','+i+')" title="ลบบันทึก">&times;</button></div>'+'<div class="lgm" onclick="piEditLog('+d._pi+','+i+',this)" title="คลิกเพื่อแก้ไข">'+esc(e.m)+'</div></div>';}).reverse().join('');return '<div class="dsec">บันทึกความคืบหน้า ('+L.length+')</div>'+'<div class="lgadd"><textarea id="piLogIn" placeholder="เขียนสิ่งที่อัปเดต แล้วกดเพิ่ม…"></textarea>'+'<button class="btn btn-sec" onclick="piAddLog('+d._pi+')">เพิ่ม</button></div>'+(items||'<div class="roval" style="color:var(--ink3)">— ยังไม่มีบันทึก —</div>');}
 /* ══════════ การเลื่อนกำหนดส่ง (2026-09-09) ══════════
    d.dueLog = [{from,to,at,why}] — from/to เป็น วว/ดด/ปปปป · at ใช้ piLogStamp() ตัวเดียวกับบันทึกความคืบหน้า
@@ -3830,7 +3849,7 @@ function piDueOpen(pid){var f=document.getElementById('piDueForm'),b=document.ge
   var i=document.getElementById('piDueNew');if(i){i.focus();i.select();}}
 function piDueCancel(){var f=document.getElementById('piDueForm'),b=document.getElementById('piDueBtn');
   if(f)f.classList.remove('open');if(b)b.style.display='';}
-function piDueSave(pid){
+function piDueSave(pid){if(erpDenyEdit())return;
   var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;
   var v=(document.getElementById('piDueNew').value||'').trim().replace(/[-.]/g,'/');
   var m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
@@ -3845,11 +3864,11 @@ function piDueSave(pid){
   openPI(pid);
   var dd=Math.round((piDate(to)-piDate(from))/86400000);
   if(window.toast)toast('เลื่อนกำหนดเป็น '+to+' ('+piDueDays(dd)+')');}
-function piDueDel(pid,i){
+function piDueDel(pid,i){if(erpDenyEdit())return;
   var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.dueLog)||!d.dueLog[i])return;
   if(!confirm('ลบประวัติการเลื่อนรายการนี้?\n(วันกำหนดปัจจุบันไม่เปลี่ยน)'))return;
   d.dueLog.splice(i,1);piSaveTask(d);renderPI();openPI(pid);}
-function piDueEditWhy(pid,i,el){
+function piDueEditWhy(pid,i,el){if(erpDenyEdit())return;
   var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.dueLog)||!d.dueLog[i])return;
   if(el.querySelector('textarea'))return;
   var ta=document.createElement('textarea');ta.className='lgedit';ta.value=d.dueLog[i].why||'';
@@ -3872,7 +3891,7 @@ function piDueSection(d){
       +'<div class="lgm" onclick="piDueEditWhy('+d._pi+','+i+',this)" title="คลิกเพื่อแก้เหตุผล">'
       +(e.why?esc(e.why):'<span style="color:var(--ink3)">— ไม่ได้ระบุเหตุผล —</span>')+'</div></div>';}).join('');
   return '<div class="dsec">ประวัติการเลื่อนกำหนด ('+L.length+')</div>'+items;}
-function piDeleteTask(pid){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);if(!confirm('ลบงาน "'+d.name+'"'+(desc.length?(' และงานย่อย '+desc.length+' รายการ'):'')+' ?'))return;var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();closeModal();toast('ลบแล้ว');}
+function piDeleteTask(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);if(!confirm('ลบงาน "'+d.name+'"'+(desc.length?(' และงานย่อย '+desc.length+' รายการ'):'')+' ?'))return;var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();closeModal();toast('ลบแล้ว');}
 /* ══ ล้างแผนงานกลับเป็นข้อมูลตั้งต้น — ไม่มีปุ่มใน UI โดยตั้งใจ ══
    ลบ doc ทุกตัวใน pi_tasks/ap_tasks บน Firebase แล้วเขียนข้อมูลตั้งต้นทับ
    = วันที่ที่ทีมปรับ · งานที่เพิ่มเอง · dependency · บันทึก · ประวัติการเลื่อน หายถาวรทั้งทีม
@@ -3999,6 +4018,25 @@ function alFillFilters(){
 function alClear(){['alWho','alAct','alSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderAudit();}
 ['alWho','alAct','alSearch'].forEach(function(id){
   var e=document.getElementById(id);if(e)e.addEventListener(id==='alSearch'?'input':'change',function(){renderAudit();});});
+/* ══════════ สิทธิ์การแก้ไข (2026-09-11) ══════════
+   ERP_ROLE ตั้งโดย js/auth.js จากอีเมลที่ล็อกอินจริง ไม่ใช่จากรหัสที่พิมพ์
+
+   ที่นี่ใช้ "ซ่อนปุ่มและกันการกด" เท่านั้น เพื่อให้คนดูอย่างเดียวไม่กดแล้วเจอ error
+   ตัวบังคับจริงคือ firestore.rules ซึ่งทำงานบนเซิร์ฟเวอร์ ต่อให้เปิด DevTools
+   ตั้ง ERP_ROLE='admin' เองก็เขียนไม่ผ่านอยู่ดี
+
+   ล็อกเฉพาะแผนงานโครงการกับ Automation — Requirements / ติดตามสถานะ / รายงาน
+   ทุกคนยังแก้ได้ตามเดิม */
+function erpCanEditPlan(){return window.ERP_ROLE==='admin';}
+function erpApplyRole(){
+  document.body.classList.toggle('ro',!erpCanEditPlan());
+  var b=document.getElementById('roBadge');
+  if(b)b.style.display=erpCanEditPlan()?'none':'';
+  try{if(typeof renderPI==='function'&&document.querySelector('.panel.active'))renderPI();}catch(e){}}
+function erpDenyEdit(){
+  if(erpCanEditPlan())return false;
+  if(window.toast)toast('โหมดดูอย่างเดียว — แผนงานโครงการและ Automation แก้ได้เฉพาะผู้ดูแล IT');
+  return true;}
 function piIsOverdue(d){
   if(!d||d.st==='Completed'||d.st==='On Hold'||d.st==='Delayed')return false;
   var e=piDate(d.e);if(!e)return false;
@@ -4021,7 +4059,7 @@ function piRollStatus(p){var ch=piChildren(p);if(!ch.length)return;var sts=ch.ma
 function piTreeOrder(list){var byKey={};list.forEach(function(d){byKey[d._key]=d;});var ch={};list.forEach(function(d){var p=(d.parent&&byKey[d.parent])?d.parent:'_root';(ch[p]=ch[p]||[]).push(d);});var out=[];function walk(k,dep){(ch[k]||[]).forEach(function(d){out.push({d:d,depth:dep});if(!piTaskCol[d._key])walk(d._key,dep+1);});}walk('_root',0);return out;}
 function piCollectDesc(key,acc){PIMPL.filter(function(x){return x.parent===key;}).forEach(function(c){acc.push(c);piCollectDesc(c._key,acc);});}
 function piAddSub(pid){var p=PIMPL.find(function(z){return z._pi===pid;});if(!p)return;var nid=piNextId();var sp=piSpan(p);var t=new Date();var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear();};var s=sp.s||fmt(t);var e=sp.e||fmt(new Date(t.getTime()+7*86400000));var d={ph:p.ph,parent:p._key,name:'งานย่อยใหม่',asg:p.asg.slice(),s:s,e:e,prog:0,st:'Not Started',pr:'Low',dep:[],_pi:nid,_key:'a'+nid};PIMPL.push(d);PI_STORE[GCTX]=PIMPL;piSaveTask(d);renderPI();openPI(pid);}
-function piMoveTask(pid,dir){var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var vis=filteredPI();var sib=vis.filter(function(z){return (z.parent||'')===(d.parent||'')&&z.ph===d.ph;});sib.sort(function(a,b){return piOrdOf(a)-piOrdOf(b);});var i=sib.indexOf(d);if(i<0)return;var j=i+dir;if(j<0||j>=sib.length)return;var ra=piOrdOf(sib[i]),rb=piOrdOf(sib[j]);sib[i].ord=rb;sib[j].ord=ra;piSaveTask(sib[i]);piSaveTask(sib[j]);PIMPL=piNorm(PIMPL);renderPI();}
+function piMoveTask(pid,dir){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var vis=filteredPI();var sib=vis.filter(function(z){return (z.parent||'')===(d.parent||'')&&z.ph===d.ph;});sib.sort(function(a,b){return piOrdOf(a)-piOrdOf(b);});var i=sib.indexOf(d);if(i<0)return;var j=i+dir;if(j<0||j>=sib.length)return;var ra=piOrdOf(sib[i]),rb=piOrdOf(sib[j]);sib[i].ord=rb;sib[j].ord=ra;piSaveTask(sib[i]);piSaveTask(sib[j]);PIMPL=piNorm(PIMPL);renderPI();}
 /* ══ หุบ/กางทุกเฟสในคลิกเดียว ══
    piCollapsed อยู่ในหน่วยความจำอย่างเดียว ไม่ persist ที่ไหน กดแล้วไม่มีการเขียนข้อมูล
    ถ้ายังมีเฟสไหนกางอยู่ = หุบทั้งหมด · ถ้าหุบหมดแล้ว = กางทั้งหมด */
@@ -4063,7 +4101,7 @@ function drawPIDeps(){var gw=document.getElementById(PIGID);if(!gw)return;var gb
   if(mk){gb.insertAdjacentHTML('beforeend','<svg class="g-deps" width="'+W+'" height="'+H+'"><defs><marker id="pad-n" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7z" fill="var(--ink3)"/></marker><marker id="pad-c" markerWidth="8" markerHeight="8" refX="5" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="var(--red)"/></marker></defs>'+paths+'</svg>');}
 }
 var piLink=null;
-function piLinkStart(ev,pid){ev.stopPropagation();ev.preventDefault();piLink={from:+pid,sx:ev.clientX,sy:ev.clientY};document.body.style.cursor='crosshair';var sv=document.getElementById('piLinkSvg');if(!sv){sv=document.createElement('div');sv.id='piLinkSvg';sv.style.cssText='position:fixed;inset:0;z-index:9998;pointer-events:none';sv.innerHTML='<svg width="100%" height="100%"><path id="piLinkPath" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 3"/></svg>';document.body.appendChild(sv);}}
+function piLinkStart(ev,pid){if(erpDenyEdit())return;ev.stopPropagation();ev.preventDefault();piLink={from:+pid,sx:ev.clientX,sy:ev.clientY};document.body.style.cursor='crosshair';var sv=document.getElementById('piLinkSvg');if(!sv){sv=document.createElement('div');sv.id='piLinkSvg';sv.style.cssText='position:fixed;inset:0;z-index:9998;pointer-events:none';sv.innerHTML='<svg width="100%" height="100%"><path id="piLinkPath" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="4 3"/></svg>';document.body.appendChild(sv);}}
 document.addEventListener('mousemove',function(ev){if(!piLink)return;var p=document.getElementById('piLinkPath');if(p){var x1=piLink.sx,y1=piLink.sy,x2=ev.clientX,y2=ev.clientY,dx=Math.max(20,Math.abs(x2-x1)/2);p.setAttribute('d','M '+x1+' '+y1+' C '+(x1+dx)+' '+y1+', '+(x2-dx)+' '+y2+', '+x2+' '+y2);}document.querySelectorAll('.g-bar.linkhover').forEach(x=>x.classList.remove('linkhover'));var b=ev.target.closest?ev.target.closest('.g-bar'):null;if(b&&+b.dataset.pi!==piLink.from)b.classList.add('linkhover');});
 document.addEventListener('mouseup',function(ev){if(!piLink)return;var pl=piLink;piLink=null;document.body.style.cursor='';var sv=document.getElementById('piLinkSvg');if(sv)sv.remove();document.querySelectorAll('.g-bar.linkhover').forEach(x=>x.classList.remove('linkhover'));var b=ev.target.closest?ev.target.closest('.g-bar'):null;if(b&&+b.dataset.pi!==pl.from){piDepsAdd(+b.dataset.pi,pl.from);}});
 
@@ -4169,7 +4207,7 @@ function piToday(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=pa
 function piHome(){var gw=document.getElementById(PIGID);if(!gw)return;gw.scrollTo({left:0});}
 function piFocusTasks(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-290),behavior:'smooth'});}
 function piScroll(dir){var gw=document.getElementById(PIGID);if(!gw)return;gw.scrollBy({left:dir*gw.clientWidth*0.82,behavior:'smooth'});}
-function piBarDown(ev,pid){var _d=PIMPL.find(function(z){return z._pi===pid;});var _sum=_d&&piIsSummary(_d);ev.stopPropagation();ev.preventDefault();var bar=ev.currentTarget;var r=bar.getBoundingClientRect();var rx=ev.clientX-r.left;var mode=rx<9?'l':(rx>r.width-9?'r':'m');var d=PIMPL.find(z=>z._pi===pid);var dw=parseFloat(document.getElementById(PIGID).dataset.dw||'5');piDrag={pid:pid,mode:mode,sx:ev.clientX,os:piDate(d.s),oe:piDate(d.e),bar:bar,dw:dw,ol:parseFloat(bar.style.left),ow:parseFloat(bar.style.width),noDrag:_sum};if(!_sum)document.body.style.cursor=mode==='m'?'grabbing':'ew-resize';}
+function piBarDown(ev,pid){if(erpDenyEdit())return;var _d=PIMPL.find(function(z){return z._pi===pid;});var _sum=_d&&piIsSummary(_d);ev.stopPropagation();ev.preventDefault();var bar=ev.currentTarget;var r=bar.getBoundingClientRect();var rx=ev.clientX-r.left;var mode=rx<9?'l':(rx>r.width-9?'r':'m');var d=PIMPL.find(z=>z._pi===pid);var dw=parseFloat(document.getElementById(PIGID).dataset.dw||'5');piDrag={pid:pid,mode:mode,sx:ev.clientX,os:piDate(d.s),oe:piDate(d.e),bar:bar,dw:dw,ol:parseFloat(bar.style.left),ow:parseFloat(bar.style.width),noDrag:_sum};if(!_sum)document.body.style.cursor=mode==='m'?'grabbing':'ew-resize';}
 document.addEventListener('mousemove',ev=>{if(!piDrag)return;if(piDrag.noDrag)return;var dd=Math.round((ev.clientX-piDrag.sx)/piDrag.dw);var b=piDrag.bar;if(piDrag.mode==='m'){b.style.left=(piDrag.ol+dd*piDrag.dw)+'px';}else if(piDrag.mode==='l'){var nl=piDrag.ol+dd*piDrag.dw,nw=piDrag.ow-dd*piDrag.dw;if(nw>=piDrag.dw){b.style.left=nl+'px';b.style.width=nw+'px';}}else{var n2=piDrag.ow+dd*piDrag.dw;if(n2>=piDrag.dw)b.style.width=n2+'px';}});
 document.addEventListener('mouseup',ev=>{if(!piDrag)return;var dg=piDrag;piDrag=null;document.body.style.cursor='';var dd=Math.round((ev.clientX-dg.sx)/dg.dw);
   if(dd===0||dg.noDrag){openPI(dg.pid);return;}
@@ -4199,6 +4237,15 @@ function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi==
     ${piDueSection(d)}
     ${piLogSection(d)}
   </div></div><div class="mact"><span class="m-auto">${LANG==='en'?'Saved automatically':'บันทึกอัตโนมัติทุกครั้งที่แก้'}</span><button class="btn btn-sec" onclick="closeModal()">${LANG==='en'?'Close':'ปิด'}</button><button class="btn btn-danger" onclick="piDeleteTask(${d._pi})">${LANG==='en'?'Delete':'ลบงาน'}</button></div>`;
+  /* ปิดช่องกรอกในหน้ารายละเอียดของงานแผน/Automation เมื่อเป็นผู้ดูอย่างเดียว
+     ทำหลัง innerHTML เพื่อให้ครอบคลุมทุกช่องโดยไม่ต้องไล่แก้ทีละอัน */
+  if(!erpCanEditPlan()){
+    var _mb=document.getElementById('mBody');
+    if(_mb){
+      _mb.querySelectorAll('input,select,textarea').forEach(function(el){el.disabled=true;});
+      _mb.querySelectorAll('.lgx,.sbadd,.dpadd,.btn-pri,.duebtn').forEach(function(el){el.style.display='none';});
+      _mb.classList.add('mb-ro');}
+    var _del=document.querySelector('#modal .m-del');if(_del)_del.style.display='none';}
   document.getElementById('modal').classList.add('open');}
 function toggleGFocus(){var pid=GCTX==='ap'?'bridge':'project';var p=document.getElementById(pid);if(!p)return;p.classList.toggle('gfocus');var on=p.classList.contains('gfocus');var b=document.getElementById(GCTX==='ap'?'apFocusBtn':'gFocusBtn');if(b)b.classList.toggle('on',on);var m=document.querySelector('.main');if(m)m.classList.toggle('gffit',on);var gw=document.getElementById(GCTX==='ap'?'apGantt':'piGantt');if(gw&&on&&gw.dataset.origMaxH==null)gw.dataset.origMaxH=gw.style.maxHeight||'';var applyH=function(){if(!gw)return;if(p.classList.contains('gfocus')){if(m)m.scrollTop=0;var t=Math.round(gw.getBoundingClientRect().top);gw.style.maxHeight='calc(100vh - '+(t+16)+'px)';}else{gw.style.maxHeight=gw.dataset.origMaxH||'';delete gw.dataset.origMaxH;}};applyH();setTimeout(function(){applyH();piToday();},90);}
 function piGanttHover(){var gw=document.getElementById(PIGID);if(!gw||gw._hb)return;gw._hb=1;gw.addEventListener("mouseover",function(e){var hi=gw.querySelector(".g-hdrhi");if(!hi)return;var bar=e.target.closest?e.target.closest(".g-bar"):null;if(bar){hi.style.left=bar.dataset.hl+"px";hi.style.width=bar.dataset.hw+"px";hi.classList.add("on");}else{hi.classList.remove("on");}});}
@@ -4450,7 +4497,7 @@ window.addEventListener('resize',function(){document.querySelectorAll('.cs').for
 
 window.startApp=async function(){
 var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillRptFilters();rptBind();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
-if(_ld)_ld.style.display='none';erpSyncActor();showTab('project');setTimeout(erpAskDevice,700);
+if(_ld)_ld.style.display='none';erpSyncActor();erpApplyRole();showTab('project');setTimeout(erpAskDevice,700);
 subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePhases('pi');subscribePhases('ap');subscribePlan();subscribeActs();subscribeRpts();
 var _syncS=null;function renderSyncBadge(){var _sb=document.getElementById('syncBadge');if(!_sb||!_syncS)return;var s=_syncS;_sb.querySelector('.sb-txt').textContent=!s.online?L('ออฟไลน์ — ยังไม่ซิงก์','Offline — not synced'):(s.saving?L('กำลังบันทึก…','Saving…'):L('เชื่อมต่อแล้ว','Connected'));}
 if(window.DB&&window.DB.onStatus){var _sb=document.getElementById('syncBadge');window.DB.onStatus(function(s){if(!_sb)return;_syncS=s;_sb.style.display='flex';_sb.classList.toggle('off',!s.online);_sb.classList.toggle('saving',s.online&&s.saving);renderSyncBadge();});}
