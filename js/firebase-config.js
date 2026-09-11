@@ -18,3 +18,9 @@ export const firebaseConfig = {
 
 // บัญชีทีมที่ใช้ร่วมกัน (สร้างใน Firebase Console → Authentication → Users)
 export const TEAM_EMAIL = "team@civil.co.th";
+
+
+// บัญชีผู้ดูแล IT — คนที่ล็อกอินด้วยบัญชีนี้เท่านั้นที่แก้แผนงานโครงการและ Automation ได้
+// ต้องสร้างบัญชีนี้ใน Firebase Console → Authentication → Users ก่อน ไม่งั้นจะไม่มีใครแก้ได้เลย
+// ถ้าลบบรรทัดนี้ออก ระบบจะกลับไปเป็นทุกคนแก้ได้เหมือนเดิม
+export const ADMIN_EMAIL = "admin@civil.co.th";

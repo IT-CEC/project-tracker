@@ -9,7 +9,11 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 import { auth } from "./db.js";
-import { TEAM_EMAIL } from "./firebase-config.js";
+// นำเข้าทั้งโมดูลแทนการระบุชื่อ เพราะ firebase-config.js ของแต่ละเครื่องถูก git-ignore
+// ถ้าเครื่องไหนยังไม่ได้เติม ADMIN_EMAIL การ import แบบระบุชื่อจะพังทั้งไฟล์
+import * as CFG from "./firebase-config.js";
+const TEAM_EMAIL  = CFG.TEAM_EMAIL;
+const ADMIN_EMAIL = CFG.ADMIN_EMAIL || "";
 
 let appStarted = false;
 let wasSignedIn = false;
@@ -61,14 +65,24 @@ async function doLogin(e) {
   const pass = ($("loginPass") && $("loginPass").value) || "";
   if (!pass) { showErr("กรอกรหัสผ่าน"); return; }
   showErr(""); setBusy(true);
-  try {
-    await signInWithEmailAndPassword(auth, TEAM_EMAIL, pass);
-    // onAuthStateChanged จะเรียก reveal() ต่อเอง
-  } catch (err) {
-    showErr(msgFor(err));
-    setBusy(false);
-    const p = $("loginPass"); if (p) { p.select && p.select(); p.focus(); }
+  // ช่องกรอกยังมีช่องเดียวเหมือนเดิม — ลองบัญชีทีมก่อน (คนส่วนใหญ่)
+  // ถ้ารหัสไม่ตรงค่อยลองบัญชีผู้ดูแล ผู้ใช้จึงไม่ต้องเลือกอะไรเพิ่ม
+  const tries = ADMIN_EMAIL ? [TEAM_EMAIL, ADMIN_EMAIL] : [TEAM_EMAIL];
+  let last = null;
+  for (const email of tries) {
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      return;                                   // onAuthStateChanged จะเรียก reveal() ต่อเอง
+    } catch (err) {
+      last = err;
+      const c = err && err.code;
+      // รหัสผิดกับบัญชีนี้ → ลองบัญชีถัดไป  ส่วน error อื่น (เน็ตหลุด ฯลฯ) หยุดเลย
+      if (c !== "auth/wrong-password" && c !== "auth/invalid-credential" && c !== "auth/user-not-found") break;
+    }
   }
+  showErr(msgFor(last));
+  setBusy(false);
+  const p = $("loginPass"); if (p) { p.select && p.select(); p.focus(); }
 }
 
 function wire() {
@@ -79,6 +93,11 @@ function wire() {
   // สถานะ auth: ถ้ามี session อยู่แล้ว → เข้าเลย ; ไม่งั้นแสดงหน้า login
   onAuthStateChanged(auth, user => {
     if (user) {
+      // บอกแอปว่าล็อกอินด้วยบัญชีไหน — ฝั่งหน้าเว็บใช้ซ่อนปุ่มแก้ไขเท่านั้น
+      // ตัวบังคับจริงคือ firestore.rules ต่อให้แก้ค่านี้ใน DevTools ก็เขียนไม่ผ่าน
+      window.ERP_ROLE  = (ADMIN_EMAIL && user.email === ADMIN_EMAIL) ? "admin" : "viewer";
+      window.ERP_EMAIL = user.email || "";
+      try { window.erpApplyRole && window.erpApplyRole(); } catch (e) {}
       showErr(""); setBusy(false); reveal();
       // บันทึกเฉพาะตอนเพิ่งเข้ามา ไม่ใช่ทุกครั้งที่ onAuthStateChanged ยิงซ้ำ
       if (!wasSignedIn && window.DB && window.DB.logEvent) {
