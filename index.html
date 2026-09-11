@@ -884,6 +884,11 @@ body.ro #addBrBtn,body.ro #brTableView .rowdel,body.ro #brTableView .rowadd{disp
 body.ro #implement .g-bar,body.ro #brTimeline .g-bar{cursor:default}
 body.ro #implement .g-rsz,body.ro #implement .g-link,
 body.ro #brTimeline .g-rsz,body.ro #brTimeline .g-link{display:none!important}
+/* ตาราง ROI แก้ผ่านช่องกรอกในเซลล์โดยตรง ไม่มีปุ่มให้ซ่อน จึงต้องปิดการโต้ตอบทั้งตาราง
+   ยามในฟังก์ชันกันการเขียนไว้แล้ว ตรงนี้ทำให้เห็นด้วยตาว่าแก้ไม่ได้ */
+body.ro #brTableView input,body.ro #brTableView select,body.ro #brTableView textarea,
+body.ro #brTimeline select,body.ro #brTimeline input{pointer-events:none;opacity:.72}
+body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
 .mb-ro input,.mb-ro select,.mb-ro textarea{opacity:.72;cursor:not-allowed}
 /* ── ประวัติการใช้งาน ── */
 /* หน้าตั้งค่าจำกัดความกว้าง 880px ซึ่งพอสำหรับการ์ดตั้งค่า แต่บีบตารางประวัติจน
@@ -3593,7 +3598,7 @@ async function loadBR(){try{var docs=await window.DB.loadAll(COL_BR);if(!docs.le
 function brSaveOne(b){if(window.DB&&b&&b._key)window.DB.saveItem(COL_BR,b._key,b).catch(dbErr('bridge save'));}
 var _brFirst=true;
 function subscribeBr(){if(!window.DB)return;window.DB.subscribe(COL_BR,function(docs){if(_brFirst){_brFirst=false;return;}brBuild(docs);fillBrFilters();renderBridge();fillAbout();});}
-function setBrField(bid,field,val){var b=BR.find(x=>x._bid===bid);if(!b)return;var sv=(field==='risk')?(val==='High'?'Yes':'No'):val;b[field]=sv;brSaveOne(b);if(field==='name'){var mt=document.getElementById('mTitle');if(mt)mt.textContent=sv||'(ไม่มีชื่อ)';}renderBrKpi();renderBrTable();renderBrCharts();}
+function setBrField(bid,field,val){if(erpDenyEdit())return;var b=BR.find(x=>x._bid===bid);if(!b)return;var sv=(field==='risk')?(val==='High'?'Yes':'No'):val;b[field]=sv;brSaveOne(b);if(field==='name'){var mt=document.getElementById('mTitle');if(mt)mt.textContent=sv||'(ไม่มีชื่อ)';}renderBrKpi();renderBrTable();renderBrCharts();}
 async function brAddRow(){if(erpDenyEdit())return;brNid++;var nk='a'+brNid;var nb={_key:nk,_nid:brNid,module:'(ใหม่)',name:'รายการใหม่',type:'',cycle:'',hrs:'',save:'',fteNow:'',cplx:'',risk:'No',status:'Not Started',req:'',dept:'',owner:'',app:'',cat:'',src:nk};if(window.DB)await window.DB.saveItem(COL_BR,nk,nb);await loadBR();fillBrFilters();renderBridge();var a=BR.find(x=>x._key===nk);if(a)openBridge(a._bid);toast(T('added'));}
 async function brDelRow(bid){if(erpDenyEdit())return;var b=BR.find(x=>x._bid===bid);if(!b)return;if(!confirm('ลบรายการนี้?'))return;if(window.DB)await window.DB.deleteItem(COL_BR,b._key);await loadBR();fillBrFilters();closeModal();renderBridge();toast('ลบแล้ว');}
 function brSel(bid,field,val,opts){return '<select class="selmini" onclick="event.stopPropagation()" onchange="setBrField('+bid+',&quot;'+field+'&quot;,this.value)">'+opts.map(function(o){return '<option value="'+attr(o)+'" '+(String(o)===String(val||'')?'selected':'')+'>'+(o===''?'—':esc(o))+'</option>';}).join('')+'</select>';}
@@ -3605,7 +3610,7 @@ function filteredBr(){var ds=vm('brDept'),ts=vm('brType'),cs=vm('brCplx'),rks=vm
   var r=BR.filter(b=>(!ds.length||ds.includes(b.module))&&(!ts.length||ts.includes(b.type))&&(!cs.length||cs.includes(b.cplx))&&(!rks.length||rks.includes(brRiskVal(b)))&&(!st||(b.status||'Not Started')===st)&&(!brCatF||b.cat===brCatF)&&(!q||((b.name||'')+(b.dept||'')+(b.req||'')+(b.owner||'')+(b.app||'')).toLowerCase().includes(q)));
   if(brSort.key){var k=brSort.key,nk=(k==='hrs'||k==='save');r=r.slice().sort((a,b)=>nk?(brNum(a[k])-brNum(b[k]))*brSort.dir:String(a[k]||'').localeCompare(String(b[k]||''),'th')*brSort.dir);}return r;}
 function brStatusCell(b){var sv=b.status||'Not Started',c=STATUS_COLORS[sv]||'#8e8e93';return `<span class="stwrap" style="--sc:${c}"><span class="stdot"></span><select class="selmini stsel" onclick="event.stopPropagation()" onchange="setBrStatus(${b._bid},this.value)">${STATUS_LIST.map(x=>`<option ${x===sv?'selected':''}>${x}</option>`).join('')}</select></span>`;}
-function setBrStatus(bid,val){setBrField(bid,'status',val);toast(T('saved'));}
+function setBrStatus(bid,val){if(erpDenyEdit())return;setBrField(bid,'status',val);toast(T('saved'));}
 function toggleBrStatus(x){var f=document.getElementById('brStatus');f.value=(f.value===x)?'':x;renderBrTable();}
 function clearBrFilters(){brCatF='';['brDept','brType','brCplx','brRisk','brStatus','brSearch'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});renderBrTable();}
 function renderBrStatusStrip(){var el=document.getElementById('brStatusStrip');if(!el)return;var cur=v('brStatus'),counts={};STATUS_LIST.forEach(x=>counts[x]=0);BR.forEach(b=>{var x=b.status||'Not Started';counts[x]=(counts[x]||0)+1;});el.innerHTML=STATUS_LIST.map(x=>`<span class="stchip${cur===x?' on':''}" style="--sc:${STATUS_COLORS[x]}" onclick="toggleBrStatus('${x}')"><span class="cd"></span>${x}<b>${counts[x]}</b></span>`).join('');}
@@ -3620,7 +3625,7 @@ function planBase(){return PLAN.map(function(p){return Object.assign({},p);});}
 function planApply(docs){var byId={};docs.forEach(function(d){byId[d._pid]=d;});PLAN.forEach(function(p){var d=byId[p._pid];if(d&&d.status!=null)p.status=d.status;});}
 async function loadPlan(){try{var docs=await window.DB.loadAll(COL_PLAN);if(!docs.length){docs=planBase();await Promise.all(docs.map(function(p){return window.DB.saveItem(COL_PLAN,p._pid,p);}));}planApply(docs);}catch(e){console.error('[plan load]',e);if(window.toast)toast('ซิงก์ Firebase มีปัญหา — ลองรีเฟรช');}}
 function savePlan(){/* deprecated: plan ย้ายไป Firestore per-item แล้ว (ดู setPlanStatus) */}
-function setPlanStatus(pid,val){var p=PLAN.find(x=>x._pid===pid);if(!p)return;p.status=val;if(window.DB)window.DB.saveItem(COL_PLAN,pid,{_pid:pid,status:val}).catch(dbErr('plan save'));renderPlan();}
+function setPlanStatus(pid,val){if(erpDenyEdit())return;var p=PLAN.find(x=>x._pid===pid);if(!p)return;p.status=val;if(window.DB)window.DB.saveItem(COL_PLAN,pid,{_pid:pid,status:val}).catch(dbErr('plan save'));renderPlan();}
 var _planFirst=true;
 function subscribePlan(){if(!window.DB)return;window.DB.subscribe(COL_PLAN,function(docs){if(_planFirst){_planFirst=false;return;}planApply(docs);renderPlan();});}
 function fillPlanFilters(){setOpts('plDept',[...new Set(PLAN.map(p=>p.dept))],'ทุกแผนก');setOpts('plStatus',PLAN_ST,'ทุกสถานะ');}
@@ -3781,11 +3786,11 @@ var AP_PROGW={'Not Started':0,'In Progress':50,'Partial Done':75,'Blocker':50,'D
 function apRollup(d){var sg=(d&&d.stages)||[];if(!sg.length)return {prog:(d&&d.prog)||0,st:(d&&d.st)||'Not Started',blocker:false,started:false};var sum=0,done=0,blk=false,started=false;sg.forEach(function(s){var v=AP_PROGW[s.st];sum+=(v==null?0:v);if(s.st==='Done')done++;if(s.st==='Blocker')blk=true;if(s.st&&s.st!=='Not Started')started=true;});return {prog:Math.round(sum/sg.length),st:(done===sg.length?'Completed':blk?'Delayed':started?'In Progress':'Not Started'),blocker:blk,started:started};}
 function apSaveStages(d){var ds=[],de=[];(d.stages||[]).forEach(function(z){var a=piDate(z.s),b=piDate(z.e);if(a)ds.push(a.getTime());if(b)de.push(b.getTime());});var gl=d.gld?piDate(d.gld):null;if(gl)de.push(gl.getTime());if(ds.length)d.s=fmtDMY(new Date(Math.min.apply(null,ds)));if(de.length)d.e=fmtDMY(new Date(Math.max.apply(null,de)));if((d.stages||[]).length){var r=apRollup(d);d.prog=r.prog;d.st=r.st;}piSaveTask(d);}
 function apValidDate(x){return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test((x||'').trim());}
-function apSetStage(id,idx,fld,val){var d=PIMPL.find(x=>x._pi===id);if(!d||!d.stages||!d.stages[idx])return;val=(val||'').trim();if(!apValidDate(val)){toast('ต้องเป็นวันที่ dd/mm/yyyy');openAP(id);return;}d.stages[idx][fld]=val;apSaveStages(d);renderPI();openAP(id);}
-function apSetStageStatus(id,idx,val){var d=PIMPL.find(x=>x._pi===id);if(!d||!d.stages||!d.stages[idx])return;d.stages[idx].st=val;apSaveStages(d);renderPI();openAP(id);}
-function apAddStage(id,k){var d=PIMPL.find(x=>x._pi===id);if(!d)return;d.stages=d.stages||[];var last=d.stages[d.stages.length-1];var st=last?piDate(last.e):piDate(d.s);st=st?new Date(st.getTime()+864e5):new Date();var en=new Date(st.getTime()+7*864e5);d.stages.push({k:k||'req',s:fmtDMY(st),e:fmtDMY(en)});apSaveStages(d);renderPI();openAP(id);}
-function apDelStage(id,idx){var d=PIMPL.find(x=>x._pi===id);if(!d||!d.stages)return;d.stages.splice(idx,1);apSaveStages(d);renderPI();openAP(id);}
-function apSetGL(id,val){var d=PIMPL.find(x=>x._pi===id);if(!d)return;val=(val||'').trim();if(val&&!apValidDate(val)){toast('รูปแบบวันที่ dd/mm/yyyy');openAP(id);return;}d.gld=val;apSaveStages(d);renderPI();openAP(id);}
+function apSetStage(id,idx,fld,val){if(erpDenyEdit())return;var d=PIMPL.find(x=>x._pi===id);if(!d||!d.stages||!d.stages[idx])return;val=(val||'').trim();if(!apValidDate(val)){toast('ต้องเป็นวันที่ dd/mm/yyyy');openAP(id);return;}d.stages[idx][fld]=val;apSaveStages(d);renderPI();openAP(id);}
+function apSetStageStatus(id,idx,val){if(erpDenyEdit())return;var d=PIMPL.find(x=>x._pi===id);if(!d||!d.stages||!d.stages[idx])return;d.stages[idx].st=val;apSaveStages(d);renderPI();openAP(id);}
+function apAddStage(id,k){if(erpDenyEdit())return;var d=PIMPL.find(x=>x._pi===id);if(!d)return;d.stages=d.stages||[];var last=d.stages[d.stages.length-1];var st=last?piDate(last.e):piDate(d.s);st=st?new Date(st.getTime()+864e5):new Date();var en=new Date(st.getTime()+7*864e5);d.stages.push({k:k||'req',s:fmtDMY(st),e:fmtDMY(en)});apSaveStages(d);renderPI();openAP(id);}
+function apDelStage(id,idx){if(erpDenyEdit())return;var d=PIMPL.find(x=>x._pi===id);if(!d||!d.stages)return;d.stages.splice(idx,1);apSaveStages(d);renderPI();openAP(id);}
+function apSetGL(id,val){if(erpDenyEdit())return;var d=PIMPL.find(x=>x._pi===id);if(!d)return;val=(val||'').trim();if(val&&!apValidDate(val)){toast('รูปแบบวันที่ dd/mm/yyyy');openAP(id);return;}d.gld=val;apSaveStages(d);renderPI();openAP(id);}
 function openAP(id){var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _b=brByKey(d._key),_r=apRollup(d);document.getElementById('mTitle').textContent=d.name||'(ไม่มีชื่อ)';document.getElementById('mSub').textContent=(d.ph||'')+' · แผนงาน Automation';
   var stg=(d.stages||[]).map(function(sg,si){var def=AP_STG[sg.k]||['Stage','#888'];return '<div class="apstg"><span class="apstg-c" style="background:'+def[1]+'">'+esc(def[0])+'</span><select class="apsts" onchange="apSetStageStatus('+id+','+si+',this.value)">'+['Not Started','In Progress','Partial Done','Blocker','Done'].map(function(o){return '<option '+(o===(sg.st||'Not Started')?'selected':'')+'>'+o+'</option>';}).join('')+'</select><input class="apdt" value="'+attr(sg.s)+'" onchange="apSetStage('+id+','+si+',&quot;s&quot;,this.value)"><span class="apar">→</span><input class="apdt" value="'+attr(sg.e)+'" onchange="apSetStage('+id+','+si+',&quot;e&quot;,this.value)"><button class="apx" onclick="apDelStage('+id+','+si+')" title="ลบ stage">×</button></div>';}).join('')||'<div class="muted" style="font-size:12px">— ยังไม่มี stage —</div>';
   document.getElementById('mBody').innerHTML='<div style="padding:6px 4px">'
@@ -3797,6 +3802,14 @@ function openAP(id){var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _b=brByKey(
     +'<div class="fld" style="margin-top:16px"><label>วัน Go-Live (milestone)</label><input value="'+attr(d.gld||'')+'" placeholder="dd/mm/yyyy หรือเว้นว่าง" onchange="apSetGL('+id+',this.value)"></div>'
     +(_b?'<div class="dsec" style="margin-top:16px">ข้อมูลจาก FTE Inventory (วิเคราะห์ FTE)</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px"><span class="atag">เจ้าของ: '+esc(_b.owner||'—')+'</span><span class="atag">FTE Saving: '+esc(String(_b.save||'—'))+'</span><span class="atag">ชม./ปี: '+esc(String(_b.hrs||'—'))+'</span><span class="atag">ซับซ้อน: '+esc(_b.cplx||'—')+'</span><span class="atag">เสี่ยง: '+esc(_b.risk||'—')+'</span></div>'+(((_b.req||'').trim())?'<div class="reqview" style="font-size:13px">'+fmtReq(_b.req)+'</div>':'<div class="muted" style="font-size:12px">— ไม่มีรายละเอียดความต้องการ —</div>'):'<div class="dsec" style="margin-top:16px">ข้อมูลจาก FTE Inventory</div><div class="muted" style="font-size:12px">— งานนี้ยังไม่ผูกกับรายการใน FTE Inventory —</div>')
     +'</div><div class="mact"><button class="btn btn-sec del" onclick="piDeleteTask('+id+')">ลบกระบวนการ</button><button class="btn btn-sec" onclick="closeModal()">ปิด</button></div>';
+  /* ปิดช่องกรอกในหน้ารายละเอียด Automation เมื่อเป็นผู้ดูอย่างเดียว
+     ทำแบบเดียวกับหน้ารายละเอียดของแผนงาน (openPI) */
+  if(!erpCanEditPlan()){
+    var _mb2=document.getElementById('mBody');
+    if(_mb2){
+      _mb2.querySelectorAll('input,select,textarea').forEach(function(el){el.disabled=true;});
+      _mb2.querySelectorAll('.apstg-x,.apstg-add,.btn-pri').forEach(function(el){el.style.display='none';});
+      _mb2.classList.add('mb-ro');}}
   document.getElementById('modal').classList.add('open');}
 function setGanttCtx(which){GCTX=which;if(which==="ap"){PIBASE=AP_BASE;PIEKEY="erp_ap_edits_v1";PIADDKEY="erp_ap_add_v1";PIDELKEY="erp_ap_del_v1";PIGID="apGantt";ZOOMID="apZoom";GP="ap";}else{PIBASE=PI_BASE0;PIEKEY="erp_pi_edits_v1";PIADDKEY="erp_pi_add_v1";PIDELKEY="erp_pi_del_v1";PIGID="piGantt";ZOOMID="piZoom";GP="pi";}applyPhaseMap(which);piTaskCol={};piCollapsed={};PIMPL=PI_STORE[which]||[];fillPIFilters();}
 function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);if(f==='st'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;piRollStatus(_par);piSaveTask(_par);_cur=_par;}}renderPI();if(window.renderProjRibbon)renderProjRibbon();}
