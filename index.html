@@ -3378,7 +3378,12 @@ function updateNavActive(){var tab=(document.querySelector('.panel.active')||{})
   document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
     :(a.dataset.pop==='tbPlan'?(tab==='project'||tab==='oracle'):a.dataset.pop==='tbAuto'?tab==='bridge':false);
     a.classList.toggle('on',on);});}
-document.querySelectorAll('.sb-item').forEach(function(el){el.title=el.dataset.tip||'';el.onclick=function(){var tab=el.dataset.tab,pv=el.dataset.pv,bv=el.dataset.bv,cur=(document.querySelector('.panel.active')||{}).id||'';if(pv){if(tab!==cur){curProjView=pv;showTab(tab);}else{setProjView(pv);}}else if(bv){if(tab!==cur){curBrView=bv;showTab(tab);}else{setBrView(bv);}}else{showTab(tab);}};});
+/* .sb-item ใช้ทั้งเมนูย่อยและปุ่มอื่นที่ยืมสไตล์ไปใช้ (เช่น ออกจากระบบ)
+   การตั้ง el.onclick ตรงนี้เขียนทับ onclick ที่เขียนไว้ใน markup — ตัวที่ไม่มี
+   ปลายทางนำทางจึงต้องข้ามไป ไม่งั้นจะกลายเป็น showTab(undefined) แล้วจอว่าง */
+document.querySelectorAll('.sb-item').forEach(function(el){
+  if(!el.dataset.tab&&!el.dataset.pv&&!el.dataset.bv)return;
+  el.title=el.dataset.tip||'';el.onclick=function(){var tab=el.dataset.tab,pv=el.dataset.pv,bv=el.dataset.bv,cur=(document.querySelector('.panel.active')||{}).id||'';if(pv){if(tab!==cur){curProjView=pv;showTab(tab);}else{setProjView(pv);}}else if(bv){if(tab!==cur){curBrView=bv;showTab(tab);}else{setBrView(bv);}}else{showTab(tab);}};});
 /* ══════════ แถบนำทางด้านบน — เปิด/ปิดดรอปดาวน์ ══════════
    เมนูย่อยในดรอปดาวน์คือ .sb-item ชุดเดิมที่ย้ายมาจาก sidebar ทั้งดุ้น
    ตัวจับคลิกด้านบนจึงยังผูกกับมันอยู่แล้ว ที่นี่เพิ่มแค่การปิดดรอปดาวน์ */
