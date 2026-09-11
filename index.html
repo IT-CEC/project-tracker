@@ -871,6 +871,32 @@ body.locked{overflow:hidden}
   color:var(--ink2);background:var(--chip);border-radius:980px;padding:2px 7px 2px 5px}
 .g-duechip svg{width:11px;height:11px}
 
+/* ── ประวัติการใช้งาน ── */
+/* หน้าตั้งค่าจำกัดความกว้าง 880px ซึ่งพอสำหรับการ์ดตั้งค่า แต่บีบตารางประวัติจน
+   คอลัมน์ "สิ่งที่เปลี่ยน" ตัดบรรทัดรัว — ขยายเฉพาะตอนเปิดแท็บนี้ */
+.setwrap:has(#sec-audit.active){max-width:1360px}
+.devgate{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center}
+.devgate.open{display:flex}
+.devbox{background:var(--surface);border-radius:16px;padding:24px 26px 20px;width:min(400px,92vw);box-shadow:var(--shadow)}
+.devh{font-size:18px;font-weight:700;color:var(--ink)}
+.devs{font-size:12px;color:var(--ink2);margin:6px 0 16px;line-height:1.55}
+.devbox input{width:100%;box-sizing:border-box;height:42px;padding:0 13px;font-family:inherit;font-size:14px;
+  color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;outline:none}
+.devbox input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--mint)}
+.devact{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+#alTable td{vertical-align:top}
+#alTable td:first-child{white-space:nowrap}
+.alua{font-size:10px;color:var(--ink3);margin-top:2px}
+.alcol{display:inline-block;font-size:10px;font-weight:600;color:var(--ink2);background:var(--chip);
+  border-radius:980px;padding:1px 7px;margin-right:6px}
+.alact{display:inline-flex;font-size:11px;font-weight:600;padding:2px 9px;border-radius:980px;
+  background:var(--chip);color:var(--ink2)}
+.alact.a-login{background:rgba(40,205,65,.14);color:#1f9c33}
+.alact.a-del{background:rgba(255,59,48,.12);color:var(--red)}
+.alact.a-add{background:var(--mint);color:var(--accent)}
+.alch{font-size:12px;color:var(--ink);line-height:1.65;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alch b{font-weight:600}
+.alarr{color:var(--ink3)}
 /* ══════════ TITLE BAR NAVIGATION (2026-09-07) ══════════
    ย้ายการนำทางจาก sidebar ซ้ายขึ้นมาไว้บนแถบหัว ดีไซน์ตามเว็บบริษัท
    civilengineering.co.th — พื้นขาว ตัวอักษรน้ำเงิน จุดเน้นสีแดง
@@ -952,6 +978,16 @@ body.locked{overflow:hidden}
 
 <div class="app" id="app">
   <div class="scrim" onclick="tbClose()"></div>
+  <div class="devgate" id="devGate">
+    <div class="devbox">
+      <div class="devh">เครื่องนี้คือใคร</div>
+      <div class="devs">ใช้บันทึกว่าใครเป็นคนแก้ไขข้อมูล ถามครั้งเดียว แล้วจำไว้ในเบราว์เซอร์นี้</div>
+      <input type="text" id="devGateIn" placeholder="เช่น IT_NATHIPAT" maxlength="40"
+        onkeydown="if(event.key==='Enter')erpDevGateSave()">
+      <div class="devact"><button class="btn btn-sec" onclick="erpDevGateSkip()">ข้ามไปก่อน</button>
+        <button class="btn btn-pri" onclick="erpDevGateSave()">บันทึก</button></div>
+    </div>
+  </div>
   <!-- ===== ARCHIVED DOCK (2026-07-04). REVERT: uncomment this dock block AND comment out the .nav block below. ===== -->
   <!--
   <aside class="dock">
@@ -1175,7 +1211,7 @@ body.locked{overflow:hidden}
           <button class="snav active" data-sec="appearance">การแสดงผล</button>
           <button class="snav" data-sec="language">ภาษา</button>
           <button class="snav" data-sec="data">จัดการข้อมูล</button>
-          <button class="snav" data-sec="about">เกี่ยวกับ</button>
+          <button class="snav" data-sec="audit">ประวัติการใช้งาน</button><button class="snav" data-sec="about">เกี่ยวกับ</button>
           <button class="snav" data-sec="account">บัญชี</button>
         </div>
         <div class="setbody">
@@ -1197,6 +1233,28 @@ body.locked{overflow:hidden}
               <div class="srow"><div><div class="st">พิมพ์ / PDF</div><div class="ss">พิมพ์หน้าปัจจุบัน</div></div><button class="btn btn-sec" onclick="window.print()">พิมพ์</button></div>
               <div class="srow"><div><div class="st" style="color:#ff453a">รีเซ็ตข้อมูล</div><div class="ss">ลบข้อมูล Requirements ของทั้งทีมบน Firebase แล้วคืนค่าต้นฉบับ</div></div><button class="btn btn-danger" onclick="resetData()">รีเซ็ต</button></div>
             </div>
+          </div>
+          <div class="ssec" id="sec-audit">
+            <div class="scard">
+              <div class="srow"><div><div class="st">ชื่อเครื่องนี้</div>
+                <div class="ss">ใช้ระบุว่าใครเป็นคนแก้ — เก็บไว้ในเบราว์เซอร์นี้เครื่องเดียว</div></div>
+                <input type="text" id="devName" placeholder="เช่น IT_NATHIPAT" style="width:200px" onchange="erpSetDevice(this.value)"></div>
+            </div>
+            <div class="bar" style="margin-top:14px">
+              <span class="lbl">เครื่อง</span><select id="alWho"><option value="">ทุกเครื่อง</option></select>
+              <span class="lbl">ประเภท</span><select id="alAct"><option value="">ทุกประเภท</option></select>
+              <input type="text" id="alSearch" placeholder="ค้นหารายการ…" style="width:190px;flex:none">
+              <button class="tbtn" onclick="alClear()">ล้าง</button>
+              <button class="tbtn" onclick="renderAudit(true)">โหลดใหม่</button>
+              <span class="count" id="alCount" style="margin-left:auto"></span>
+            </div>
+            <div class="tablecard"><div class="tscroll"><table class="dt" id="alTable">
+              <colgroup><col style="width:104px"><col style="width:132px"><col style="width:96px"><col style="width:250px"><col></colgroup>
+              <thead><tr><th>เวลา</th><th>เครื่อง</th><th>การกระทำ</th><th>รายการ</th><th>สิ่งที่เปลี่ยน</th></tr></thead>
+              <tbody id="alBody"></tbody>
+            </table></div></div>
+            <div class="mxnote">ชื่อเครื่องเป็นค่าที่ผู้ใช้ตั้งเอง ใช้เพื่อสืบย้อน ไม่ใช่การยืนยันตัวตน —
+              ทุกคนใช้บัญชี Firebase เดียวกัน ระบบจึงไม่มีทางรู้ตัวตนจริงได้เอง</div>
           </div>
           <div class="ssec" id="sec-about">
             <div class="scard"><div class="srow"><div><div class="st">ERP Requirement Inventory</div><div class="ss">CIVIL ENGINEERING · ERP Transformation (Oracle)</div></div></div><div class="srow"><div class="ss" id="aboutStats">—</div></div></div>
@@ -3359,6 +3417,12 @@ function setTheme(t){applyTheme(t);if(charts.cMod){renderAll();renderBridge();}}
 function setLang(l){applyLang(l);try{localStorage.setItem('erp_lang',l);}catch(e){}}
 function renderSwatches(){var el=document.getElementById('swatches');if(!el)return;el.innerHTML=Object.keys(ACCENTS).map(function(k){var c=ACCENTS[k].l[0];return '<span class="swatch'+(k===ACC_NAME?' on':'')+'" data-acc="'+k+'" style="background:'+c+';color:'+c+'" onclick="setAccent(\''+k+'\')" title="'+k+'"></span>';}).join('');}
 document.querySelectorAll('.snav').forEach(function(b){b.onclick=function(){document.querySelectorAll('.snav').forEach(function(x){x.classList.toggle('active',x===b);});document.querySelectorAll('.ssec').forEach(function(x){x.classList.toggle('active',x.id==='sec-'+b.dataset.sec);});};});
+/* เปิดแท็บประวัติการใช้งานค่อยโหลด ไม่ดึงตั้งแต่เปิดแอป เพราะกินโควตาอ่านฟรีๆ
+   ทั้งที่คนส่วนใหญ่ไม่ได้เข้ามาดู */
+document.querySelectorAll('.snav[data-sec="audit"]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var i=document.getElementById('devName');if(i)i.value=erpDevice();
+    renderAudit(true);});});
 
 /* center text plugin for module doughnut */
 const centerText={id:'centerText',afterDraw(c,a,o){if(!o.text)return;const{ctx,chartArea:{left,right,top,bottom}}=c;ctx.save();const x=(left+right)/2,y=(top+bottom)/2;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#1d1d1f';ctx.font='700 30px "Noto Sans Thai",sans-serif';ctx.fillText(o.text,x,y-6);ctx.fillStyle='#86868b';ctx.font='500 12px "Noto Sans Thai",sans-serif';ctx.fillText(o.sub||'',x,y+18);ctx.restore();}};
@@ -3852,6 +3916,89 @@ function piPhColor(ph){return STATUS_COLORS[piPhRoll(PIMPL.filter(function(z){re
 
    ห้ามเอาไปใช้ใน piCalcProg — Not Started อยู่ที่ 0% แต่ Delayed อยู่ที่ 50%
    ถ้าใช้ ความคืบหน้าจะเด้งขึ้นเองเมื่องานเลยกำหนด ซึ่งตรงข้ามกับความจริง */
+/* ══════════ ประวัติการใช้งาน (2026-09-11) ══════════
+   ตัวดักอยู่ใน js/db.js ชั้นเดียว (saveItem/updateItem/deleteItem) ที่นี่ทำแค่
+   บอก DB ว่า "ใคร" กำลังใช้อยู่ แล้วดึงมาแสดง
+
+   เบราว์เซอร์อ่านชื่อเครื่องจริงไม่ได้ (ไม่มี API และไม่ควรมี) จึงให้ผู้ใช้ตั้งเอง
+   ครั้งเดียวแล้วเก็บใน localStorage ของเบราว์เซอร์นั้น */
+var AUDIT=[];
+function erpUA(){
+  var u=navigator.userAgent,os='อื่นๆ',br='อื่นๆ';
+  if(/Windows NT 10/.test(u))os='Windows 10/11';else if(/Windows/.test(u))os='Windows';
+  else if(/Mac OS X/.test(u))os='macOS';else if(/Android/.test(u))os='Android';
+  else if(/iPhone|iPad/.test(u))os='iOS';else if(/Linux/.test(u))os='Linux';
+  var m=u.match(/(Edg|Chrome|Firefox|Safari)\/(\d+)/);
+  if(m)br=(m[1]==='Edg'?'Edge':m[1])+' '+m[2];
+  return os+' · '+br;}
+function erpDevice(){try{return localStorage.getItem('erp_device')||'';}catch(e){return '';}}
+function erpSetDevice(v){
+  v=(v||'').trim().slice(0,40);
+  try{localStorage.setItem('erp_device',v);}catch(e){}
+  erpSyncActor();var i=document.getElementById('devName');if(i)i.value=v;
+  if(window.toast&&v)toast('ตั้งชื่อเครื่องเป็น '+v+' แล้ว');}
+function erpSyncActor(){if(window.DB&&DB.setActor)DB.setActor({who:erpDevice(),ua:erpUA()});}
+/* ถามครั้งเดียวตอนเข้าใช้ครั้งแรกของเบราว์เซอร์นี้ ถ้าข้ามไปก็ยังใช้งานได้
+   แค่ log จะขึ้นว่า "ไม่ระบุ" จนกว่าจะไปตั้งในหน้าตั้งค่า */
+function erpAskDevice(){
+  if(erpDevice())return;
+  var w=document.getElementById('devGate');if(!w)return;
+  w.classList.add('open');
+  var i=document.getElementById('devGateIn');if(i){i.value='';setTimeout(function(){i.focus();},60);}}
+function erpDevGateSave(){
+  var i=document.getElementById('devGateIn'),v=(i&&i.value||'').trim();
+  if(!v){if(window.toast)toast('กรอกชื่อเครื่องก่อน');return;}
+  erpSetDevice(v);document.getElementById('devGate').classList.remove('open');}
+function erpDevGateSkip(){document.getElementById('devGate').classList.remove('open');}
+
+var ACT_TH={login:'ล็อกอิน',logout:'ออกจากระบบ',add:'เพิ่มรายการ',edit:'แก้ไข',del:'ลบรายการ'};
+var COL_TH={pi_tasks:'แผนงานโครงการ',ap_tasks:'Automation',pi_phases:'เฟส',ap_groups:'กลุ่ม Automation',
+  action_items:'ติดตามสถานะ',requirements:'ความต้องการ',bridge:'Automation',reports:'รายงาน',
+  settings:'ตั้งค่า',plan:'แผนงาน'};
+/* ชื่อช่องในระบบเป็นตัวย่อ (e, s, st) ต้องแปลตอนแสดง — เก็บใน log เป็นคีย์ดิบไว้
+   เพื่อให้ js/db.js ไม่ต้องรู้จักฟิลด์ของแอป */
+var FLD_TH={name:'ชื่องาน',s:'วันเริ่ม',e:'วันสิ้นสุด',st:'สถานะ',pr:'ความสำคัญ',ph:'เฟส',ms:'หมุดหมาย',
+  asg:'ผู้รับผิดชอบ',rvw:'กำลังตรวจโดย',dep:'งานก่อนหน้า',parent:'งานแม่',ord:'ลำดับ',prog:'ความคืบหน้า',
+  dueLog:'ประวัติการเลื่อน',log:'บันทึกความคืบหน้า',color:'สี',order:'ลำดับ',gl:'Go-Live',pin:'ปักหมุด',
+  status:'สถานะ',status2:'สถานะ PS Global',due:'กำหนดส่ง',owner:'ผู้รับผิดชอบ',cat:'หมวด',note:'หมายเหตุ'};
+function fldTH(k){return FLD_TH[k]||k;}
+
+async function renderAudit(force){
+  var body=document.getElementById('alBody');if(!body)return;
+  if(force||!AUDIT.length){
+    body.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--ink3);padding:22px">กำลังโหลด…</td></tr>';
+    try{AUDIT=(window.DB&&DB.loadRecent)?await DB.loadRecent('audit_log',300):[];}
+    catch(e){AUDIT=[];if(window.toast)toast('โหลดประวัติไม่ได้ — ตรวจการเชื่อมต่อ');}
+    AUDIT.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+    alFillFilters();}
+  var who=v('alWho'),act=v('alAct'),q=(v('alSearch')||'').toLowerCase();
+  var rows=AUDIT.filter(function(r){
+    if(who&&r.who!==who)return false;
+    if(act&&r.act!==act)return false;
+    if(q&&((r.name||'')+' '+(r.id||'')+' '+(COL_TH[r.col]||r.col||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;});
+  var cn=document.getElementById('alCount');
+  if(cn)cn.textContent=rows.length+' จาก '+AUDIT.length+' รายการล่าสุด';
+  if(!rows.length){body.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--ink3);padding:22px">— ไม่มีรายการ —</td></tr>';return;}
+  body.innerHTML=rows.map(function(r){
+    var ch=Array.isArray(r.ch)?r.ch:[];
+    var chHtml=ch.length?ch.map(function(c){
+      return '<div class="alch"><b>'+esc(fldTH(c.f))+'</b> '+esc(c.a)+' <span class="alarr">&rarr;</span> <b>'+esc(c.b)+'</b></div>';
+    }).join(''):'<span style="color:var(--ink3)">&mdash;</span>';
+    var place=r.col?('<span class="alcol">'+esc(COL_TH[r.col]||r.col)+'</span>'):'';
+    return '<tr><td>'+esc(r.at||'')+'</td>'
+      +'<td><b>'+esc(r.who||'ไม่ระบุ')+'</b><div class="alua">'+esc(r.ua||'')+'</div></td>'
+      +'<td><span class="alact a-'+esc(r.act||'')+'">'+esc(ACT_TH[r.act]||r.act||'')+'</span></td>'
+      +'<td>'+place+esc(r.name||r.id||'')+'</td>'
+      +'<td>'+chHtml+'</td></tr>';}).join('');}
+function alFillFilters(){
+  var w=document.getElementById('alWho'),a=document.getElementById('alAct');if(!w||!a)return;
+  var ws={},as={};AUDIT.forEach(function(r){if(r.who)ws[r.who]=1;if(r.act)as[r.act]=1;});
+  w.innerHTML='<option value="">ทุกเครื่อง</option>'+Object.keys(ws).sort().map(function(k){return '<option>'+esc(k)+'</option>';}).join('');
+  a.innerHTML='<option value="">ทุกประเภท</option>'+Object.keys(as).sort().map(function(k){return '<option value="'+esc(k)+'">'+esc(ACT_TH[k]||k)+'</option>';}).join('');}
+function alClear(){['alWho','alAct','alSearch'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});renderAudit();}
+['alWho','alAct','alSearch'].forEach(function(id){
+  var e=document.getElementById(id);if(e)e.addEventListener(id==='alSearch'?'input':'change',function(){renderAudit();});});
 function piIsOverdue(d){
   if(!d||d.st==='Completed'||d.st==='On Hold'||d.st==='Delayed')return false;
   var e=piDate(d.e);if(!e)return false;
@@ -4303,7 +4450,7 @@ window.addEventListener('resize',function(){document.querySelectorAll('.cs').for
 
 window.startApp=async function(){
 var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillRptFilters();rptBind();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
-if(_ld)_ld.style.display='none';showTab('project');
+if(_ld)_ld.style.display='none';erpSyncActor();showTab('project');setTimeout(erpAskDevice,700);
 subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePhases('pi');subscribePhases('ap');subscribePlan();subscribeActs();subscribeRpts();
 var _syncS=null;function renderSyncBadge(){var _sb=document.getElementById('syncBadge');if(!_sb||!_syncS)return;var s=_syncS;_sb.querySelector('.sb-txt').textContent=!s.online?L('ออฟไลน์ — ยังไม่ซิงก์','Offline — not synced'):(s.saving?L('กำลังบันทึก…','Saving…'):L('เชื่อมต่อแล้ว','Connected'));}
 if(window.DB&&window.DB.onStatus){var _sb=document.getElementById('syncBadge');window.DB.onStatus(function(s){if(!_sb)return;_syncS=s;_sb.style.display='flex';_sb.classList.toggle('off',!s.online);_sb.classList.toggle('saving',s.online&&s.saving);renderSyncBadge();});}

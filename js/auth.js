@@ -78,7 +78,14 @@ function wire() {
 
   // สถานะ auth: ถ้ามี session อยู่แล้ว → เข้าเลย ; ไม่งั้นแสดงหน้า login
   onAuthStateChanged(auth, user => {
-    if (user) { showErr(""); setBusy(false); reveal(); wasSignedIn = true; }
+    if (user) {
+      showErr(""); setBusy(false); reveal();
+      // บันทึกเฉพาะตอนเพิ่งเข้ามา ไม่ใช่ทุกครั้งที่ onAuthStateChanged ยิงซ้ำ
+      if (!wasSignedIn && window.DB && window.DB.logEvent) {
+        try { window.erpSyncActor && window.erpSyncActor(); window.DB.logEvent("login"); } catch (e) {}
+      }
+      wasSignedIn = true;
+    }
     else {
       if (wasSignedIn) { if (window.toast) window.toast('เซสชันหมดอายุ — กรุณาเข้าสู่ระบบใหม่'); }
       setBusy(false); lock();
@@ -87,7 +94,12 @@ function wire() {
 }
 
 // ล็อกเอาต์ (ปุ่มใน Settings หรือ console) — เคลียร์ wasSignedIn ก่อน signOut กันโชว์ toast "เซสชันหมดอายุ" ตอนตั้งใจออก
-window.erpLogout = () => { wasSignedIn = false; signOut(auth).then(() => location.reload()); };
+window.erpLogout = () => {
+  wasSignedIn = false;
+  // ยิง log ก่อน แล้วหน่วงสั้นๆ ให้มีโอกาสส่งออกก่อนหน้าจะรีโหลด
+  try { window.DB && window.DB.logEvent && window.DB.logEvent("logout"); } catch (e) {}
+  setTimeout(() => signOut(auth).then(() => location.reload()), 200);
+};
 
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wire);
 else wire();
