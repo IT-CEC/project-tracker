@@ -422,6 +422,11 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .kbn-link{border:0;background:none;font-family:inherit;font-size:12px;font-weight:600;
   color:var(--accent);cursor:pointer;padding:0;margin-left:auto;white-space:nowrap}
 .kbn-link:hover{text-decoration:underline}
+.kbn-side{cursor:help;white-space:nowrap}
+.kbn-od{color:var(--red);font-size:11px;margin-left:5px}
+/* ใช้แดงแบบเดียวกับ .g-phwarn ที่เตือนงานล้นกรอบเฟส — เตือนเหมือนกันต้องหน้าตาเหมือนกัน */
+.kbn-warn{margin-left:auto;display:inline-flex;align-items:center;gap:5px;
+  color:var(--red);font-weight:600;white-space:nowrap;cursor:help}
 .kgap{flex:1}
 .kcard .chip{font-size:10px;padding:1px 7px}
 .kcard .kph{background:var(--chip);color:var(--ink2);font-weight:700;letter-spacing:.02em}
@@ -1138,7 +1143,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         <button class="bvt" data-piv="table">Full Details</button>
       </div></div>
       </div>
-      <div class="piview" id="piTimeline"><div class="ganttwrap" id="piGantt" style="max-height:calc(100vh - 300px);min-height:360px"></div></div>
+      <div class="piview" id="piTimeline"><div class="kbnote" id="piRvwNote"></div><div class="ganttwrap" id="piGantt" style="max-height:calc(100vh - 300px);min-height:360px"></div></div>
       <div class="piview" id="piStatusV" style="display:none"><div class="kbnote" id="piKbNote"></div><div class="kb" id="piKbStatus"></div></div>
       <div class="piview" id="piPriorityV" style="display:none"><div class="kb" id="piKbPriority"></div></div>
       <div class="piview" id="piTableV" style="display:none"><div class="tablecard"><div class="tscroll" style="max-height:620px"><table class="dt" id="piTbl"><thead><tr><th data-pis="ph"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Category <span class="ar"></span></th><th data-pis="name"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></span>งาน <span class="ar"></span></th><th data-pis="st"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></span>สถานะ <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>ทีม</th><th data-pis="s"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>เริ่ม <span class="ar"></span></th><th data-pis="e"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>สิ้นสุด <span class="ar"></span></th><th data-pis="prog"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>Progress <span class="ar"></span></th><th><span class="thi">฿</span>Budget/Cost</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></span>Blocked by</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg></span>Blocking</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Dependencies</th><th data-pis="pr"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span>Priority <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Tags</th><th data-pis="wbs"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></span>WBS <span class="ar"></span></th></tr></thead><tbody></tbody></table></div></div></div>
@@ -3760,6 +3765,64 @@ function piRing(p,c,noPct){p=p||0;var cf=(2*Math.PI*9).toFixed(1),off=(cf*(1-p/1
 
    แต่ไม่ตัดทิ้งเงียบๆ — ขึ้นบรรทัดสรุปไว้ ไม่งั้นบอร์ดจะดูเหมือนโปรเจคมีแค่ 33 งาน */
 const KB_STATUSES=STATUS_LIST.filter(function(x){return x!=='Completed';});
+/* ══ ตอนนี้งานรอตรวจค้างอยู่บนโต๊ะใคร ══
+   BRD หนึ่งใบเดินสองทาง: Civil ตรวจแล้วส่ง feedback กลับ / PS Global แก้แล้วส่ง V. ใหม่มา
+   แถบนี้ตอบคำถามเดียว — ตอนนี้ใบไหนค้างฝั่งไหน
+
+   ── นับเฉพาะงานย่อย ──
+   งานแม่รับสถานะมาจากลูกผ่าน piRollStatus อยู่แล้ว นับด้วยจะซ้ำ
+   และ rvw ของงานแม่ตั้งด้วยมือครั้งเดียว ไม่เคยตามลูกเวลางานย้ายฝั่ง
+   วัดกับข้อมูลจริง 24/09/2026: ทุกระดับ 15 (Civil 10 · PS 5) แต่ซ้ำกันเอง
+   งานแม่ 8 (Civil 5 · PS 3) ซึ่ง 4 ใบขัดกับลูกตัวเอง · งานย่อย 7 (Civil 5 · PS 2) = ของจริง
+
+   ── ใช้ d.st ดิบ ไม่ใช่ piEffSt() ──
+   piEffSt ดีดงานที่เลยกำหนดเป็น Delayed งานย่อย 4 ใบครบกำหนด 25/09/2026
+   ถ้านับด้วย piEffSt วันที่ 26 เลข Civil จะร่วงจาก 5 เหลือ 1 เองทั้งที่งานยังค้างที่เดิม
+   เลยกำหนดแล้วยิ่งต้องนับ ไม่ใช่หลุดออกจากเลข — แยกบอกเป็นวงเล็บกำกับแทน */
+function piRvwNote(){
+  var el=document.getElementById('piRvwNote');if(!el)return;
+  var gw=document.getElementById('piGantt');
+  /* แถบหายเมื่อว่าง (.kbnote:empty) จึงคืนความสูงให้ผังด้วย ไม่งั้นก้นผังตกขอบจอฟรีๆ */
+  var done=function(h){el.innerHTML=h;
+    if(gw)gw.style.maxHeight='calc(100vh - '+(h?341:300)+'px)';};
+  /* หน้า Automation ไม่มีแนวคิดฝั่งตรวจ (ไม่มี rvw เลยทั้ง 54 งาน) */
+  if(GCTX!=='pi')return done('');
+  var rows=filteredPI().filter(function(d){
+    return piChildren(d).length===0&&d.st==='In Review';});
+  if(!rows.length)return done('');
+  /* ชื่องานย่อยซ้ำกันเอง ("CIVIL - Feedback BRD V.1" มี 3 ใบ) อ่านแล้วไม่รู้ว่าของ BRD ไหน
+     tooltip จึงขึ้นรหัสเอกสารจากงานแม่นำหน้า และตัดคำนำหน้าฝั่งออกเพราะซ้ำกับคอลัมน์ */
+  var codeOf=function(d){
+    var p=PIMPL.find(function(z){return z._key===d.parent;}),n=p?(p.name||''):'';
+    var m=n.match(/^([A-Za-z0-9_]+)\s*[-–]/);return m?m[1]:(n.slice(0,16)||'—');};
+  var shortOf=function(d){
+    return String(d.name||'').replace(/^\s*(CIVIL|PS\s*GLOBAL)\s*[-–]\s*/i,'');};
+  var half=function(side){
+    var L2=rows.filter(function(d){return (d.rvw||'Civil')===side;});
+    if(!L2.length)return '';
+    var od=L2.filter(piIsOverdue).length;
+    return '<span class="kbn-side" title="'+attr(L2.map(function(d){
+        return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
+      +esc(side)+' <b>'+L2.length+'</b>'
+      +(od?'<span class="kbn-od">('+L('เลยกำหนด ','overdue ')+od+')</span>':'')+'</span>';};
+  var parts=REVIEW_SIDES.map(half).filter(Boolean);
+  var h='<span class="kbn-dot" style="background:'+STATUS_COLORS['In Review']+'"></span>'
+    +L('รอตรวจ ','In review ')+'<b>'+rows.length+'</b>'+L(' งาน — ค้างฝั่ง ',' tasks — pending with ')
+    +parts.join(' · ');
+  /* บาร์หลักบอกฝั่งหนึ่ง งานย่อยที่ค้างจริงอยู่อีกฝั่ง — เตือนอย่างเดียว ไม่แก้ข้อมูลให้
+     เตือนเฉพาะตอนงานย่อยเห็นตรงกันหมดแต่ต่างจากแม่ ถ้าลูกยังไม่ตรงกันเองก็ไม่มีอะไรให้ชี้ */
+  var bad=[];
+  PIMPL.forEach(function(pp){
+    if(pp.st!=='In Review')return;
+    var ch=piChildren(pp).filter(function(c){return c.st==='In Review';});
+    if(!ch.length)return;
+    var sd={};ch.forEach(function(c){sd[c.rvw||'Civil']=1;});
+    var ks=Object.keys(sd);
+    if(ks.length===1&&ks[0]!==(pp.rvw||'Civil'))bad.push(pp.name+' — '+L('บาร์: ','bar: ')+(pp.rvw||'Civil')+' / '+L('งานย่อย: ','sub-task: ')+ks[0]);});
+  if(bad.length)h+='<span class="kbn-warn" title="'+attr(bad.join('\n'))+'">'
+    +'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+    +bad.length+L(' บาร์หลักระบุฝั่งไม่ตรงกับงานย่อย',' bars disagree with their sub-tasks')+'</span>';
+  done(h);}
 function piKbSummary(){
   var el=document.getElementById(GP+'KbNote');if(!el)return;
   var rows=filteredPI(),done=rows.filter(function(d){return piEffSt(d)==='Completed';}).length;
@@ -4306,7 +4369,7 @@ document.addEventListener('mouseup',ev=>{if(!piDrag)return;var dg=piDrag;piDrag=
   piEnforce();renderPI();});
 let piCurV='timeline';
 function renderPI(){var rows=filteredPI();var c=document.getElementById(GP+'Count');if(c)c.innerHTML='แสดง <b>'+rows.length+'</b> / '+PIMPL.length+' งาน';
-  if(piCurV==='timeline')renderPIGantt();else if(piCurV==='status'){piKbSummary();renderPIKb(GP+'KbStatus',KB_STATUSES,STATUS_COLORS,'st',function(g,items){if(g!=='In Review')return '';var c=items.filter(function(d){return (d.rvw||'Civil')==='Civil';}).length;return 'Civil '+c+' · PS '+(items.length-c);});}else if(piCurV==='priority')renderPIKb(GP+'KbPriority',PI_PRL,PI_PRC,'pr');else renderPITbl();}
+  if(piCurV==='timeline'){piRvwNote();renderPIGantt();}else if(piCurV==='status'){piKbSummary();renderPIKb(GP+'KbStatus',KB_STATUSES,STATUS_COLORS,'st',function(g,items){if(g!=='In Review')return '';var lf=items.filter(function(d){return piChildren(d).length===0;});if(!lf.length)return '';var c=lf.filter(function(d){return (d.rvw||'Civil')==='Civil';}).length;return L('งานย่อย: ','Sub-tasks: ')+'Civil '+c+' · PS '+(lf.length-c);});}else if(piCurV==='priority')renderPIKb(GP+'KbPriority',PI_PRL,PI_PRC,'pr');else renderPITbl();}
 function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _isSum=piIsSummary(d),_cp=piCalcProg(d);
   document.getElementById('mTitle').textContent=d.name;var _par=d.parent?PIMPL.find(function(z){return z._key===d.parent;}):null;var _nc=piChildren(d).length;document.getElementById('mSub').textContent=PI_PHASES[d.ph]+(_par?(' › '+_par.name):'')+(_nc?(' · งานย่อย '+_nc):'');
   var rw=(l,vv)=>`<div class="fld"><label>${l}</label><div class="roval">${vv}</div></div>`;
