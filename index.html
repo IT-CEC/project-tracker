@@ -301,6 +301,17 @@ select{-webkit-appearance:none;appearance:none;padding-right:28px;background-ima
 select option{color:#15181d;background:#fff}
 select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--mint)}
 input[type=text]{min-width:190px;flex:1;max-width:320px}
+/* ช่องค้นหาของหน้าผังต้องแคบกว่าช่องอื่น เพื่อคืนที่ว่างหลังปุ่มล้างให้ชิปรอตรวจ
+   ต้องปลด min-width:190px ข้างบนก่อน ไม่งั้น width ที่ตั้งไม่มีผล — ของเดิมตั้ง
+   170px ไว้ในแท็กแต่ได้ 190px มาตลอด
+
+   โหมดอังกฤษกินที่กว้างกว่าไทย (ปุ่มขวา 718px เทียบ 704px) ที่จอ 1920 จึงขาด 19px
+   ปุ่มขวาเลยตกบรรทัด ย่อเหลือ 125px คืนมา 65px — อังกฤษเหลือ 26px ที่จอ 1900
+   และ 46px ที่ 1920 · ไทยเหลือเกิน 100px ทั้งคู่ · placeholder ยังไม่ล้น
+
+   กรณีมีคำเตือนด้วย ชิปโตเป็น 309px ซึ่งพอดีที่ 1920 แต่ยังตกบรรทัดที่ 1900
+   ปล่อยให้ตกไป — ตอนข้อมูลมีปัญหาจริงชิปโตขึ้นและลงแถวของตัวเอง สะดุดตากว่าเดิม */
+#piSearch{min-width:0;width:125px;flex:none}
 .count{margin-left:auto;font-size:13px;color:var(--ink3)}.count b{color:var(--ink);font-weight:600}
 .pager{display:flex;align-items:center;justify-content:center;gap:5px;padding:14px;border-top:1px solid var(--line2)}
 .pg{min-width:32px;height:32px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);border-radius:9px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:.15s}
@@ -1145,7 +1156,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         <span class="lbl" data-i18n="fStatus">สถานะ</span><select id="piStatus" data-multi="1"></select>
         <span class="lbl" data-i18n="fTeam">ทีม</span><select id="piAsg" data-multi="1"></select>
         
-        <input type="text" id="piSearch" placeholder="ค้นหางาน…" data-i18n-ph="searchTask" style="width:170px;flex:none">
+        <input type="text" id="piSearch" placeholder="ค้นหางาน…" data-i18n-ph="searchTask">
         <button class="tbtn" onclick="clearPI()" data-i18n="clear">ล้าง</button><div class="kbnote barnote" id="piRvwNote"></div>
         <div class="barright"><span class="gtbar" id="piGtoolbar"><button class="gtbtn gtfold" id="piFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="gFocusBtn" onclick="toggleGFocus()" title="ขยาย Gantt เต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="piZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="piViewTabs">
         <button class="bvt on" data-piv="timeline">Timeline</button>
