@@ -4172,9 +4172,28 @@ document.addEventListener('mousemove',function(ev){if(!piLink)return;var p=docum
 document.addEventListener('mouseup',function(ev){if(!piLink)return;var pl=piLink;piLink=null;document.body.style.cursor='';var sv=document.getElementById('piLinkSvg');if(sv)sv.remove();document.querySelectorAll('.g-bar.linkhover').forEach(x=>x.classList.remove('linkhover'));var b=ev.target.closest?ev.target.closest('.g-bar'):null;if(b&&+b.dataset.pi!==pl.from){piDepsAdd(+b.dataset.pi,pl.from);}});
 
 function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PIGID);if(!gw)return;
-  var dts=[];rows.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);if(a)dts.push(a.getTime());if(b)dts.push(b.getTime());});
+  if(!rows.length){gw.innerHTML='<div class="muted" style="padding:30px;text-align:center">ไม่พบงาน</div>';return;}
+  /* ══ ช่วงเวลาของผังคิดจาก "งานทั้งหมด" ไม่ใช่เฉพาะงานที่ผ่านตัวกรอง ══
+     ของเดิมคิดจาก rows (งานที่กรองแล้ว) พอกรองเฟส 02 ซึ่งกินช่วง 16/06–30/09
+     ผังก็เหลือแค่ May–September ผู้ใช้เห็นเป็น "เดือนตุลา/พฤศจิกาหายไป"
+     ทั้งที่ความจริงคือไม่มีงานของเฟสนั้นในเดือนนั้น
+
+     แกนเวลาคงที่ทำให้เทียบข้ามเฟสได้ ตำแหน่งแถบไม่ขยับเวลาเปลี่ยนตัวกรอง
+     และเห็นว่าเฟสที่กรองอยู่ตรงไหนของทั้งโครงการ */
+  var dts=[];(PI_STORE[GCTX]||[]).forEach(function(d){
+    var sp=piSpan(d),a=piDate(sp.s),b=piDate(sp.e);
+    if(a)dts.push(a.getTime());if(b)dts.push(b.getTime());});
+  /* รวมวันที่ของเฟสที่ตั้งเองด้วย ไม่งั้นเฟสที่กรอบกว้างกว่างานข้างในจะถูกตัดท้าย */
+  Object.keys(PH_STORE[GCTX]||{}).forEach(function(k){
+    var r=piPhaseRange(k);if(r){dts.push(r.a.getTime());dts.push(r.b.getTime());}});
   if(!dts.length){gw.innerHTML='<div class="muted" style="padding:30px;text-align:center">ไม่พบงาน</div>';return;}
-  var minD=new Date(Math.min(...dts)),maxD=new Date(Math.max(...dts));var base=new Date(minD.getFullYear(),minD.getMonth()-1,1);var endP=new Date(maxD.getFullYear(),maxD.getMonth()+1,0);
+  var minD=new Date(Math.min(...dts)),maxD=new Date(Math.max(...dts));
+  /* เผื่อที่ว่างหัว-ท้ายอย่างละ 1 เดือน
+     ของเดิมเขียน new Date(y, m+1, 0) ซึ่ง day=0 หักกลับไปหนึ่งเดือน กลายเป็น
+     "วันสุดท้ายของเดือน m" = ไม่เผื่อเลย ผังจึงมีที่ว่างหน้า 1 เดือน ท้าย 0 เดือน
+     แถบงานตัวสุดท้ายเลยชนขอบขวาพอดี ต้องเป็น m+2 ถึงจะได้วันสุดท้ายของเดือน m+1 */
+  var base=new Date(minD.getFullYear(),minD.getMonth()-1,1);
+  var endP=new Date(maxD.getFullYear(),maxD.getMonth()+2,0);
   var DAY=86400000;var dayOf=dt=>Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-base)/DAY);
   var totalDays=dayOf(endP)+1;var zs=document.getElementById(ZOOMID);var dw=parseFloat((zs&&zs.value)||'5');var TW=Math.max(totalDays*dw,600);var tw=`width:${TW}px;min-width:${TW}px`;
   var MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -4268,7 +4287,11 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
   var deco=`<div class="g-grid" style="left:250px;width:${TW}px">${gridLines}</div>`;
   if(tx>0)deco+=`<div class="g-past" style="left:250px;width:${Math.min(tx,TW)}px"></div>`;
   if(tx>=0&&tx<=TW)deco+=`<div class="g-todaycol" style="left:${250+dayOf(now)*dw}px;width:${dw}px"></div>`;
-  gw.innerHTML='<div class="g-body">'+deco+head+body+todayLine+'</div>';gw.dataset.dw=dw;gw.dataset.tx=(250+tx);gw.dataset.firstx=dayOf(minD)*dw;drawPIDeps();piSyncFoldBtn();}
+  gw.innerHTML='<div class="g-body">'+deco+head+body+todayLine+'</div>';gw.dataset.dw=dw;gw.dataset.tx=(250+tx);/* แกนเวลาเป็นช่วงเต็มของโครงการแล้ว แต่ปุ่มเลื่อนควรพาไปที่ "งานที่กำลังดู"
+     ไม่ใช่ต้นโครงการ จึงคิด firstx จากงานที่ผ่านตัวกรอง */
+  gw.dataset.firstx=(function(){var fd=[];rows.forEach(function(d){
+    var sp=piSpan(d),a=piDate(sp.s);if(a)fd.push(a.getTime());});
+    return fd.length?dayOf(new Date(Math.min.apply(null,fd)))*dw:dayOf(minD)*dw;})();drawPIDeps();piSyncFoldBtn();}
 function piToday(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-gw.clientWidth/2),behavior:'smooth'});}
 function piHome(){var gw=document.getElementById(PIGID);if(!gw)return;gw.scrollTo({left:0});}
 function piFocusTasks(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-290),behavior:'smooth'});}
