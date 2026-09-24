@@ -401,16 +401,40 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .g-dept{position:sticky;left:4px;z-index:4;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--pc,#888);background:color-mix(in srgb,var(--pc,#888) 13%,transparent);padding:3px 12px;border-radius:980px;letter-spacing:.01em}
 .g-dn{color:var(--pc,#888);opacity:.75;font-weight:700}
 .g-dept .eic{color:var(--pc,#888)}
-.kb{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;align-items:flex-start}
-.kcol{flex:none;width:282px;background:color-mix(in srgb,var(--kc,#8e8e93) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--kc,#8e8e93) 16%,transparent);border-radius:14px;padding:10px}
+/* ── บอร์ด Kanban ──
+   ตรึงความสูงไว้เท่าหน้าจอ แล้วให้แต่ละคอลัมน์เลื่อนในตัวเอง (แบบเดียวกับ Trello/Jira)
+   ของเดิม align-items:flex-start ปล่อยให้คอลัมน์ยืดตามจำนวนการ์ด บอร์ดจึงสูง 2,551px
+   = 2.8 หน้าจอ และหัวคอลัมน์หายไปเมื่อเลื่อนลง */
+.kb{display:flex;gap:14px;overflow-x:auto;padding-bottom:8px;align-items:stretch;
+  height:calc(100vh - 310px);min-height:340px}
+.kcol-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:2px}
+.kcol-body::-webkit-scrollbar{width:7px}
+.kcol-body::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+.kcol-body:empty::before{content:"—";color:var(--ink3);font-size:12px;padding:8px;display:block}
+/* คอลัมน์ที่ไม่มีงาน ยังบอกว่า "ไม่มีงานติดอยู่" แต่ไม่กินความกว้างเท่าคอลัมน์จริง */
+.kcol.kempty{width:128px}
+.kcol.kempty .kcol-h{font-size:12px;flex-wrap:wrap;gap:5px}
+.kbnote{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2);
+  margin:0 0 11px;padding:7px 12px;background:var(--surface);border:1px solid var(--line2);border-radius:10px}
+.kbnote:empty{display:none}
+.kbnote b{color:var(--ink);font-weight:600}
+.kbn-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none}
+.kbn-link{border:0;background:none;font-family:inherit;font-size:12px;font-weight:600;
+  color:var(--accent);cursor:pointer;padding:0;margin-left:auto;white-space:nowrap}
+.kbn-link:hover{text-decoration:underline}
+.kgap{flex:1}
+.kcard .chip{font-size:10px;padding:1px 7px}
+.kcard .kph{background:var(--chip);color:var(--ink2);font-weight:700;letter-spacing:.02em}
+.kcard .kt{margin-bottom:1px}
+.kcol{flex:none;width:282px;display:flex;flex-direction:column;min-height:0;background:color-mix(in srgb,var(--kc,#8e8e93) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--kc,#8e8e93) 16%,transparent);border-radius:14px;padding:10px}
 .kcol-h{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:4px 6px 10px;color:var(--ink)}
 .kcol-h .kn{color:var(--ink3);font-weight:600;font-size:12px}
 .kcol-sub{font-size:11px;color:var(--ink3);padding:0 6px 9px;margin-top:-7px}
-.kcard{background:var(--surface);border:1px solid var(--line2);border-radius:11px;padding:11px 12px;margin-bottom:9px;cursor:pointer;transition:.12s}
+.kcard{background:var(--surface);border:1px solid var(--line2);border-radius:11px;padding:9px 11px;margin-bottom:7px;cursor:pointer;transition:.12s}
 .kcard:hover{box-shadow:var(--shadow)}
 .kcard .kt{font-weight:600;font-size:13px;line-height:1.35;display:flex;gap:7px;align-items:flex-start}
-.kcard .km{display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap}
-.kcard .kd{font-size:11px;color:var(--ink3);margin-top:7px}
+.kcard .km{display:flex;align-items:center;gap:6px;margin-top:7px;flex-wrap:wrap}
+.kcard .kd{font-size:11px;color:var(--ink3);margin:0;white-space:nowrap}
 .prog{display:inline-flex;align-items:center;gap:7px;min-width:88px}
 .prog .pb{flex:1;height:6px;border-radius:4px;background:var(--chip);overflow:hidden;min-width:40px}
 .prog .pf{height:100%;border-radius:4px}
@@ -1115,7 +1139,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
       </div></div>
       </div>
       <div class="piview" id="piTimeline"><div class="ganttwrap" id="piGantt" style="max-height:calc(100vh - 300px);min-height:360px"></div></div>
-      <div class="piview" id="piStatusV" style="display:none"><div class="kb" id="piKbStatus"></div></div>
+      <div class="piview" id="piStatusV" style="display:none"><div class="kbnote" id="piKbNote"></div><div class="kb" id="piKbStatus"></div></div>
       <div class="piview" id="piPriorityV" style="display:none"><div class="kb" id="piKbPriority"></div></div>
       <div class="piview" id="piTableV" style="display:none"><div class="tablecard"><div class="tscroll" style="max-height:620px"><table class="dt" id="piTbl"><thead><tr><th data-pis="ph"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Category <span class="ar"></span></th><th data-pis="name"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></span>งาน <span class="ar"></span></th><th data-pis="st"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></span>สถานะ <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>ทีม</th><th data-pis="s"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>เริ่ม <span class="ar"></span></th><th data-pis="e"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>สิ้นสุด <span class="ar"></span></th><th data-pis="prog"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>Progress <span class="ar"></span></th><th><span class="thi">฿</span>Budget/Cost</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></span>Blocked by</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg></span>Blocking</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Dependencies</th><th data-pis="pr"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span>Priority <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Tags</th><th data-pis="wbs"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></span>WBS <span class="ar"></span></th></tr></thead><tbody></tbody></table></div></div></div>
     </div>
@@ -1199,7 +1223,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         </div></div>
         </div>
         <div id="apTimeline"><div class="ganttwrap" id="apGantt" style="max-height:calc(100vh - 320px);min-height:360px"></div></div>
-        <div id="apStatusV" style="display:none"><div class="kb" id="apKbStatus"></div></div>
+        <div id="apStatusV" style="display:none"><div class="kbnote" id="apKbNote"></div><div class="kb" id="apKbStatus"></div></div>
         <div id="apPriorityV" style="display:none"><div class="kb" id="apKbPriority"></div></div>
         <div id="apTableV" style="display:none"><div class="tablecard"><div class="tscroll" style="max-height:620px"><table class="dt" id="apTbl"><thead><tr><th data-pis="ph"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Category <span class="ar"></span></th><th data-pis="name"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></span>งาน <span class="ar"></span></th><th data-pis="st"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></span>สถานะ <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>ทีม</th><th data-pis="s"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>เริ่ม <span class="ar"></span></th><th data-pis="e"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>สิ้นสุด <span class="ar"></span></th><th data-pis="prog"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>Progress <span class="ar"></span></th><th><span class="thi">฿</span>Budget/Cost</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 1 4-4h12"/></svg></span>Blocked by</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg></span>Blocking</th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>Dependencies</th><th data-pis="pr"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span>Priority <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>Tags</th><th data-pis="wbs"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg></span>WBS <span class="ar"></span></th></tr></thead><tbody></tbody></table></div></div></div>
       </div>
@@ -3726,9 +3750,33 @@ function renderPITbl(){var rows=filteredPI();
   var tb=document.querySelector('#'+GP+'Tbl tbody');if(tb)tb.innerHTML=rows.map(d=>`<tr onclick="openPI(${d._pi})" style="cursor:pointer"><td><span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(PI_PHASES[d.ph])}</span></td><td><div class="truncate" style="color:var(--ink);font-weight:600;max-width:none">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg> ':''}${esc(d.name)}</div></td><td><span class="chip" style="background:${STATUS_COLORS[d.st]}1f;color:${STATUS_COLORS[d.st]}">${d.st}</span></td><td>${piAsg(d.asg)}</td><td class="muted">${d.s}</td><td class="muted">${d.e}</td><td>${piProg(piCalcProg(d),STATUS_COLORS[d.st])}</td><td><span style="display:inline-flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--ink3)">฿0</span><span style="width:48px;height:6px;border-radius:4px;background:var(--chip);overflow:hidden;display:inline-block"><span style="display:block;height:100%;width:0%;background:#28cd41"></span></span></span></td><td class="muted">—</td><td class="muted">—</td><td class="muted">—</td><td><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span></td><td>${piTags(d._pi)}</td><td class="muted">${d._pi+1}.0</td></tr>`).join('')||'<tr><td colspan="14" style="text-align:center;padding:40px" class="muted">ไม่พบงาน</td></tr>';}
 function piStIcon(st){var c=STATUS_COLORS[st]||'#888';return st==='Completed'?`<span style="color:${c};font-weight:700"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`:`<span class="dotc" style="background:${c};margin-right:0"></span>`;}
 function piRing(p,c,noPct){p=p||0;var cf=(2*Math.PI*9).toFixed(1),off=(cf*(1-p/100)).toFixed(1);return `<span style="display:inline-flex;align-items:center;gap:6px"><svg width="22" height="22" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--chip)" stroke-width="3"/><circle cx="12" cy="12" r="9" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="${cf}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 12 12)"/></svg>${noPct?'':`<span style="font-size:11px;color:var(--ink3)">${p}%</span>`}</span>`;}
-function piKcard(d){return `<div class="kcard" onclick="openPI(${d._pi})"><div class="kt">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg>':piStIcon(d.st)}${esc(d.name)}</div><div class="km"><span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(PI_PHASES[d.ph])}</span><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span>${d.st==='In Review'?`<span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:''}</div><div class="km" style="justify-content:space-between">${piRing(piCalcProg(d),STATUS_COLORS[d.st])}<span class="kd" style="margin:0">${d.s} → ${d.e}</span></div></div>`;}
+/* การ์ดเดิมสูง 104px จาก 3 ชั้น (ชื่อ / ชิป / วงกลม+ช่วงวัน)
+   ยุบชิปกับความคืบหน้ามาอยู่บรรทัดเดียว เหลือ 2 ชั้น เห็นการ์ดได้มากขึ้นเกือบเท่าตัว
+   แสดงเฉพาะวันครบกำหนด ไม่แสดงวันเริ่ม — บนบอร์ดสถานะ สิ่งที่ต้องรู้คือ "ครบเมื่อไหร่" */
+/* ══ บอร์ดสถานะ ══
+   Completed ถูกตัดออกจากบอร์ด — 22 จาก 55 การ์ดเป็นงานที่จบไปแล้ว และคอลัมน์นั้น
+   ใบเดียวสูง 2,543px ซึ่งกำหนดความสูงของทั้งบอร์ด คนต้องเลื่อนผ่านประวัติทุกครั้ง
+   เพื่อดูงานที่ยังทำอยู่  ดูรายการที่เสร็จแล้วได้ที่แท็บ Full Details
+
+   แต่ไม่ตัดทิ้งเงียบๆ — ขึ้นบรรทัดสรุปไว้ ไม่งั้นบอร์ดจะดูเหมือนโปรเจคมีแค่ 33 งาน */
+const KB_STATUSES=STATUS_LIST.filter(function(x){return x!=='Completed';});
+function piKbSummary(){
+  var el=document.getElementById(GP+'KbNote');if(!el)return;
+  var rows=filteredPI(),done=rows.filter(function(d){return piEffSt(d)==='Completed';}).length;
+  el.innerHTML=rows.length?('<span class="kbn-dot"></span>เสร็จแล้ว <b>'+done+'</b> จาก <b>'+rows.length
+    +'</b> งาน — คอลัมน์ Completed ไม่แสดงบนบอร์ด '
+    +'<button class="kbn-link" onclick="piSwitchView(\'table\')">ดูรายการที่เสร็จแล้ว</button>'):'';}
+function piKcard(d){var _est=piEffSt(d);return `<div class="kcard" onclick="openPI(${d._pi})"><div class="kt">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg>':piStIcon(_est)}${esc(d.name)}</div><div class="km"><span class="chip kph" title="${attr(PI_PHASES[d.ph]||d.ph||'')}">${esc(d.ph||'')}</span><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span>${_est==='In Review'?`<span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:''}<span class="kgap"></span>${piRing(piCalcProg(d),STATUS_COLORS[_est])}<span class="kd">${esc(d.e||'—')}</span></div></div>`;}
 function renderPIKb(elId,groups,cmap,key,sub){var rows=filteredPI();var el=document.getElementById(elId);if(!el)return;
-  el.innerHTML=groups.map(g=>{var items=rows.filter(d=>(d[key]||(key==='pr'?'No Priority':''))===g);return `<div class="kcol" style="--kc:${cmap[g]||'#8e8e93'}"><div class="kcol-h"><span class="dotc" style="background:${cmap[g]||'#888'}"></span>${g}<span class="kn">${items.length}</span></div>${(sub&&sub(g,items))?`<div class="kcol-sub">${sub(g,items)}</div>`:''}${items.map(piKcard).join('')||'<div class="muted" style="padding:8px;font-size:12px">—</div>'}</div>`;}).join('');}
+  /* การ์ดอยู่ใน .kcol-body ซึ่งเลื่อนในตัวเอง — ความสูงบอร์ดจึงคงที่เท่าหน้าจอ
+     หัวคอลัมน์กับตัวเลขอยู่นอกกล่องนั้น จึงเห็นตลอดเวลาไม่ว่าเลื่อนไปไหน
+     ของเดิมปล่อยให้คอลัมน์ยืดตามจำนวนการ์ดแล้วให้ทั้งหน้าเลื่อน พอเลื่อนลงไป
+     ดูการ์ดใบท้ายๆ หัวคอลัมน์อื่นหายหมด บอร์ดเลยไม่ทำหน้าที่เป็นบอร์ด
+
+     คอลัมน์ที่ไม่มีการ์ดยุบเป็นแถบแคบ — ยังบอกว่า "ไม่มีงานติดอยู่" ซึ่งเป็น
+     ข้อมูล แต่ไม่กินความกว้างเท่าคอลัมน์ที่มีของจริง */
+  el.innerHTML=groups.map(g=>{var items=rows.filter(d=>(d[key]||(key==='pr'?'No Priority':''))===g);
+    return `<div class="kcol${items.length?'':' kempty'}" style="--kc:${cmap[g]||'#8e8e93'}"><div class="kcol-h"><span class="dotc" style="background:${cmap[g]||'#888'}"></span>${g}<span class="kn">${items.length}</span></div>${(sub&&sub(g,items))?`<div class="kcol-sub">${sub(g,items)}</div>`:''}<div class="kcol-body">${items.map(piKcard).join('')}</div></div>`;}).join('');}
 var piCollapsed={};var piTaskCol={};
 let PIEKEY="erp_pi_edits_v1";let PIE={};
 function loadPIE(){try{PIE=JSON.parse(localStorage.getItem(PIEKEY)||'{}');}catch(e){PIE={};}PIMPL.forEach(d=>{if(!d.dep)d.dep=[];var x=PIE[d._pi];if(x){if(x.s)d.s=x.s;if(x.e)d.e=x.e;if(x.st)d.st=x.st;if(x.prog!=null)d.prog=x.prog;if(x.pr)d.pr=x.pr;if(x.dep)d.dep=x.dep.slice();if(x.asg)d.asg=x.asg.slice();if(x.ph)d.ph=x.ph;if(x.name)d.name=x.name;if(x.parent)d.parent=x.parent;if(x.ms!=null)d.ms=x.ms;if(x.stages)d.stages=x.stages.map(function(z){return {k:z.k,s:z.s,e:z.e,st:z.st};});if(x.gld!=null)d.gld=x.gld;}});}
@@ -4124,9 +4172,28 @@ document.addEventListener('mousemove',function(ev){if(!piLink)return;var p=docum
 document.addEventListener('mouseup',function(ev){if(!piLink)return;var pl=piLink;piLink=null;document.body.style.cursor='';var sv=document.getElementById('piLinkSvg');if(sv)sv.remove();document.querySelectorAll('.g-bar.linkhover').forEach(x=>x.classList.remove('linkhover'));var b=ev.target.closest?ev.target.closest('.g-bar'):null;if(b&&+b.dataset.pi!==pl.from){piDepsAdd(+b.dataset.pi,pl.from);}});
 
 function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PIGID);if(!gw)return;
-  var dts=[];rows.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);if(a)dts.push(a.getTime());if(b)dts.push(b.getTime());});
+  if(!rows.length){gw.innerHTML='<div class="muted" style="padding:30px;text-align:center">ไม่พบงาน</div>';return;}
+  /* ══ ช่วงเวลาของผังคิดจาก "งานทั้งหมด" ไม่ใช่เฉพาะงานที่ผ่านตัวกรอง ══
+     ของเดิมคิดจาก rows (งานที่กรองแล้ว) พอกรองเฟส 02 ซึ่งกินช่วง 16/06–30/09
+     ผังก็เหลือแค่ May–September ผู้ใช้เห็นเป็น "เดือนตุลา/พฤศจิกาหายไป"
+     ทั้งที่ความจริงคือไม่มีงานของเฟสนั้นในเดือนนั้น
+
+     แกนเวลาคงที่ทำให้เทียบข้ามเฟสได้ ตำแหน่งแถบไม่ขยับเวลาเปลี่ยนตัวกรอง
+     และเห็นว่าเฟสที่กรองอยู่ตรงไหนของทั้งโครงการ */
+  var dts=[];(PI_STORE[GCTX]||[]).forEach(function(d){
+    var sp=piSpan(d),a=piDate(sp.s),b=piDate(sp.e);
+    if(a)dts.push(a.getTime());if(b)dts.push(b.getTime());});
+  /* รวมวันที่ของเฟสที่ตั้งเองด้วย ไม่งั้นเฟสที่กรอบกว้างกว่างานข้างในจะถูกตัดท้าย */
+  Object.keys(PH_STORE[GCTX]||{}).forEach(function(k){
+    var r=piPhaseRange(k);if(r){dts.push(r.a.getTime());dts.push(r.b.getTime());}});
   if(!dts.length){gw.innerHTML='<div class="muted" style="padding:30px;text-align:center">ไม่พบงาน</div>';return;}
-  var minD=new Date(Math.min(...dts)),maxD=new Date(Math.max(...dts));var base=new Date(minD.getFullYear(),minD.getMonth()-1,1);var endP=new Date(maxD.getFullYear(),maxD.getMonth()+1,0);
+  var minD=new Date(Math.min(...dts)),maxD=new Date(Math.max(...dts));
+  /* เผื่อที่ว่างหัว-ท้ายอย่างละ 1 เดือน
+     ของเดิมเขียน new Date(y, m+1, 0) ซึ่ง day=0 หักกลับไปหนึ่งเดือน กลายเป็น
+     "วันสุดท้ายของเดือน m" = ไม่เผื่อเลย ผังจึงมีที่ว่างหน้า 1 เดือน ท้าย 0 เดือน
+     แถบงานตัวสุดท้ายเลยชนขอบขวาพอดี ต้องเป็น m+2 ถึงจะได้วันสุดท้ายของเดือน m+1 */
+  var base=new Date(minD.getFullYear(),minD.getMonth()-1,1);
+  var endP=new Date(maxD.getFullYear(),maxD.getMonth()+2,0);
   var DAY=86400000;var dayOf=dt=>Math.round((new Date(dt.getFullYear(),dt.getMonth(),dt.getDate())-base)/DAY);
   var totalDays=dayOf(endP)+1;var zs=document.getElementById(ZOOMID);var dw=parseFloat((zs&&zs.value)||'5');var TW=Math.max(totalDays*dw,600);var tw=`width:${TW}px;min-width:${TW}px`;
   var MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -4220,7 +4287,11 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
   var deco=`<div class="g-grid" style="left:250px;width:${TW}px">${gridLines}</div>`;
   if(tx>0)deco+=`<div class="g-past" style="left:250px;width:${Math.min(tx,TW)}px"></div>`;
   if(tx>=0&&tx<=TW)deco+=`<div class="g-todaycol" style="left:${250+dayOf(now)*dw}px;width:${dw}px"></div>`;
-  gw.innerHTML='<div class="g-body">'+deco+head+body+todayLine+'</div>';gw.dataset.dw=dw;gw.dataset.tx=(250+tx);gw.dataset.firstx=dayOf(minD)*dw;drawPIDeps();piSyncFoldBtn();}
+  gw.innerHTML='<div class="g-body">'+deco+head+body+todayLine+'</div>';gw.dataset.dw=dw;gw.dataset.tx=(250+tx);/* แกนเวลาเป็นช่วงเต็มของโครงการแล้ว แต่ปุ่มเลื่อนควรพาไปที่ "งานที่กำลังดู"
+     ไม่ใช่ต้นโครงการ จึงคิด firstx จากงานที่ผ่านตัวกรอง */
+  gw.dataset.firstx=(function(){var fd=[];rows.forEach(function(d){
+    var sp=piSpan(d),a=piDate(sp.s);if(a)fd.push(a.getTime());});
+    return fd.length?dayOf(new Date(Math.min.apply(null,fd)))*dw:dayOf(minD)*dw;})();drawPIDeps();piSyncFoldBtn();}
 function piToday(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-gw.clientWidth/2),behavior:'smooth'});}
 function piHome(){var gw=document.getElementById(PIGID);if(!gw)return;gw.scrollTo({left:0});}
 function piFocusTasks(){var gw=document.getElementById(PIGID);if(!gw)return;var tx=parseFloat(gw.dataset.tx||'0');gw.scrollTo({left:Math.max(0,tx-290),behavior:'smooth'});}
@@ -4235,7 +4306,7 @@ document.addEventListener('mouseup',ev=>{if(!piDrag)return;var dg=piDrag;piDrag=
   piEnforce();renderPI();});
 let piCurV='timeline';
 function renderPI(){var rows=filteredPI();var c=document.getElementById(GP+'Count');if(c)c.innerHTML='แสดง <b>'+rows.length+'</b> / '+PIMPL.length+' งาน';
-  if(piCurV==='timeline')renderPIGantt();else if(piCurV==='status')renderPIKb(GP+'KbStatus',STATUS_LIST,STATUS_COLORS,'st',function(g,items){if(g!=='In Review')return '';var c=items.filter(function(d){return (d.rvw||'Civil')==='Civil';}).length;return 'Civil '+c+' · PS '+(items.length-c);});else if(piCurV==='priority')renderPIKb(GP+'KbPriority',PI_PRL,PI_PRC,'pr');else renderPITbl();}
+  if(piCurV==='timeline')renderPIGantt();else if(piCurV==='status'){piKbSummary();renderPIKb(GP+'KbStatus',KB_STATUSES,STATUS_COLORS,'st',function(g,items){if(g!=='In Review')return '';var c=items.filter(function(d){return (d.rvw||'Civil')==='Civil';}).length;return 'Civil '+c+' · PS '+(items.length-c);});}else if(piCurV==='priority')renderPIKb(GP+'KbPriority',PI_PRL,PI_PRC,'pr');else renderPITbl();}
 function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _isSum=piIsSummary(d),_cp=piCalcProg(d);
   document.getElementById('mTitle').textContent=d.name;var _par=d.parent?PIMPL.find(function(z){return z._key===d.parent;}):null;var _nc=piChildren(d).length;document.getElementById('mSub').textContent=PI_PHASES[d.ph]+(_par?(' › '+_par.name):'')+(_nc?(' · งานย่อย '+_nc):'');
   var rw=(l,vv)=>`<div class="fld"><label>${l}</label><div class="roval">${vv}</div></div>`;
