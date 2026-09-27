@@ -443,12 +443,13 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
    ไม่ใช่ตัดคำกลางประโยคหรือดันปุ่มขวาหลุดแถว
    วัดแล้ว: ข้อความกว้าง 285px · ที่ว่างหลังปุ่มล้าง 331px ที่จอ 1920 (พอดี)
    จอ 1600 เหลือ 11px จึงตกบรรทัด ซึ่งแถบตัวกรองเองก็ตกบรรทัดอยู่แล้วที่ 1440 */
-/* ที่ว่างหลังปุ่มล้างหดตามความกว้างจอแบบ 1:1 — วัดได้ 331px ที่จอ 1920
-   แต่เหลือ 11px ที่ 1600 ชิปกว้างสุด (มีคำเตือนด้วย) ~294px จึงพอดีเฉพาะจอ ~1900 ขึ้นไป
-   ต่ำกว่านั้นให้ลงแถวของตัวเองท้ายแถบ (order:9) แทนที่จะดันปุ่มขวาตกบรรทัด
-   ซึ่งจะทำให้แถบเครื่องมือดูพัง */
-.barnote{margin:2px 0 0;padding:6px 12px;white-space:nowrap;flex:0 0 100%;order:9}
-@media (min-width:1900px){.barnote{flex:0 1 auto;order:0;margin-top:0;min-width:0}}
+/* ══ ชิปนั่งในช่องว่างหลังปุ่มล้าง ถ้าที่ไม่พอค่อยลงแถวของตัวเอง ══
+   ของเดิมเดาด้วย @media (min-width:1900px) ซึ่งพลาดสองรอบ — รอบแรกไม่ได้เผื่อว่า
+   โหมดอังกฤษกินที่กว้างกว่าไทย รอบสองไม่ได้เผื่อว่าชิปโตขึ้นเองเมื่อมีงานเลยกำหนด
+   ความกว้างของชิปขึ้นกับข้อมูล ภาษา และระดับซูม ซึ่ง media query มองไม่เห็นสักอย่าง
+   piRvwNote() จึงวัดจริงหลังวาดเสร็จแล้วติด .ownrow เอง (ดูเหตุผลเต็มในฟังก์ชัน) */
+.barnote{margin:0;padding:6px 12px;white-space:nowrap;flex:0 1 auto;min-width:0}
+.barnote.ownrow{flex:0 0 100%;order:9;margin-top:2px}
 .kgap{flex:1}
 .kcard .chip{font-size:10px;padding:1px 7px}
 .kcard .kph{background:var(--chip);color:var(--ink2);font-weight:700;letter-spacing:.02em}
@@ -3803,8 +3804,21 @@ const KB_STATUSES=STATUS_LIST.filter(function(x){return x!=='Completed';});
    เลยกำหนดแล้วยิ่งต้องนับ ไม่ใช่หลุดออกจากเลข — แยกบอกเป็นวงเล็บกำกับแทน */
 function piRvwNote(){
   var el=document.getElementById('piRvwNote');if(!el)return;
-  /* แถบอยู่ในแถบตัวกรองแล้ว ไม่ได้กินแถวเหนือผัง จึงไม่ต้องหักความสูงผังอีก */
-  var done=function(h){el.innerHTML=h;};
+  /* ══ วัดจริงว่าชิปลงช่องว่างได้ไหม ไม่ใช่เดาจากความกว้างจอ ══
+     ชิปกว้างไม่เท่ากันตามข้อมูล (มีงานเลยกำหนดไหม มีคำเตือนไหม) ตามภาษา
+     (อังกฤษกินที่กว้างกว่าไทย) และตามระดับซูมของเบราว์เซอร์
+     media query เห็นแค่ความกว้างจอ จึงเดาพลาดมาแล้วสองรอบ
+
+     วิธีนี้: วาดแบบนั่งในช่องก่อน แล้วเทียบว่าปุ่มขวายังอยู่แถวเดียวกับชิปไหม
+     ถ้าคนละแถว = ที่ไม่พอจริง ค่อยติด .ownrow ให้ชิปลงแถวของตัวเองท้ายแถบ
+     เช็ครอบเดียวไม่วน เพราะ .ownrow ย้ายชิปออกจากแถวแรกเสมอ ไม่มีทางกลับมาชน */
+  var done=function(h){
+    el.innerHTML=h;el.classList.remove('ownrow');
+    if(!h)return;
+    var bar=el.parentNode,br=bar&&bar.querySelector('.barright');
+    if(!br)return;
+    if(Math.abs(br.getBoundingClientRect().top-el.getBoundingClientRect().top)>6)
+      el.classList.add('ownrow');};
   /* หน้า Automation ไม่มีแนวคิดฝั่งตรวจ (ไม่มี rvw เลยทั้ง 54 งาน) */
   if(GCTX!=='pi')return done('');
   var rows=filteredPI().filter(function(d){
@@ -3827,7 +3841,13 @@ function piRvwNote(){
     return '<span class="kbn-side" title="'+attr(L2.map(function(d){
         return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
       +esc(shortSide[side]||side)+' <b>'+L2.length+'</b>'
-      +(od?'<span class="kbn-od">('+L('เลยกำหนด ','overdue ')+od+')</span>':'')+'</span>';};
+      /* คำว่า "เลยกำหนด"/"overdue" กิน ~60px ต่อฝั่ง สองฝั่งก็ 120px ซึ่งดันชิป
+         ออกนอกช่องว่าง เหลือแค่ตัวเลขในวงเล็บสีแดง คำเต็มกับรายชื่อไปอยู่ใน tooltip
+         ของตัวมันเอง (ซ้อนอยู่ใน title ของฝั่ง ชี้ที่เลขแดงจะได้เฉพาะงานที่เลยกำหนด) */
+      +(od?'<span class="kbn-od" title="'+attr(L(' เลยกำหนด ',' Overdue ')+od+L(' งาน:',' tasks:')+'\n'
+          +L2.filter(piIsOverdue).map(function(d){
+             return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||'');}).join('\n'))
+        +'">('+od+')</span>':'')+'</span>';};
   var parts=REVIEW_SIDES.map(half).filter(Boolean);
   var h='<span class="kbn-dot" style="background:'+STATUS_COLORS['In Review']+'"></span>'
     +L('รอตรวจ ','In review ')+'<b>'+rows.length+'</b> — '
@@ -4671,7 +4691,10 @@ function csStartObserver(){
   obs.observe(document.body,{childList:true,subtree:true});
 }
 document.addEventListener('click',function(){document.querySelectorAll('.cs').forEach(csClose);});
-window.addEventListener('resize',function(){document.querySelectorAll('.cs').forEach(csClose);piMoveThumb();brMoveThumb();});
+window.addEventListener('resize',function(){document.querySelectorAll('.cs').forEach(csClose);piMoveThumb();brMoveThumb();
+  /* ชิปรอตรวจตัดสินว่าจะนั่งในช่องว่างหรือลงแถวเองจากการวัดจริง ย่อ-ขยายหน้าต่าง
+     หรือเปลี่ยนระดับซูมแล้วคำตอบเปลี่ยน ต้องวัดใหม่ ไม่งั้นค้างอยู่ท่าเดิม */
+  if(typeof piRvwNote==='function')piRvwNote();});
 
 window.startApp=async function(){
 var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillRptFilters();rptBind();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
