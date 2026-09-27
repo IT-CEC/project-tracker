@@ -3937,7 +3937,7 @@ function piKbSummary(){
   el.innerHTML=rows.length?('<span class="kbn-dot"></span>เสร็จแล้ว <b>'+done+'</b> จาก <b>'+rows.length
     +'</b> งาน — คอลัมน์ Completed ไม่แสดงบนบอร์ด '
     +'<button class="kbn-link" onclick="piSwitchView(\'table\')">ดูรายการที่เสร็จแล้ว</button>'):'';}
-function piKcard(d){var _est=piEffSt(d);return `<div class="kcard" onclick="openPI(${d._pi})"><div class="kt">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg>':piStIcon(_est)}${esc(d.name)}</div><div class="km"><span class="chip kph" title="${attr(PI_PHASES[d.ph]||d.ph||'')}">${esc(d.ph||'')}</span><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span>${_est==='In Review'?`<span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:''}<span class="kgap"></span>${piRing(piCalcProg(d),STATUS_COLORS[_est])}<span class="kd">${esc(d.e||'—')}</span></div></div>`;}
+function piKcard(d){var _est=piEffSt(d);return `<div class="kcard" onclick="openPI(${d._pi})"><div class="kt">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg>':piStIcon(_est)}${esc(d.name)}</div><div class="km"><span class="chip kph" title="${attr(PI_PHASES[d.ph]||d.ph||'')}">${esc(d.ph||'')}</span><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span>${d.st==='In Review'?`<span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:''}<span class="kgap"></span>${piRing(piCalcProg(d),STATUS_COLORS[_est])}<span class="kd">${esc(d.e||'—')}</span></div></div>`;}
 function renderPIKb(elId,groups,cmap,key,sub){var rows=filteredPI();var el=document.getElementById(elId);if(!el)return;
   /* การ์ดอยู่ใน .kcol-body ซึ่งเลื่อนในตัวเอง — ความสูงบอร์ดจึงคงที่เท่าหน้าจอ
      หัวคอลัมน์กับตัวเลขอยู่นอกกล่องนั้น จึงเห็นตลอดเวลาไม่ว่าเลื่อนไปไหน
@@ -4296,6 +4296,13 @@ function piIsOverdue(d){
    — เป็นการรายงานความล้มเหลวที่ยังไม่เกิด และทำให้สีแดงเฟ้อจนงานที่พลาดจริง
    กลืนหายไปกับงานที่ยังทัน ความเสี่ยงจากงานย่อยไปบอกด้วยชิปเตือนแทน (_owarn2) */
 function piEffSt(d){return (d&&piIsOverdue(d))?'Delayed':((d&&d.st)||'');}
+/* เลยกำหนดมากี่วัน — 0 ถ้ายังไม่เลย
+   บอกจำนวนวันตรงๆ ใช้ตามงานได้ทันทีกว่าบอกวันครบกำหนดแล้วให้ไปลบเอง */
+function piLateDays(d){
+  if(!piIsOverdue(d))return 0;
+  var e=piDate(d.e);if(!e)return 0;
+  var t=new Date();t.setHours(0,0,0,0);
+  return Math.max(1,Math.round((t-e)/86400000));}
 /* ph (ถ้าส่งมา) ใช้ตัดสินว่า "ล่าช้า" จริงไหม — งานเลยกำหนดสักตัวไม่ได้แปลว่า
    เฟสพลาดกำหนดตัวเอง เฟสจะล่าช้าก็ต่อเมื่อวันนี้เลยวันจบเฟส หรือมีงานล้นกรอบเฟส
    ซึ่งเป็นเกณฑ์เดียวกับการ์ด Phase Status (#72) หัวเฟสกับการ์ดจึงพูดตรงกัน */
@@ -4457,7 +4464,22 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var a=dayOf(_spa),b=dayOf(_spb);if(b<a){var t=a;a=b;b=t;}
       var left=a*dw,width=Math.max((b-a+1)*dw,6);
       var _pg=piCalcProg(d);
-      var pill=`<span class="g-pill" style="background:${sc}1f;color:${sc}"><span class="g-pdot" style="background:${sc}"></span>${_est}${(_est==='Delayed'&&d.e)?` · ${L('กำหนด ','due ')}${esc(d.e)}`:''}</span>`+(_est==='In Review'?`<span class="g-pill" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:'');
+      /* ══ สถานะงานกับสถานะเวลาเป็นคนละมิติ ป้ายเดียวต้องบอกให้ครบทั้งคู่ ══
+         ของเดิม piEffSt ดีดงานที่เลยกำหนดเป็น Delayed แล้วป้ายก็แสดงแค่ "Delayed"
+         สถานะจริงหายไปทั้งดุ้น — งาน In Review ที่ช้าจะไม่รู้ว่าค้างฝั่งไหน
+         (ชิปฝั่งผูกกับ _est จึงหายไปด้วย) และงาน Not Started ที่ช้าก็ดูเหมือน
+         มีคนทำอยู่แล้วแค่ช้า ทั้งที่ยังไม่มีใครเริ่ม
+
+         สีแดงคงไว้เพราะความเร่งด่วนต้องเห็นจากสีตามที่ตกลงกันไว้ แต่ข้อความ
+         บอกสถานะจริงนำหน้า แล้วต่อด้วยว่าช้ากี่วัน · วันครบกำหนดย้ายไป tooltip */
+      var _ovdue=piIsOverdue(d);
+      var _ptxt=_ovdue
+        ?`${d.st} · ${L('เลยกำหนด ','overdue ')}${piLateDays(d)}${L(' วัน',' d')}`
+        :`${_est}${(_est==='Delayed'&&d.e)?` · ${L('กำหนด ','due ')}${esc(d.e)}`:''}`;
+      var pill=`<span class="g-pill" style="background:${sc}1f;color:${sc}"${(_ovdue&&d.e)?` title="${attr(L('กำหนด ','due ')+d.e)}"`:''}><span class="g-pdot" style="background:${sc}"></span>${_ptxt}</span>`
+        /* ชิปฝั่งผูกกับสถานะจริง (d.st) ไม่ใช่สถานะที่ดีดแล้ว (_est)
+           ไม่งั้นพอเลยกำหนดจะหายไป ซึ่งเป็นตอนที่ต้องรู้ว่าใครถืออยู่มากที่สุด */
+        +(d.st==='In Review'?`<span class="g-pill" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:'');
       var _di=(GCTX==='ap')?null:piDueInfo(d);
       var _dmk='';
       if(_di){var _bx=dayOf(piDate(_di.base));
