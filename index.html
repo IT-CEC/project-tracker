@@ -3787,11 +3787,27 @@ function piRvwHit(d){
   if(d.st!=='In Review')return false;
   if((d.rvw||'Civil')!==piRvwF.side)return false;
   return piRvwF.od?piIsOverdue(d):true;}
-/* ไม่ต้องกัน erpDenyEdit — กรองคือการดู ไม่ใช่การแก้ข้อมูล ผู้ดูอย่างเดียวกดได้ */
-function piRvwFilter(side,od){
+/* ไม่ต้องกัน erpDenyEdit — กรองคือการดู ไม่ใช่การแก้ข้อมูล ผู้ดูอย่างเดียวกดได้
+
+   รับ "ลำดับใน REVIEW_SIDES" ไม่ใช่ชื่อฝั่ง เพราะปุ่มสร้างด้วยการต่อสตริงเป็น onclick
+   ถ้าส่งชื่อไปตรงๆ ต้อง escape ให้ครบทั้งชั้น HTML attribute และชั้น JS string
+   ซึ่งพลาดง่าย (ของเดิมเขียนเองแทน ' อย่างเดียว ไม่ครอบ \ " &)
+   วันนี้ REVIEW_SIDES เป็นค่าคงที่ในโค้ดจึงยังปลอดภัย แต่ถ้าวันหนึ่งย้ายไปเก็บ
+   ใน Firestore ให้แก้ชื่อได้ ช่องนั้นจะกลายเป็น stored XSS ทันที
+   ส่งตัวเลขแล้วไม่มีอะไรให้ escape ตั้งแต่ต้น */
+function piRvwFilter(i,od){
+  /* ปุ่มส่งลำดับมาเสมอ แต่รับชื่อฝั่งได้ด้วย เผื่อมีคนเรียกจากที่อื่น
+     ถ้ารับแต่ลำดับอย่างเดียว การเรียกผิดแบบจะเงียบ ไม่มีอะไรฟ้อง กว่าจะรู้ก็หลงทางไปไกล */
+  var side=(typeof i==='number')?REVIEW_SIDES[i]
+          :(REVIEW_SIDES.indexOf(i)>=0?i:null);
+  if(!side)return;
   var same=piRvwF&&piRvwF.side===side&&piRvwF.od===!!od;
   piRvwF=same?null:{side:side,od:!!od};
   renderPI();}
+/* ปุ่ม "ยกเลิกตัวกรอง" ตอนไม่มีงานตรง ใช้ตัวนี้ ไม่ใช่ piRvwFilter(indexOf(...))
+   เพราะถ้า indexOf ได้ -1 ปุ่มจะกดไม่ออก แล้วผู้ใช้ติดอยู่กับตัวกรองที่ยกเลิกไม่ได้
+   ซึ่งเป็นสิ่งเดียวกับที่ปุ่มนี้มีไว้แก้ */
+function piRvwClear(){piRvwF=null;renderPI();}
 /* opts.noRvw = ข้ามตัวกรองของชิปเอง — ชิปต้องรู้ยอดทุกฝั่งเสมอ ไม่งั้นกด Civil แล้ว
    เลข PS หายไป สลับฝั่งไม่ได้ แต่ยังเคารพตัวกรองเฟส/สถานะ/ทีม/ค้นหาตามปกติ */
 function filteredPI(opts){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
@@ -3858,7 +3874,7 @@ function piRvwNote(){
       +L('กรองอยู่: ','Filtered: ')+'<b>'+esc(piRvwF.side)+'</b>'
       +(piRvwF.od?'<span class="kbn-od">('+L('เลยกำหนด','overdue')+')</span>':'')
       +' — '+L('ไม่มีงานที่ตรง','no matching tasks')
-      +'<button class="kbn-link" onclick="piRvwFilter(\''+piRvwF.side.replace(/'/g,"\\'")+'\','+(piRvwF.od?1:0)+')">'
+      +'<button class="kbn-link" onclick="piRvwClear()">'
       +L('ยกเลิกตัวกรอง','Clear filter')+'</button>');}
   /* ชื่องานย่อยซ้ำกันเอง ("CIVIL - Feedback BRD V.1" มี 3 ใบ) อ่านแล้วไม่รู้ว่าของ BRD ไหน
      tooltip จึงขึ้นรหัสเอกสารจากงานแม่นำหน้า และตัดคำนำหน้าฝั่งออกเพราะซ้ำกับคอลัมน์ */
@@ -3870,15 +3886,14 @@ function piRvwNote(){
   /* ย่อ "PS Global" เหลือ "PS" ในชิป — ชื่อเต็มกิน 38px ที่ช่องว่างไม่มีให้
      บอร์ดสถานะใช้ "PS" อยู่แล้ว คำย่อนี้จึงไม่ใช่ของใหม่ในระบบ */
   var shortSide={'PS Global':'PS'};
-  var half=function(side){
+  var half=function(side,si){
     var L2=rows.filter(function(d){return (d.rvw||'Civil')===side;});
     if(!L2.length)return '';
     var od=L2.filter(piIsOverdue).length;
     var onAll=!!(piRvwF&&piRvwF.side===side&&!piRvwF.od);
     var onOd=!!(piRvwF&&piRvwF.side===side&&piRvwF.od);
-    var q=function(x){return x.replace(/'/g,"\\'");};
     return '<span class="kbn-side'+(onAll?' on':'')+'" role="button" tabindex="0"'
-      +' onclick="piRvwFilter(\''+q(side)+'\',0)"'
+      +' onclick="piRvwFilter('+si+',0)"'
       +' title="'+attr(L('กดเพื่อกรองเฉพาะที่ค้างฝั่งนี้','Click to filter to this side')+'\n'
         +L2.map(function(d){
           return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
@@ -3889,7 +3904,7 @@ function piRvwNote(){
       /* เลขแดงกดแยกได้ — กรองซ้อนอีกชั้นเหลือเฉพาะที่เลยกำหนดของฝั่งนี้
          stopPropagation ไม่งั้นโดน onclick ของครึ่งใหญ่ทับ กลายเป็นกรองทั้งฝั่ง */
       +(od?'<span class="kbn-od'+(onOd?' on':'')+'" role="button" tabindex="0"'
-          +' onclick="event.stopPropagation();piRvwFilter(\''+q(side)+'\',1)"'
+          +' onclick="event.stopPropagation();piRvwFilter('+si+',1)"'
           +' title="'+attr(L('กดเพื่อกรองเฉพาะที่เลยกำหนด','Click to filter to overdue only')+'\n'
           +L(' เลยกำหนด ',' Overdue ')+od+L(' งาน:',' tasks:')+'\n'
           +L2.filter(piIsOverdue).map(function(d){
