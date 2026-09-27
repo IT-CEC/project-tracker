@@ -433,8 +433,14 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .kbn-link{border:0;background:none;font-family:inherit;font-size:12px;font-weight:600;
   color:var(--accent);cursor:pointer;padding:0;margin-left:auto;white-space:nowrap}
 .kbn-link:hover{text-decoration:underline}
-.kbn-side{cursor:help;white-space:nowrap}
-.kbn-od{color:var(--red);font-size:11px;margin-left:5px}
+.kbn-side{cursor:pointer;white-space:nowrap;border-radius:7px;padding:1px 6px;margin:0 -2px;
+  transition:background .15s,box-shadow .15s}
+.kbn-side:hover{background:var(--hover)}
+/* ใช้พื้น mint แบบเดียวกับ .mkpi-half.on ที่หน้า Action Request ใช้บอก "กรองอยู่" */
+.kbn-side.on{background:var(--mint);box-shadow:inset 0 0 0 1px var(--accent)}
+.kbn-side:focus-visible,.kbn-od:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.kbn-od.on{background:var(--mint);box-shadow:inset 0 0 0 1px var(--red);border-radius:6px;padding:0 4px}
+.kbn-od{color:var(--red);font-size:11px;margin-left:5px;cursor:pointer}
 /* ใช้แดงแบบเดียวกับ .g-phwarn ที่เตือนงานล้นกรอบเฟส — เตือนเหมือนกันต้องหน้าตาเหมือนกัน */
 .kbn-warn{margin-left:6px;display:inline-flex;align-items:center;gap:5px;
   color:var(--red);font-weight:600;white-space:nowrap;cursor:help}
@@ -3769,9 +3775,44 @@ function piProg(p,c){return `<span class="prog"><span style="font-size:11px;colo
 function piAsg(a){return '<span class="asg">'+a.map(x=>`<span class="atag">${esc(x)}</span>`).join('')+'</span>';}
 function piDot(st){return `<span class="dotc" style="background:${STATUS_COLORS[st]||'#888'}"></span>`;}
 function fillPIFilters(){setOpts(GP+'Phase',Object.keys(PI_PHASES),GP==='ap'?L('ทุกแผนก','All depts'):L('ทุกเฟส','All phases'));setOpts(GP+'Status',GP==='ap'?STATUS_LIST.filter(function(s){return PIMPL.some(function(d){return d.st===s;});}):STATUS_LIST,L('ทุกสถานะ','All statuses'));setOpts(GP+'Asg',[...new Set(PIMPL.flatMap(d=>d.asg))].sort(),L('ทุกทีม','All teams'));}
-function clearPI(){[GP+'Phase',GP+'Status',GP+'Asg',GP+'Search'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});renderPI();}
-function filteredPI(){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
-  return PIMPL.filter(d=>(!phs.length||phs.includes(d.ph))&&(!sts.length||sts.includes(d.st))&&(!ags.length||ags.some(a=>d.asg.includes(a)))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q)));}
+function clearPI(){[GP+'Phase',GP+'Status',GP+'Asg',GP+'Search'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});piRvwF=null;renderPI();}
+/* ══ ตัวกรอง "ค้างฝั่งไหน" จากชิปรอตรวจ ══
+   ไม่มี dropdown เป็นของตัวเอง สั่งจากการกดชิปอย่างเดียว จึงเก็บสถานะไว้ตรงนี้
+   side = ฝั่งที่กด · od = true คือเอาเฉพาะที่เลยกำหนดของฝั่งนั้น
+   nul = ไม่ได้กรองอยู่ */
+var piRvwF=null;
+function piRvwHit(d){
+  if(!piRvwF)return true;
+  if(piChildren(d).length)return false;          /* นับชั้นงานย่อยเหมือนที่ชิปนับ */
+  if(d.st!=='In Review')return false;
+  if((d.rvw||'Civil')!==piRvwF.side)return false;
+  return piRvwF.od?piIsOverdue(d):true;}
+/* ไม่ต้องกัน erpDenyEdit — กรองคือการดู ไม่ใช่การแก้ข้อมูล ผู้ดูอย่างเดียวกดได้
+
+   รับ "ลำดับใน REVIEW_SIDES" ไม่ใช่ชื่อฝั่ง เพราะปุ่มสร้างด้วยการต่อสตริงเป็น onclick
+   ถ้าส่งชื่อไปตรงๆ ต้อง escape ให้ครบทั้งชั้น HTML attribute และชั้น JS string
+   ซึ่งพลาดง่าย (ของเดิมเขียนเองแทน ' อย่างเดียว ไม่ครอบ \ " &)
+   วันนี้ REVIEW_SIDES เป็นค่าคงที่ในโค้ดจึงยังปลอดภัย แต่ถ้าวันหนึ่งย้ายไปเก็บ
+   ใน Firestore ให้แก้ชื่อได้ ช่องนั้นจะกลายเป็น stored XSS ทันที
+   ส่งตัวเลขแล้วไม่มีอะไรให้ escape ตั้งแต่ต้น */
+function piRvwFilter(i,od){
+  /* ปุ่มส่งลำดับมาเสมอ แต่รับชื่อฝั่งได้ด้วย เผื่อมีคนเรียกจากที่อื่น
+     ถ้ารับแต่ลำดับอย่างเดียว การเรียกผิดแบบจะเงียบ ไม่มีอะไรฟ้อง กว่าจะรู้ก็หลงทางไปไกล */
+  var side=(typeof i==='number')?REVIEW_SIDES[i]
+          :(REVIEW_SIDES.indexOf(i)>=0?i:null);
+  if(!side)return;
+  var same=piRvwF&&piRvwF.side===side&&piRvwF.od===!!od;
+  piRvwF=same?null:{side:side,od:!!od};
+  renderPI();}
+/* ปุ่ม "ยกเลิกตัวกรอง" ตอนไม่มีงานตรง ใช้ตัวนี้ ไม่ใช่ piRvwFilter(indexOf(...))
+   เพราะถ้า indexOf ได้ -1 ปุ่มจะกดไม่ออก แล้วผู้ใช้ติดอยู่กับตัวกรองที่ยกเลิกไม่ได้
+   ซึ่งเป็นสิ่งเดียวกับที่ปุ่มนี้มีไว้แก้ */
+function piRvwClear(){piRvwF=null;renderPI();}
+/* opts.noRvw = ข้ามตัวกรองของชิปเอง — ชิปต้องรู้ยอดทุกฝั่งเสมอ ไม่งั้นกด Civil แล้ว
+   เลข PS หายไป สลับฝั่งไม่ได้ แต่ยังเคารพตัวกรองเฟส/สถานะ/ทีม/ค้นหาตามปกติ */
+function filteredPI(opts){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
+  var noR=!!(opts&&opts.noRvw);
+  return PIMPL.filter(d=>(!phs.length||phs.includes(d.ph))&&(!sts.length||sts.includes(d.st))&&(!ags.length||ags.some(a=>d.asg.includes(a)))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q))&&(noR||piRvwHit(d)));}
 let piSortK='',piSortD=1;
 function renderPITbl(){var rows=filteredPI();
   if(piSortK)rows=rows.slice().sort((a,b)=>{if(piSortK==='s'||piSortK==='e')return ((piDate(a[piSortK])||0)-(piDate(b[piSortK])||0))*piSortD;if(piSortK==='prog')return (a.prog-b.prog)*piSortD;if(piSortK==='wbs')return (a._pi-b._pi)*piSortD;return String(a[piSortK]||'').localeCompare(String(b[piSortK]||''),'th')*piSortD;});
@@ -3821,9 +3862,20 @@ function piRvwNote(){
       el.classList.add('ownrow');};
   /* หน้า Automation ไม่มีแนวคิดฝั่งตรวจ (ไม่มี rvw เลยทั้ง 54 งาน) */
   if(GCTX!=='pi')return done('');
-  var rows=filteredPI().filter(function(d){
+  var rows=filteredPI({noRvw:1}).filter(function(d){
     return piChildren(d).length===0&&d.st==='In Review';});
-  if(!rows.length)return done('');
+  /* ══ กันตัวกรองค้างแบบมองไม่เห็น ══
+     กรองฝั่งไว้แล้วไปกรองเฟสที่ไม่มีงานรอตรวจเลย ชิปจะว่างและหายไปทั้งอัน
+     แต่ piRvwF ยังกรองผังอยู่ ผังเลยขึ้น "ไม่พบงาน" โดยไม่มีอะไรบอกว่าทำไม
+     และไม่เหลือปุ่มให้กดยกเลิก — กรณีนี้ต้องคงชิปไว้พร้อมทางออก */
+  if(!rows.length){
+    if(!piRvwF)return done('');
+    return done('<span class="kbn-dot" style="background:'+STATUS_COLORS['In Review']+'"></span>'
+      +L('กรองอยู่: ','Filtered: ')+'<b>'+esc(piRvwF.side)+'</b>'
+      +(piRvwF.od?'<span class="kbn-od">('+L('เลยกำหนด','overdue')+')</span>':'')
+      +' — '+L('ไม่มีงานที่ตรง','no matching tasks')
+      +'<button class="kbn-link" onclick="piRvwClear()">'
+      +L('ยกเลิกตัวกรอง','Clear filter')+'</button>');}
   /* ชื่องานย่อยซ้ำกันเอง ("CIVIL - Feedback BRD V.1" มี 3 ใบ) อ่านแล้วไม่รู้ว่าของ BRD ไหน
      tooltip จึงขึ้นรหัสเอกสารจากงานแม่นำหน้า และตัดคำนำหน้าฝั่งออกเพราะซ้ำกับคอลัมน์ */
   var codeOf=function(d){
@@ -3834,17 +3886,27 @@ function piRvwNote(){
   /* ย่อ "PS Global" เหลือ "PS" ในชิป — ชื่อเต็มกิน 38px ที่ช่องว่างไม่มีให้
      บอร์ดสถานะใช้ "PS" อยู่แล้ว คำย่อนี้จึงไม่ใช่ของใหม่ในระบบ */
   var shortSide={'PS Global':'PS'};
-  var half=function(side){
+  var half=function(side,si){
     var L2=rows.filter(function(d){return (d.rvw||'Civil')===side;});
     if(!L2.length)return '';
     var od=L2.filter(piIsOverdue).length;
-    return '<span class="kbn-side" title="'+attr(L2.map(function(d){
-        return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
+    var onAll=!!(piRvwF&&piRvwF.side===side&&!piRvwF.od);
+    var onOd=!!(piRvwF&&piRvwF.side===side&&piRvwF.od);
+    return '<span class="kbn-side'+(onAll?' on':'')+'" role="button" tabindex="0"'
+      +' onclick="piRvwFilter('+si+',0)"'
+      +' title="'+attr(L('กดเพื่อกรองเฉพาะที่ค้างฝั่งนี้','Click to filter to this side')+'\n'
+        +L2.map(function(d){
+          return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
       +esc(shortSide[side]||side)+' <b>'+L2.length+'</b>'
       /* คำว่า "เลยกำหนด"/"overdue" กิน ~60px ต่อฝั่ง สองฝั่งก็ 120px ซึ่งดันชิป
          ออกนอกช่องว่าง เหลือแค่ตัวเลขในวงเล็บสีแดง คำเต็มกับรายชื่อไปอยู่ใน tooltip
          ของตัวมันเอง (ซ้อนอยู่ใน title ของฝั่ง ชี้ที่เลขแดงจะได้เฉพาะงานที่เลยกำหนด) */
-      +(od?'<span class="kbn-od" title="'+attr(L(' เลยกำหนด ',' Overdue ')+od+L(' งาน:',' tasks:')+'\n'
+      /* เลขแดงกดแยกได้ — กรองซ้อนอีกชั้นเหลือเฉพาะที่เลยกำหนดของฝั่งนี้
+         stopPropagation ไม่งั้นโดน onclick ของครึ่งใหญ่ทับ กลายเป็นกรองทั้งฝั่ง */
+      +(od?'<span class="kbn-od'+(onOd?' on':'')+'" role="button" tabindex="0"'
+          +' onclick="event.stopPropagation();piRvwFilter('+si+',1)"'
+          +' title="'+attr(L('กดเพื่อกรองเฉพาะที่เลยกำหนด','Click to filter to overdue only')+'\n'
+          +L(' เลยกำหนด ',' Overdue ')+od+L(' งาน:',' tasks:')+'\n'
           +L2.filter(piIsOverdue).map(function(d){
              return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||'');}).join('\n'))
         +'">('+od+')</span>':'')+'</span>';};
@@ -3969,7 +4031,19 @@ function openAP(id){var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _b=brByKey(
       _mb2.classList.add('mb-ro');}}
   document.getElementById('modal').classList.add('open');}
 function setGanttCtx(which){GCTX=which;if(which==="ap"){PIBASE=AP_BASE;PIEKEY="erp_ap_edits_v1";PIADDKEY="erp_ap_add_v1";PIDELKEY="erp_ap_del_v1";PIGID="apGantt";ZOOMID="apZoom";GP="ap";}else{PIBASE=PI_BASE0;PIEKEY="erp_pi_edits_v1";PIADDKEY="erp_pi_add_v1";PIDELKEY="erp_pi_del_v1";PIGID="piGantt";ZOOMID="piZoom";GP="pi";}applyPhaseMap(which);piTaskCol={};piCollapsed={};PIMPL=PI_STORE[which]||[];fillPIFilters();}
-function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);if(f==='st'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;piRollStatus(_par);piSaveTask(_par);_cur=_par;}}renderPI();if(window.renderProjRibbon)renderProjRibbon();}
+function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);
+  /* ══ ฝั่งที่ตรวจไหลขึ้นหางานแม่ เหมือนที่สถานะทำอยู่แล้ว ══
+     ของเดิม rvw ของงานแม่ตั้งด้วยมือครั้งเดียวแล้วไม่เคยตามลูก พองานย้ายฝั่ง
+     บาร์หลักก็ยังบอกฝั่งเก่า (วัดแล้วเจอ BRD02 ค้างแบบนี้จริง)
+     เดินขึ้นทุกชั้นเหมือน piRollStatus และบันทึกเฉพาะชั้นที่เปลี่ยนจริง
+     ไม่ใช่บันทึกทุกชั้นทุกครั้ง จะได้ไม่เปลืองโควตาเขียนโดยเปล่าประโยชน์ */
+  if(f==='st'||f==='rvw'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;
+    var _ch=false;
+    if(f==='st'){piRollStatus(_par);_ch=true;}
+    if(piRollRvw(_par))_ch=true;
+    if(_ch)piSaveTask(_par);
+    _cur=_par;}}
+  renderPI();if(window.renderProjRibbon)renderProjRibbon();}
 function setPIName(pid,val){if(erpDenyEdit())return;setPIField(pid,'name',val);var t=document.getElementById('mTitle');if(t)t.textContent=val;}
 function setPIAsg(pid,str){if(erpDenyEdit())return;setPIField(pid,'asg',(str||'').split(',').map(function(x){return x.trim();}).filter(Boolean));}
 function setPIDate(pid,f,val){if(erpDenyEdit())return;
@@ -4230,6 +4304,18 @@ function piPhRoll(list,ph){var st=list.map(function(z){return piEffSt(z);});if(!
     var _r=piPhaseRange(ph);
     if(!_r||_r.over>0||new Date()>_r.b)return 'Delayed';
     return 'In Progress';}if(st.indexOf('On Hold')>=0)return 'On Hold';if(st.every(function(x){return x==='In Review'||x==='Completed';}))return 'In Review';return 'In Progress';}
+/* คืน true เมื่อเปลี่ยนจริง เพื่อให้ผู้เรียกบันทึกเฉพาะชั้นที่เปลี่ยน
+   ตามเฉพาะตอนงานย่อยที่ In Review เห็นตรงกันหมด ถ้าลูกยังไม่ตรงกันเอง
+   ก็ไม่มีคำตอบเดียวให้ตาม ปล่อยค่าเดิมไว้แล้วให้คำเตือน ⚠ บนชิปเป็นคนบอก */
+function piRollRvw(p){
+  var ch=piChildren(p).filter(function(c){return c.st==='In Review';});
+  if(!ch.length)return false;
+  var sd={};ch.forEach(function(c){sd[c.rvw||'Civil']=1;});
+  var ks=Object.keys(sd);
+  if(ks.length!==1)return false;
+  if((p.rvw||'Civil')===ks[0])return false;
+  p.rvw=ks[0];PIE[p._pi]=PIE[p._pi]||{};PIE[p._pi].rvw=ks[0];
+  return true;}
 function piRollStatus(p){var ch=piChildren(p);if(!ch.length)return;var sts=ch.map(function(c){return c.st;});var ns;if(sts.every(function(x){return x==='Completed';}))ns='Completed';else if(sts.every(function(x){return x==='Not Started';}))ns='Not Started';else if(sts.indexOf('Delayed')>=0)ns='Delayed';else if(sts.indexOf('On Hold')>=0)ns='On Hold';else if(sts.every(function(x){return x==='In Review'||x==='Completed';}))ns='In Review';else ns='In Progress';if(p.st!==ns){p.st=ns;PIE[p._pi]=PIE[p._pi]||{};PIE[p._pi].st=ns;}}
 function piTreeOrder(list){var byKey={};list.forEach(function(d){byKey[d._key]=d;});var ch={};list.forEach(function(d){var p=(d.parent&&byKey[d.parent])?d.parent:'_root';(ch[p]=ch[p]||[]).push(d);});var out=[];function walk(k,dep){(ch[k]||[]).forEach(function(d){out.push({d:d,depth:dep});if(!piTaskCol[d._key])walk(d._key,dep+1);});}walk('_root',0);return out;}
 function piCollectDesc(key,acc){PIMPL.filter(function(x){return x.parent===key;}).forEach(function(c){acc.push(c);piCollectDesc(c._key,acc);});}
@@ -4281,6 +4367,17 @@ document.addEventListener('mousemove',function(ev){if(!piLink)return;var p=docum
 document.addEventListener('mouseup',function(ev){if(!piLink)return;var pl=piLink;piLink=null;document.body.style.cursor='';var sv=document.getElementById('piLinkSvg');if(sv)sv.remove();document.querySelectorAll('.g-bar.linkhover').forEach(x=>x.classList.remove('linkhover'));var b=ev.target.closest?ev.target.closest('.g-bar'):null;if(b&&+b.dataset.pi!==pl.from){piDepsAdd(+b.dataset.pi,pl.from);}});
 
 function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PIGID);if(!gw)return;
+  /* ══ กรองจากชิปแล้วต้องลากงานแม่มาด้วย ══
+     piTreeOrder() ถือว่างานที่หาพ่อแม่ในลิสต์ไม่เจอคือ root พอกรองเหลือเฉพาะงานย่อย
+     ผังจะเป็นแถบลอย 4 แถบชื่อ "CIVIL - Feedback BRD V.1" ซ้ำกัน ไม่รู้ว่าของ BRD ไหน
+     เติมบรรพบุรุษเข้าไปให้ต้นไม้ต่อติด — ทำเฉพาะผังซึ่งเป็นมุมมองต้นไม้
+     บอร์ด Kanban/Priority/ตาราง เป็นรายการแบน กรองตรงๆ ถูกแล้ว ไม่ต้องเติม */
+  if(piRvwF&&rows.length){
+    var seen={};rows.forEach(function(d){seen[d._key]=1;});
+    rows=rows.slice();
+    rows.slice().forEach(function(d){var c=d;
+      while(c&&c.parent){var pa=PIMPL.find(function(z){return z._key===c.parent;});
+        if(!pa||seen[pa._key])break;seen[pa._key]=1;rows.push(pa);c=pa;}});}
   if(!rows.length){gw.innerHTML='<div class="muted" style="padding:30px;text-align:center">ไม่พบงาน</div>';return;}
   /* ══ ช่วงเวลาของผังคิดจาก "งานทั้งหมด" ไม่ใช่เฉพาะงานที่ผ่านตัวกรอง ══
      ของเดิมคิดจาก rows (งานที่กรองแล้ว) พอกรองเฟส 02 ซึ่งกินช่วง 16/06–30/09
