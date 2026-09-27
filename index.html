@@ -4031,7 +4031,19 @@ function openAP(id){var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _b=brByKey(
       _mb2.classList.add('mb-ro');}}
   document.getElementById('modal').classList.add('open');}
 function setGanttCtx(which){GCTX=which;if(which==="ap"){PIBASE=AP_BASE;PIEKEY="erp_ap_edits_v1";PIADDKEY="erp_ap_add_v1";PIDELKEY="erp_ap_del_v1";PIGID="apGantt";ZOOMID="apZoom";GP="ap";}else{PIBASE=PI_BASE0;PIEKEY="erp_pi_edits_v1";PIADDKEY="erp_pi_add_v1";PIDELKEY="erp_pi_del_v1";PIGID="piGantt";ZOOMID="piZoom";GP="pi";}applyPhaseMap(which);piTaskCol={};piCollapsed={};PIMPL=PI_STORE[which]||[];fillPIFilters();}
-function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);if(f==='st'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;piRollStatus(_par);piSaveTask(_par);_cur=_par;}}renderPI();if(window.renderProjRibbon)renderProjRibbon();}
+function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);
+  /* ══ ฝั่งที่ตรวจไหลขึ้นหางานแม่ เหมือนที่สถานะทำอยู่แล้ว ══
+     ของเดิม rvw ของงานแม่ตั้งด้วยมือครั้งเดียวแล้วไม่เคยตามลูก พองานย้ายฝั่ง
+     บาร์หลักก็ยังบอกฝั่งเก่า (วัดแล้วเจอ BRD02 ค้างแบบนี้จริง)
+     เดินขึ้นทุกชั้นเหมือน piRollStatus และบันทึกเฉพาะชั้นที่เปลี่ยนจริง
+     ไม่ใช่บันทึกทุกชั้นทุกครั้ง จะได้ไม่เปลืองโควตาเขียนโดยเปล่าประโยชน์ */
+  if(f==='st'||f==='rvw'){var _cur=d;while(_cur&&_cur.parent){var _par=PIMPL.find(function(z){return z._key===_cur.parent;});if(!_par)break;
+    var _ch=false;
+    if(f==='st'){piRollStatus(_par);_ch=true;}
+    if(piRollRvw(_par))_ch=true;
+    if(_ch)piSaveTask(_par);
+    _cur=_par;}}
+  renderPI();if(window.renderProjRibbon)renderProjRibbon();}
 function setPIName(pid,val){if(erpDenyEdit())return;setPIField(pid,'name',val);var t=document.getElementById('mTitle');if(t)t.textContent=val;}
 function setPIAsg(pid,str){if(erpDenyEdit())return;setPIField(pid,'asg',(str||'').split(',').map(function(x){return x.trim();}).filter(Boolean));}
 function setPIDate(pid,f,val){if(erpDenyEdit())return;
@@ -4292,6 +4304,18 @@ function piPhRoll(list,ph){var st=list.map(function(z){return piEffSt(z);});if(!
     var _r=piPhaseRange(ph);
     if(!_r||_r.over>0||new Date()>_r.b)return 'Delayed';
     return 'In Progress';}if(st.indexOf('On Hold')>=0)return 'On Hold';if(st.every(function(x){return x==='In Review'||x==='Completed';}))return 'In Review';return 'In Progress';}
+/* คืน true เมื่อเปลี่ยนจริง เพื่อให้ผู้เรียกบันทึกเฉพาะชั้นที่เปลี่ยน
+   ตามเฉพาะตอนงานย่อยที่ In Review เห็นตรงกันหมด ถ้าลูกยังไม่ตรงกันเอง
+   ก็ไม่มีคำตอบเดียวให้ตาม ปล่อยค่าเดิมไว้แล้วให้คำเตือน ⚠ บนชิปเป็นคนบอก */
+function piRollRvw(p){
+  var ch=piChildren(p).filter(function(c){return c.st==='In Review';});
+  if(!ch.length)return false;
+  var sd={};ch.forEach(function(c){sd[c.rvw||'Civil']=1;});
+  var ks=Object.keys(sd);
+  if(ks.length!==1)return false;
+  if((p.rvw||'Civil')===ks[0])return false;
+  p.rvw=ks[0];PIE[p._pi]=PIE[p._pi]||{};PIE[p._pi].rvw=ks[0];
+  return true;}
 function piRollStatus(p){var ch=piChildren(p);if(!ch.length)return;var sts=ch.map(function(c){return c.st;});var ns;if(sts.every(function(x){return x==='Completed';}))ns='Completed';else if(sts.every(function(x){return x==='Not Started';}))ns='Not Started';else if(sts.indexOf('Delayed')>=0)ns='Delayed';else if(sts.indexOf('On Hold')>=0)ns='On Hold';else if(sts.every(function(x){return x==='In Review'||x==='Completed';}))ns='In Review';else ns='In Progress';if(p.st!==ns){p.st=ns;PIE[p._pi]=PIE[p._pi]||{};PIE[p._pi].st=ns;}}
 function piTreeOrder(list){var byKey={};list.forEach(function(d){byKey[d._key]=d;});var ch={};list.forEach(function(d){var p=(d.parent&&byKey[d.parent])?d.parent:'_root';(ch[p]=ch[p]||[]).push(d);});var out=[];function walk(k,dep){(ch[k]||[]).forEach(function(d){out.push({d:d,depth:dep});if(!piTaskCol[d._key])walk(d._key,dep+1);});}walk('_root',0);return out;}
 function piCollectDesc(key,acc){PIMPL.filter(function(x){return x.parent===key;}).forEach(function(c){acc.push(c);piCollectDesc(c._key,acc);});}
