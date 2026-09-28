@@ -856,6 +856,9 @@ body.locked{overflow:hidden}
   perspective:1050px;perspective-origin:50% 64%}
 #loginGate .lg-world{position:absolute;inset:0;transform-style:preserve-3d;
   transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
+/* พื้น กอง และลูกบาศก์เป็นของประดับ ต้องไม่แย่งรับคลิกจากหมุดเฟส
+   วัดด้วย elementFromPoint แล้วพบว่าหมุด 02/04/07 ถูก .lg-floor กับ .lg-road บังอยู่ */
+#loginGate .lg-floor,#loginGate .lg-side,#loginGate .lg-track{pointer-events:none}
 #loginGate .lg-floor{position:absolute;left:-18%;top:-34%;width:136%;height:176%;
   background:
     repeating-linear-gradient(90deg,var(--g-rule) 0 1px,transparent 1px 44px),
@@ -935,15 +938,19 @@ body.locked{overflow:hidden}
 /* ══ เส้นทาง 7 เฟส วางบนพื้นเดียวกับกองทั้งสองฝั่ง ══
    เฟสพวกนี้คือเฟสเดียวกับที่แอปใช้ (01–07) และตรงกับแผ่นข่าวที่ส่งในองค์กร
    ฉากจึงไม่ได้เล่าแค่ "ย้ายจาก A ไป B" แต่เล่าว่าเดินทางยังไงและตอนนี้อยู่ไหน */
-#loginGate .lg-road{position:absolute;left:21%;right:21%;top:52%;height:0;
-  transform-style:preserve-3d}
+/* วัดตอนกองสูงเต็ม (กรณีแย่สุด) ที่ 21%/21% หมุด 07 ทับกอง NetSuite 18px
+   และหมุด 01 เฉียดกอง SAP เหลือ 3px — ร่นเข้ามาให้เว้นระยะจริงทั้งสองปลาย */
+#loginGate .lg-road{position:absolute;left:24%;right:26%;top:52%;height:0;
+  transform-style:preserve-3d;pointer-events:none}
 /* เส้นถนนวางบนพื้น ถ้าไม่มีเส้นนี้หมุดจะอ่านเป็นจุดกระจาย ไม่ใช่เส้นทางเดียวกัน */
 #loginGate .lg-road::before{content:'';position:absolute;left:-3%;right:-3%;top:-1px;height:2px;
   background:linear-gradient(90deg,rgba(150,220,180,.5) 0%,rgba(255,146,136,.55) 16%,
     rgba(158,186,212,.34) 34%,rgba(158,186,212,.2) 100%)}
 #loginGate .lg-ph{position:absolute;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
   transform-style:preserve-3d;cursor:pointer;background:none;border:0;padding:0;
-  font-family:inherit}
+  font-family:inherit;pointer-events:auto;
+  /* ยกพ้นพื้นนิดเดียว ไม่งั้น z เท่ากันแล้วเบราว์เซอร์เลือกพื้นเป็นตัวรับคลิก */
+  transform:translateZ(2px)}
 /* แผ่นบนพื้น */
 #loginGate .lg-ph em{position:absolute;inset:0;display:block;border-radius:3px;
   background:rgba(158,186,212,.24);border:1.5px solid rgba(186,210,232,.6);
