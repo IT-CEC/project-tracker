@@ -814,12 +814,13 @@ body.locked{overflow:hidden}
 @property --i{syntax:"<number>";inherits:false;initial-value:0}
 @property --light{syntax:"<number>";inherits:true;initial-value:1}
 #loginGate{
-  /* รูปอ้างอิงใช้ navy เข้มจัดกับเทากลาง ของเดิม #10304f อมเทาและอ่อนไป
-     หัวเรื่องเลยดูจมกับพื้น ส่วน ink2 อมฟ้าจนอ่านเป็นลิงก์ */
-  --g-ink:#0d2545;        /* น้ำเงินเข้มสำหรับตัวอักษร */
-  --g-ink2:#5d6b7d;
-  --g-signal:#e2231a;     /* แดงจากโลโก้บริษัท */
-  --g-rule:rgba(24,68,112,.14);
+  /* พลิกเป็นพื้นเข้ม เพราะการเปล่งแสงต้องมีความมืดถึงจะเรือง
+     บนพื้นขาวการบวกแสงไม่ให้ผลอะไรเลย เอฟเฟกต์ทุกตัวในฉากจึงเป็นได้แค่ "เส้น"
+     ไม่ใช่ "แสง" — แดงต้องสว่างกว่าแดงโลโก้เดิมด้วย ไม่งั้นจมกับพื้นน้ำเงินเข้ม */
+  --g-ink:#e9f2fc;
+  --g-ink2:#93acc6;
+  --g-signal:#ff5244;
+  --g-rule:rgba(122,170,225,.13);
   --g-thai:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;
   --g-tech:'Barlow Condensed','Noto Sans Thai',sans-serif;
   position:fixed;inset:0;z-index:100000;overflow-y:auto;
@@ -827,20 +828,28 @@ body.locked{overflow:hidden}
   padding:40px 32px 76px;font-family:var(--g-thai);color:var(--g-ink);
   /* ไล่สีใน oklab ตัดช่วงกลางขุ่นที่ทำให้เห็นขั้นสี */
   background:
-    radial-gradient(1200px 680px at 22% 30% in oklab,#ffffff 0%,transparent 64%),
-    linear-gradient(168deg in oklab,#fbfdff 0%,#f1f5fa 56%,#e8eef6 100%);
+    radial-gradient(1250px 720px at 26% 24% in oklab,#12395f 0%,transparent 62%),
+    linear-gradient(168deg in oklab,#06203a 0%,#04142a 56%,#020b18 100%);
 }
 /* เกรนละเอียดทับทั้งหน้า ปิดขั้นสีที่เหลือ
    ใช้เป็น background tile ไม่ใช่ filter:url() เพราะ SVG filter สดบนอิลิเมนต์ใหญ่
    กิน CPU หนักตอน first paint ส่วน tile เบราว์เซอร์ rasterise ครั้งเดียวแล้วจบ */
 #loginGate::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
-  opacity:.055;mix-blend-mode:multiply;background-size:170px 170px;
+  opacity:.075;mix-blend-mode:overlay;background-size:170px 170px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
 #loginGate .lg-shell,#loginGate .lg-foot{position:relative;z-index:2}
+/* ของเดิมฉากถูกอัดอยู่ในคอลัมน์ซ้ายกว้างราว 580px ทั้งที่มันคือพระเอกของหน้า
+   และเหลือที่ว่างใต้การ์ดเป็นแถบเปล่า ย้ายฉากลงมาเป็นแถวของตัวเองเต็มความกว้าง
+   ฉากจึงกว้างขึ้นเท่าตัว ถนน 7 เฟสมีที่หายใจ และที่ว่างข้างล่างถูกใช้ */
 #loginGate .lg-shell{
-  width:100%;max-width:1090px;display:grid;gap:clamp(28px,4vw,56px);
-  grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr);align-items:center;
+  width:100%;max-width:1280px;display:grid;
+  column-gap:clamp(26px,3.6vw,58px);row-gap:clamp(12px,1.8vw,26px);
+  grid-template-columns:minmax(0,1fr) minmax(330px,368px);
+  grid-template-rows:auto auto;align-items:start;
 }
+#loginGate .lg-story{grid-column:1;grid-row:1;align-self:center}
+#loginGate .lg-card{grid-column:2;grid-row:1}
+#loginGate .lg-stage{grid-column:1 / -1;grid-row:2}
 
 /* ── ฝั่งเล่าเรื่อง ───────────────────────────────────────────────────────── */
 /* ชื่อ "Oracle NetSuite" ยาวกว่าเดิม ถ้าปล่อยกว้าง 15ch จะตัดเป็นสี่บรรทัด
@@ -856,12 +865,13 @@ body.locked{overflow:hidden}
   font-size:1.1em;letter-spacing:.005em}
 /* ต้นทางเทา ปลายทางแดง = สีเดียวกับกองสองฝั่งในฉาก หัวเรื่องจึงบอกทิศทาง
    ไม่ใช่แค่ระบายคำให้เด่น */
-#loginGate .lg-h b:first-of-type{color:#7b8a9b}
-#loginGate .lg-h b:last-of-type{color:var(--g-signal)}
+#loginGate .lg-h b:first-of-type{color:#7d93aa}
+#loginGate .lg-h b:last-of-type{color:var(--g-signal);
+  text-shadow:0 0 26px rgba(255,82,68,.45)}
 #loginGate .lg-lede{font-size:15px;line-height:1.7;color:var(--g-ink2);margin:0;max-width:52ch;
   text-wrap:pretty}
 #loginGate .lg-count{display:flex;align-items:baseline;gap:12px;margin-top:18px;
-  padding-top:18px;border-top:1px solid rgba(24,68,112,.16)}
+  padding-top:18px;border-top:1px solid rgba(122,170,225,.2)}
 #loginGate .lg-days{font-family:var(--g-tech);font-size:44px;font-weight:600;line-height:.84;
   color:var(--g-ink);letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
 #loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:var(--g-ink2);max-width:26ch}
@@ -889,7 +899,11 @@ body.locked{overflow:hidden}
   background-position:
     left top,left top, right top,right top,
     left bottom,left bottom, right bottom,right bottom}
-#loginGate .lg-stage{--hud:#4d86c4;position:relative;height:clamp(250px,25vw,304px);margin:20px 0 0;
+/* ของในฉากวางด้วย % ของเวที พอเวทีกว้างเต็มแถว ทุกชิ้นถูกขยายตามจนกองกลายเป็น
+   แผ่นยักษ์และล้นขอบ — คุมความกว้างไว้ ฉากจึงกว้างกว่าเดิมเกือบเท่าตัว
+   (จาก ~580 เป็น ~1000) โดยสัดส่วนของในฉากยังเหมือนเดิม */
+#loginGate .lg-stage{--hud:#57a0e4;position:relative;height:clamp(250px,23vw,318px);
+  width:100%;max-width:1000px;margin:6px auto 0;
   perspective:1050px;
   /* --ox/--oy มาจากเมาส์ · --fx/--fy มาจากการซูมเข้าหาเฟส
      ต้องแยกตัวแปรกัน เพราะ --ox ถูก rAF เขียนทับทุกเฟรม ถ้าใช้ตัวเดียวกันจะตีกัน */
@@ -920,47 +934,53 @@ body.locked{overflow:hidden}
   -webkit-mask-image:radial-gradient(70% 62% at 50% 50%,#000 34%,transparent 96%);
           mask-image:radial-gradient(70% 62% at 50% 50%,#000 34%,transparent 96%)}
 #loginGate .lg-wire path{vector-effect:non-scaling-stroke;fill:none}
-#loginGate .lg-wire .lw-base path{stroke:rgba(66,124,190,.46);stroke-width:1}
-#loginGate .lg-wire .lw-node path{stroke:rgba(52,110,178,.7);stroke-width:3.6;stroke-linecap:round}
+#loginGate .lg-wire .lw-base path{stroke:rgba(88,170,245,.32);stroke-width:1}
+#loginGate .lg-wire .lw-node path{stroke:rgba(126,200,255,.6);stroke-width:3.6;stroke-linecap:round}
 /* พัลส์วิ่งไปทางเดียวกับการย้ายระบบ ใช้เส้นประยาวช่วงเดียววิ่งไปตามเส้นเดิม */
-#loginGate .lg-wire .lw-pulse path{fill:none;stroke:rgba(26,115,232,.85);stroke-width:1.6;
+/* พัลส์เรืองแสงจริงบนพื้นเข้ม drop-shadow ทำหน้าที่เป็นรัศมี */
+#loginGate .lg-wire .lw-pulse{filter:drop-shadow(0 0 4px rgba(120,200,255,.8))}
+#loginGate .lg-wire .lw-pulse path{fill:none;stroke:rgba(180,228,255,.95);stroke-width:1.6;
   stroke-dasharray:7 260;animation:lgWire 6.5s linear infinite}
 #loginGate .lg-wire .lw-pulse path:nth-child(2){animation-duration:8.5s;animation-delay:-3s}
 @keyframes lgWire{from{stroke-dashoffset:267}to{stroke-dashoffset:0}}
-/* บนพื้นสว่าง plus-lighter ไม่เห็นอะไรเลย ใช้ multiply เป็น "เงาของแสง"
-   คือพื้นที่รอบตัวชี้เข้มขึ้นเล็กน้อย อ่านเป็นไฟส่องที่ทำให้รอบข้างมืดลง */
+/* กลับมาใช้ plus-lighter ได้แล้วเพราะพื้นเข้ม ไฟส่องจึงเป็นแสงจริงไม่ใช่เงา */
 #loginGate .lg-floor::after{content:"";position:absolute;inset:0;pointer-events:none;
-  mix-blend-mode:multiply;opacity:var(--spot,0);transition:opacity .4s ease;
+  mix-blend-mode:plus-lighter;opacity:var(--spot,0);transition:opacity .4s ease;
   background:radial-gradient(300px 300px at calc(50% + var(--lx,0px)) calc(50% + var(--ly,0px)),
-    rgba(214,228,242,.5),transparent 72%)}
+    rgba(96,170,240,.3),transparent 72%)}
 /* เส้นกวาดวิ่งไปทางเดียวกับการย้ายระบบ SAP → NetSuite ไม่ใช่กวาดไปมาเฉยๆ
    อยู่บน .lg-floor ซึ่งเอียงไปกับพื้นแล้ว เส้นจึงนอนไปกับพื้นจริงไม่ใช่ลอยทับหน้าจอ */
 #loginGate .lg-floor::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background-image:linear-gradient(90deg,transparent 0 46%,
-    rgba(77,134,196,.1) 47.5%,rgba(60,120,190,.34) 50%,rgba(77,134,196,.1) 52.5%,
-    transparent 54% 100%);
+  /* ที่ .6 บนพื้นเข้มมันกลายเป็นแถบขาวกว้างกลางฉากที่กลบเส้นทางทั้งเส้น
+     เรดาร์ควรเป็นเส้นบางที่ผ่านไป ไม่ใช่ไฟหน้ารถ */
+  mix-blend-mode:plus-lighter;opacity:.5;
+  background-image:linear-gradient(90deg,transparent 0 48.4%,
+    rgba(70,150,235,.07) 49.2%,rgba(130,200,255,.2) 50%,rgba(70,150,235,.07) 50.8%,
+    transparent 51.6% 100%);
   background-size:210% 100%;background-repeat:no-repeat;
   animation:lgSweep 9s cubic-bezier(.5,0,.5,1) infinite}
 @keyframes lgSweep{
   0%     {background-position:-14% 0;opacity:0}
-  8%,78% {opacity:1}
+  8%,78% {opacity:.5}
   92%,100%{background-position:118% 0;opacity:0}}
 #loginGate .lg-floor{position:absolute;left:-18%;top:-34%;width:136%;height:176%;
   background:
     repeating-linear-gradient(90deg,var(--g-rule) 0 1px,transparent 1px 44px),
     repeating-linear-gradient(0deg,var(--g-rule) 0 1px,transparent 1px 44px),
-    linear-gradient(180deg,rgba(210,225,240,.5),rgba(255,255,255,0));
+    linear-gradient(180deg,rgba(22,66,116,.5),rgba(4,18,36,0));
   -webkit-mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
           mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
 }
-#loginGate .lg-side{position:absolute;top:46%;width:13%;padding-bottom:13%;
+#loginGate .lg-side{position:absolute;top:46%;width:8.4%;padding-bottom:8.4%;
   transform-style:preserve-3d}
-/* เงาสัมผัสพื้น — ไม่มีอะไรในฉากแตะพื้นเลย กองจึงอ่านเป็นสติกเกอร์แปะบนกริด
-   ใช้สีน้ำเงินเข้มของฉากไม่ใช่สีดำ เงาดำบนพื้นเข้มจะกลายเป็นรูโหว่ */
-#loginGate .lg-side::before{content:"";position:absolute;left:-26%;top:-22%;
-  width:152%;height:144%;transform:translateZ(.5px);border-radius:50%;
-  background:radial-gradient(ellipse at 54% 54%,rgba(30,62,98,.3),transparent 68%);
-  pointer-events:none}
+/* บนพื้นเข้ม "เงา" มองไม่เห็นเพราะพื้นมืดอยู่แล้ว เปลี่ยนเป็นแอ่งแสงที่กองสาดลงพื้นแทน
+   ทำหน้าที่เดิมคือบอกว่ากองแตะพื้นอยู่ตรงไหน แต่เป็นภาษาของฉากเรืองแสง */
+#loginGate .lg-side::before{content:"";position:absolute;left:-46%;top:-40%;
+  width:192%;height:180%;transform:translateZ(.5px);border-radius:50%;
+  mix-blend-mode:plus-lighter;pointer-events:none;
+  background:radial-gradient(ellipse at 52% 52%,rgba(110,175,245,.22),transparent 66%)}
+#loginGate .lg-to::before{
+  background:radial-gradient(ellipse at 52% 52%,rgba(255,110,80,.28),transparent 66%)}
 /* เงาต้องจางไปพร้อมกองที่มันเป็นเงาของ วัดแล้วพบว่าเงาค้างที่ opacity 1 ตลอด
    ขณะที่กองขึ้นลง 0→6 เพราะ opacity ขยับที่ .lg-slab ซึ่งเป็นลูก
    ไม่ใช่ที่ .lg-side ที่ถือเงาไว้ — บนพื้นสว่างมันอ่านเป็นคราบเทาลอยโดยไม่มีของข้างบน
@@ -983,23 +1003,27 @@ body.locked{overflow:hidden}
    ถ้าใช้แผ่นบางล้วน พอเอียงแล้วจะอ่านเป็นคราบสีเดียว ไม่ใช่กองที่ซ้อนกัน */
 #loginGate .lg-slab{position:absolute;inset:0;border-radius:2px;
   transform:translateZ(calc(var(--i) * 26px));
-  background:linear-gradient(135deg,#ffffff,#e8eef6);
-  /* ขอบนูน: ด้านรับแสงสว่าง ด้านตรงข้ามเข้ม บนพื้นสว่างกลับทิศกับตอนพื้นเข้ม */
-  border:1px solid rgba(150,175,200,.7);
-  border-top-color:#ffffff;border-left-color:rgba(255,255,255,.9);
-  border-bottom-color:rgba(120,150,180,.85);border-right-color:rgba(130,158,186,.8);
-  box-shadow:0 10px 0 -2px rgba(186,203,222,.85), 0 14px 18px -8px rgba(30,60,95,.3);
+  /* ต้องทึบพอ ไม่งั้นหกแผ่นซ้อนกันแล้วอัลฟาบวกกันจนอ่านเป็นก้อนเดียว
+     ไม่ใช่กองที่มีชั้น — ระบบเดิมเป็นโครงเย็น ไม่มีความร้อน ตรงข้ามกับ NetSuite */
+  background:linear-gradient(135deg,rgba(74,112,158,.88),rgba(28,56,92,.92));
+  border:1px solid rgba(120,168,220,.42);
+  border-top-color:rgba(205,232,255,.85);border-left-color:rgba(176,212,248,.65);
+  border-bottom-color:rgba(38,74,116,.85);border-right-color:rgba(46,84,126,.8);
+  box-shadow:0 10px 0 -2px rgba(20,46,78,.75), 0 14px 22px -8px rgba(0,0,0,.55),
+             0 0 18px rgba(110,175,240,.14);
   filter:brightness(var(--light))}
 /* ชั้นบนรับแสงมากกว่าชั้นล่าง */
 #loginGate .lg-slab{--light:calc(.93 + var(--i) * .026)}
 #loginGate .lg-from .lg-slab{animation:lgRetire 11s cubic-bezier(.4,0,.2,1) infinite;
   animation-delay:calc(var(--i) * .2s)}
 #loginGate .lg-to .lg-slab{opacity:0;
-  background:linear-gradient(135deg,#f4685c,#d8342a);
-  border-color:rgba(160,40,32,.7);
-  border-top-color:#ff9c92;border-left-color:#fb8377;
-  border-bottom-color:#a8231b;border-right-color:#b62a21;
-  box-shadow:0 10px 0 -2px rgba(150,36,28,.7), 0 14px 18px -8px rgba(120,25,20,.35);
+  /* ระบบใหม่คือของที่กำลังติดขึ้นมา จึงร้อนและเปล่งแสงจริง */
+  background:linear-gradient(135deg,rgba(226,76,54,.94),rgba(138,30,20,.95));
+  border-color:rgba(255,124,98,.6);
+  border-top-color:rgba(255,208,186,.95);border-left-color:rgba(255,164,140,.78);
+  border-bottom-color:rgba(108,22,15,.9);border-right-color:rgba(126,30,22,.82);
+  box-shadow:0 10px 0 -2px rgba(80,18,12,.8), 0 14px 22px -8px rgba(0,0,0,.55),
+             0 0 30px rgba(255,92,62,.34);
   animation:lgErect 11s cubic-bezier(.4,0,.2,1) infinite;
   animation-delay:calc(var(--i) * .2s)}
 /* ลูปครบวง: SAP เต็มช่วงต้น → ยุบ → ค้างต่ำ → กลับมาเต็มตอนจบเพื่อวนต่อได้เนียน
@@ -1046,8 +1070,9 @@ body.locked{overflow:hidden}
   font-size:15px;font-weight:600;letter-spacing:.06em;line-height:1.12;white-space:nowrap}
 #loginGate .lg-tag small{display:block;font-family:var(--g-thai);font-size:10.5px;
   font-weight:400;letter-spacing:0;opacity:.6;margin-top:3px}
-#loginGate .lg-tag-from{left:6%;color:#5b7086}
-#loginGate .lg-tag-to{right:7%;color:#c9382c;text-align:right}
+#loginGate .lg-tag-from{left:6%;color:#8ba5c0}
+#loginGate .lg-tag-to{right:7%;color:#ff6a58;text-align:right;
+  text-shadow:0 0 20px rgba(255,90,70,.5)}
 #loginGate .lg-map{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
 /* ══ เส้นทาง 7 เฟส วางบนพื้นเดียวกับกองทั้งสองฝั่ง ══
@@ -1061,8 +1086,8 @@ body.locked{overflow:hidden}
 #loginGate .lg-road::before{content:'';position:absolute;left:-3%;right:-3%;top:-1px;height:2px;
   /* เส้นทางจริงลอยอยู่ข้างบน (วาดบน canvas ผ่านหมุดทั้ง 7) เส้นนี้เหลือไว้บนพื้น
      เป็นเงาของมัน จึงต้องเบากว่าเดิมมาก ไม่งั้นอ่านเป็นเส้นทางที่สอง */
-  background:linear-gradient(90deg,rgba(47,163,90,.3) 0%,rgba(216,52,42,.3) 16%,
-    rgba(24,68,112,.14) 34%,rgba(24,68,112,.07) 100%)}
+  background:linear-gradient(90deg,rgba(62,220,138,.34) 0%,rgba(255,90,70,.34) 16%,
+    rgba(110,175,240,.16) 34%,rgba(110,175,240,.08) 100%)}
 #loginGate .lg-ph{position:absolute;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
   transform-style:preserve-3d;cursor:pointer;background:none;border:0;padding:0;
   font-family:inherit;pointer-events:auto;
@@ -1074,23 +1099,25 @@ body.locked{overflow:hidden}
 /* วงกลมแทนสี่เหลี่ยม — อ่านเป็นโหนดบนเส้นทางแบบไดอะแกรมในรูปอ้างอิง
    ความหมายของสียังเหมือนเดิมทุกอย่าง เปลี่ยนแค่รูปทรง */
 #loginGate .lg-ph em{position:absolute;inset:0;display:block;border-radius:50%;
-  background:linear-gradient(135deg,#ffffff,#dfe9f4);border:1.5px solid rgba(96,130,168,.9);
-  /* หมุดลอยเหนือพื้นถึง 62px แต่ไม่มีเงา จึงอ่านเป็นวงกลมแบนจมพื้น
-     ใช้เงาทิ้งลงแบบเดียวกับแผ่นในกอง ซึ่งหลังเวทีเอียงอ่านเป็นเงาบนพื้น */
-  box-shadow:0 7px 0 -3px rgba(150,175,202,.55), 0 12px 16px -6px rgba(24,60,100,.4);
+  /* แกนเข้มขอบเรือง — เป็นโหนดบนจอเครื่องมือ ไม่ใช่แผ่นทึบวางบนพื้น */
+  background:radial-gradient(circle at 42% 36%,rgba(150,205,255,.34),rgba(9,32,58,.9));
+  border:1.5px solid rgba(146,198,246,.85);
+  box-shadow:0 7px 0 -3px rgba(12,34,60,.8), 0 12px 16px -6px rgba(0,0,0,.5),
+             0 0 15px rgba(118,186,252,.34);
   transition:background .2s,border-color .2s,transform .25s cubic-bezier(.2,.9,.3,1)}
 /* เสาที่ยกตัวเลขขึ้นจากพื้น */
 #loginGate .lg-ph s{position:absolute;left:50%;bottom:50%;width:1px;height:34px;
   margin-left:-.5px;display:block;text-decoration:none;
-  background:linear-gradient(0deg,rgba(60,100,145,.55),rgba(60,100,145,.05));
+  background:linear-gradient(0deg,rgba(130,190,250,.7),rgba(130,190,250,.04));
   transform-origin:50% 100%;transform:rotateZ(7deg) rotateX(-52deg);
   transition:height .25s cubic-bezier(.2,.9,.3,1)}
 /* ตัวเลขหันเข้าหาคนดูเสมอ ด้วยการหมุนสวนกับเวที ไม่งั้นจะนอนราบอ่านไม่ออก */
 #loginGate .lg-ph b{position:absolute;left:50%;bottom:50%;margin:0 0 34px -22px;
   width:44px;text-align:center;font-family:var(--g-tech);font-size:18px;font-weight:600;
-  color:#5b7086;letter-spacing:.04em;transform-origin:50% 100%;
+  color:#9db8d2;letter-spacing:.04em;transform-origin:50% 100%;
   transform:rotateZ(7deg) rotateX(-52deg);transition:color .2s,margin-bottom .25s}
-#loginGate .lg-ph:hover em{background:#fff;border-color:#3f77b8;box-shadow:0 4px 12px rgba(30,60,95,.2)}
+#loginGate .lg-ph:hover em{border-color:#a8d4ff;
+  box-shadow:0 7px 0 -3px rgba(12,34,60,.8),0 0 24px rgba(140,200,255,.6)}
 #loginGate .lg-ph:hover b{color:var(--g-ink)}
 #loginGate .lg-ph:hover s{height:50px}
 #loginGate .lg-ph:hover b{margin-bottom:50px}
@@ -1103,13 +1130,13 @@ body.locked{overflow:hidden}
    ทดสอบด้วยการปิดทีละชั้นแล้วพบว่า pseudo-element ที่ใหญ่กว่าพ่อแม่หลายเท่า
    ในโครง preserve-3d ถูก rasterise แล้วตัดเป็นสี่เหลี่ยม ต่อให้สั่ง border-radius:50%
    ก็ยังเห็นขอบแข็ง — canvas ไม่มีปัญหานี้และรู้ตำแหน่งหมุดจริงอยู่แล้ว */
-#loginGate .lg-ph.goal em{border-color:#d79a2c;
-  background:linear-gradient(135deg,#fff6e4,#ffe2ac);
-  box-shadow:0 7px 0 -3px rgba(214,168,96,.5), 0 12px 18px -6px rgba(150,100,20,.3)}
+#loginGate .lg-ph.goal em{border-color:#ffc247;
+  background:radial-gradient(circle at 42% 36%,rgba(255,220,140,.5),rgba(62,40,4,.88));
+  box-shadow:0 7px 0 -3px rgba(48,32,4,.8),0 0 26px rgba(255,186,66,.6)}
 /* เสาของเฟสขึ้นระบบเป็นลำแสง ไม่ใช่เส้นบางเหมือนเฟสอื่น */
 #loginGate .lg-ph.goal s{width:2px;margin-left:-1px;
-  background:linear-gradient(0deg,rgba(232,156,32,.9),rgba(255,198,96,.06))}
-#loginGate .lg-ph.goal b{color:#a86a10}
+  background:linear-gradient(0deg,rgba(255,190,72,.95),rgba(255,210,120,.05))}
+#loginGate .lg-ph.goal b{color:#ffc247}
 /* วงแหวนซ้อนรอบเฟสปัจจุบัน แบบโหนดบนจอ HUD ในรูปอ้างอิง บอกว่า "อยู่ตรงนี้" */
 #loginGate .lg-ph.now em::after{content:'';position:absolute;left:-55%;top:-55%;
   width:210%;height:210%;border-radius:50%;pointer-events:none;
@@ -1133,23 +1160,28 @@ body.locked{overflow:hidden}
     rgba(214,150,32,.34) 46% 56%,transparent 56% 82%,rgba(214,150,32,.5) 82% 92%,transparent 92%)}
 @keyframes lgRet{to{transform:rotate(360deg)}}
 /* เฟสที่ผ่านไปแล้ว */
-#loginGate .lg-ph.done em{background:#dff3e6;border-color:#2fa35a}
-#loginGate .lg-ph.done b{color:#1e7a41}
+#loginGate .lg-ph.done em{border-color:#41dc8c;
+  background:radial-gradient(circle at 42% 36%,rgba(110,255,180,.34),rgba(6,44,28,.9));
+  box-shadow:0 7px 0 -3px rgba(6,40,26,.8),0 0 18px rgba(62,220,138,.45)}
+#loginGate .lg-ph.done b{color:#5fe8a0}
 /* เฟสปัจจุบัน — เต้นเบาๆ ให้ตาไปหยุดตรงนี้ก่อน */
-#loginGate .lg-ph.now em{background:#fde3e0;border-color:#d8342a;
+#loginGate .lg-ph.now em{border-color:#ff6a58;
+  background:radial-gradient(circle at 42% 36%,rgba(255,150,130,.4),rgba(62,12,8,.9));
   animation:lgPulse 2.4s ease-in-out infinite}
-#loginGate .lg-ph.now b{color:#c9382c}
+#loginGate .lg-ph.now b{color:#ff8271}
 #loginGate .lg-ph.now s{height:58px;width:2px;margin-left:-1px;
-  background:linear-gradient(0deg,rgba(216,52,42,.8),rgba(216,52,42,.06))}
+  background:linear-gradient(0deg,rgba(255,106,88,.9),rgba(255,106,88,.05))}
 #loginGate .lg-ph.now b{margin-bottom:58px;font-size:20px}
-@keyframes lgPulse{0%,100%{box-shadow:0 0 0 0 rgba(216,52,42,.35)}
-  50%{box-shadow:0 0 0 9px rgba(216,52,42,0)}}
+@keyframes lgPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,90,70,.5),0 0 20px rgba(255,90,70,.5)}
+  50%    {box-shadow:0 0 0 10px rgba(255,90,70,0),0 0 30px rgba(255,90,70,.28)}}
 /* เฟสที่ถูกเลือกอยู่ */
-#loginGate .lg-ph.sel em{background:#d9e9fb;border-color:#1a73e8;
-  transform:scale(1.3);box-shadow:0 6px 20px rgba(26,115,232,.34)}
-#loginGate .lg-ph.sel s{height:76px;background:linear-gradient(0deg,rgba(26,115,232,.85),rgba(26,115,232,.05))}
+#loginGate .lg-ph.sel em{border-color:#8ccaff;
+  background:radial-gradient(circle at 42% 36%,rgba(170,220,255,.55),rgba(8,40,76,.9));
+  transform:scale(1.3);box-shadow:0 0 34px rgba(124,196,255,.7)}
+#loginGate .lg-ph.sel s{height:76px;background:linear-gradient(0deg,rgba(124,196,255,.95),rgba(124,196,255,.04))}
 #loginGate .lg-ph.sel b{margin-bottom:76px;font-size:22px}
-#loginGate .lg-ph.sel b{color:#1257b5}
+#loginGate .lg-ph.sel b{color:#a5d6ff}
 #loginGate .lg-road.picking .lg-ph:not(.sel){opacity:.42}
 /* ระหว่างซูม กองสองฝั่งกับป้ายหรี่ลง ตาจะได้ไปอยู่ที่เฟสที่กำลังดู */
 /* .3 หรี่แรงไปจนทั้งเวทีดูซีด และ .lg-map คือเส้นทางที่เรากำลังให้เขาดูอยู่
@@ -1170,14 +1202,14 @@ body.locked{overflow:hidden}
 #loginGate .lg-detail h2{margin:0 0 3px;font-size:15px;font-weight:700;color:var(--g-ink);
   line-height:1.35;display:flex;align-items:baseline;gap:9px}
 #loginGate .lg-detail h2 i{font-family:var(--g-tech);font-style:normal;font-size:15px;
-  font-weight:600;color:#1a73e8;letter-spacing:.04em;flex:none}
-#loginGate .lg-detail .lg-when{font-family:var(--g-tech);font-size:15px;color:#6b8298;
+  font-weight:600;color:#7cc4ff;letter-spacing:.04em;flex:none}
+#loginGate .lg-detail .lg-when{font-family:var(--g-tech);font-size:15px;color:#8ba5c0;
   letter-spacing:.03em;margin:0 0 4px}
 #loginGate .lg-detail p{margin:0;font-size:15px;line-height:1.6;color:var(--g-ink2);max-width:46ch}
 #loginGate .lg-detail .lg-back{margin-top:7px;border:0;background:none;padding:0;
-  font-family:inherit;font-size:13px;font-weight:600;color:#1a73e8;cursor:pointer}
+  font-family:inherit;font-size:13px;font-weight:600;color:#7cc4ff;cursor:pointer}
 #loginGate .lg-detail .lg-back:hover{text-decoration:underline}
-#loginGate .lg-roadhint{margin-top:9px;font-size:13px;color:#8496a8}
+#loginGate .lg-roadhint{margin-top:9px;font-size:13px;color:#7b93ab}
 @media (prefers-reduced-motion:reduce){
   #loginGate .lg-ph.now em{animation:none}
   #loginGate .lg-floor::before{animation:none;background-position:50% 0}
@@ -1193,52 +1225,60 @@ body.locked{overflow:hidden}
    ของเดิมเป็นเกือบขาวบนน้ำเงินเข้ม อ่านเหมือนฟอร์มจากแอปอื่นมาแปะทับโปสเตอร์
    ซึ่งเป็นรอยต่อที่ชัดที่สุดบนหน้านี้ — พื้นเข้มขึ้นมาจากตระกูลสีเดียวกับพื้นหลัง
    ยกขึ้นด้วยแสงขอบบนแทนการใช้สีขาว */
-#loginGate .lg-card{position:relative;width:100%;background:#fff;
+#loginGate .lg-card{position:relative;width:100%;
+  /* บนพื้นเข้ม การ์ดยกตัวด้วยขอบที่รับแสงและกระจกฝ้า ไม่ใช่เงาเป็นชั้น
+     เงาบนพื้นเข้มมองไม่เห็น ต้องให้ขอบด้านบนสว่างแทนเพื่อบอกว่ามันลอยอยู่ */
+  background:linear-gradient(180deg,rgba(19,48,80,.84) 0%,rgba(8,26,47,.9) 100%);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
   border-radius:20px;padding:32px 32px 24px;text-align:left;overflow:hidden;
-  border:1px solid rgba(24,68,112,.1);
-  /* บนพื้นสว่าง การ์ดยกตัวด้วยเงาเป็นชั้น ไม่ใช่ขอบเรืองแสงแบบพื้นเข้ม
-     เงาสีน้ำเงินเข้ม ไม่ใช่สีดำ — เงาดำบนพื้นสีจะดูสกปรก */
-  box-shadow:0 1px 2px rgba(24,68,112,.06),0 8px 20px -6px rgba(24,68,112,.1),
-             0 28px 60px -16px rgba(24,68,112,.2);
+  border:1px solid rgba(122,175,235,.2);
+  box-shadow:0 30px 70px rgba(0,0,0,.5),0 2px 0 rgba(0,0,0,.2),
+             inset 0 1px 0 rgba(170,212,255,.16);
   animation:lgIn .55s cubic-bezier(.2,.7,.3,1) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* เส้นคาดบน: ไล่จากเทาเหล็ก (ระบบเดิม) ไปแดง (ปลายทาง) — เรื่องเดียวกับฉากย่อลงมา */
 #loginGate .lg-card::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;
-  background:linear-gradient(90deg,#94a9bd 0%,#c8d4e0 38%,var(--g-signal) 100%)}
+  background:linear-gradient(90deg,#4a6a8c 0%,#7ca6d0 38%,var(--g-signal) 100%);
+  box-shadow:0 0 14px rgba(255,82,68,.4)}
 #loginGate .lg-brand{display:flex;align-items:center;gap:13px;margin-bottom:25px}
 #loginGate .lg-brand img{height:44px;width:auto;display:block;flex:none}
 #loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:var(--g-ink);line-height:1.14}
-#loginGate .lg-sub{font-size:13px;color:#6b8298;margin-top:3px;line-height:1.35}
+#loginGate .lg-sub{font-size:13px;color:#8ba5c0;margin-top:3px;line-height:1.35}
 #loginGate .lg-field{margin-bottom:14px}
-#loginGate label{display:block;font-size:13px;font-weight:600;color:#5b7086;margin-bottom:7px}
+#loginGate label{display:block;font-size:13px;font-weight:600;color:#9ab3cc;margin-bottom:7px}
 #loginGate input{width:100%;box-sizing:border-box;height:48px;padding:0 15px;
-  border:1.5px solid #d6e0ea;border-radius:12px;background:#f7fafd;color:#16324e;
+  border:1.5px solid rgba(122,175,235,.24);border-radius:12px;
+  background:rgba(3,15,31,.62);color:#eaf3fd;
   font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
-#loginGate input::placeholder{color:#94a8bb}
-#loginGate input:focus{border-color:#1a73e8;background:#fff;
-  box-shadow:0 0 0 4px rgba(26,115,232,.14)}
+#loginGate input::placeholder{color:#6d87a2}
+#loginGate input:focus{border-color:#5fa8e8;background:rgba(3,15,31,.8);
+  box-shadow:0 0 0 4px rgba(95,168,232,.18),0 0 22px rgba(95,168,232,.16)}
 /* เบราว์เซอร์ยัดพื้นขาวมาให้ตอน autofill ต้องทับด้วย inset shadow เพราะ
    background ธรรมดาสู้ user-agent style ไม่ได้ */
 #loginGate input:-webkit-autofill,
 #loginGate input:-webkit-autofill:hover,
 #loginGate input:-webkit-autofill:focus{
-  -webkit-text-fill-color:#16324e;
-  -webkit-box-shadow:0 0 0 1000px #f7fafd inset;
-  caret-color:#16324e;transition:background-color 9999s}
+  -webkit-text-fill-color:#eaf3fd;
+  -webkit-box-shadow:0 0 0 1000px #0a2138 inset;
+  caret-color:#eaf3fd;transition:background-color 9999s}
 #loginGate .lg-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);
   display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;
-  background:transparent;color:#94a8bb;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
-#loginGate .lg-eye:hover{color:#4a627a;background:#eef3f8}
+  background:transparent;color:#7f99b4;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
+#loginGate .lg-eye:hover{color:#dbeaf8;background:rgba(122,175,235,.14)}
 #loginGate .lg-eye .eye-off{display:none}
 #loginGate .lg-eye.on .eye-on{display:none}
 #loginGate .lg-eye.on .eye-off{display:block}
 #loginGate .lg-btn{position:relative;width:100%;height:50px;margin-top:4px;border:0;
   border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
   /* บนการ์ดเข้ม ปุ่มน้ำเงินเข้มจะจมหายไป ต้องสว่างกว่าพื้นจึงจะเป็นปุ่มหลักจริง */
-  background:linear-gradient(180deg,#2f7fd4 0%,#1d5fa8 100%);color:#fff;
+  background:linear-gradient(180deg,#3d93ea 0%,#1f6ec4 100%);color:#fff;
   font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;
-  box-shadow:0 8px 22px rgba(29,95,168,.36);transition:filter .15s,box-shadow .15s,transform .08s}
-#loginGate .lg-btn:hover{filter:brightness(1.09);box-shadow:0 10px 26px rgba(13,44,76,.36)}
+  box-shadow:0 8px 22px rgba(0,0,0,.4),0 0 26px rgba(61,147,234,.34),
+             inset 0 1px 0 rgba(255,255,255,.22);
+  transition:filter .15s,box-shadow .15s,transform .08s}
+#loginGate .lg-btn:hover{filter:brightness(1.1);
+  box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 34px rgba(61,147,234,.5),
+             inset 0 1px 0 rgba(255,255,255,.28)}
 #loginGate .lg-btn:active{transform:translateY(1px)}
 #loginGate .lg-btn:disabled{cursor:default;filter:grayscale(.25) brightness(.97)}
 #loginGate .lg-btn.busy{color:transparent}
@@ -1246,17 +1286,18 @@ body.locked{overflow:hidden}
   margin:-9.5px 0 0 -9.5px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;
   border-radius:50%;animation:lgspin .7s linear infinite}
 @keyframes lgspin{to{transform:rotate(360deg)}}
-#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#b02219;
-  background:#fdf0ee;border:1px solid #f6ccc7;border-radius:9px;padding:9px 12px}
-#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid #e8eef4;
-  font-size:13px;color:#6b8298;line-height:1.5}
+#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#ffb3a8;
+  background:rgba(150,32,22,.24);border:1px solid rgba(255,120,100,.36);
+  border-radius:9px;padding:9px 12px}
+#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid rgba(122,175,235,.16);
+  font-size:13px;color:#8ba5c0;line-height:1.5}
 /* ของเดิมทั้งก้อนลอยกลางจอ (ที่ว่างบน 164px ล่าง 164px เท่ากันเป๊ะ)
    ไม่มีอะไรให้ยึด เพิ่มเส้นฐานเต็มความกว้างให้ทั้งสองคอลัมน์วางอยู่บนมัน
    และดันขึ้นเหนือกึ่งกลางเล็กน้อย เพราะกึ่งกลางเรขาคณิตมักดูต่ำกว่าที่ตาคาด */
-#loginGate .lg-shell{padding-bottom:26px;border-bottom:1px solid rgba(24,68,112,.13)}
+#loginGate .lg-shell{padding-bottom:26px;border-bottom:1px solid rgba(122,170,225,.16)}
 #loginGate .lg-foot{margin-top:14px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
-  color:rgba(91,112,134,.62)}
-#loginGate :focus-visible{outline:2px solid #6fb3ff;outline-offset:2px}
+  color:rgba(147,172,198,.52)}
+#loginGate :focus-visible{outline:2px solid #7cc4ff;outline-offset:2px}
 
 /* ══ จังหวะตอนเข้าสู่ระบบสำเร็จ ══
    อนิเมชันที่ดีตอบสนองการกระทำของคน ไม่ใช่วิ่งวนอยู่รอบตัวเฉยๆ
@@ -1295,7 +1336,9 @@ body.locked{overflow:hidden}
 /* ── จอแคบ ────────────────────────────────────────────────────────────────── */
 @media (max-width:900px){
   #loginGate{padding:32px 22px}
-  #loginGate .lg-shell{grid-template-columns:minmax(0,1fr);gap:24px;max-width:470px}
+  #loginGate .lg-shell{grid-template-columns:minmax(0,1fr);gap:24px;max-width:470px;
+    grid-template-rows:auto}
+  #loginGate .lg-story,#loginGate .lg-card,#loginGate .lg-stage{grid-column:1;grid-row:auto}
   #loginGate .lg-h{font-size:25px;max-width:none}
   #loginGate .lg-lede{max-width:none}
   #loginGate .lg-stage{height:168px;margin-top:20px}
@@ -1306,13 +1349,17 @@ body.locked{overflow:hidden}
 /* จอโน้ตบุ๊กเตี้ย (1280x620) เนื้อหาเกินจอ 16px ต้องเลื่อนนิดหน่อยโดยไม่จำเป็น
    ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
 @media (max-height:740px) and (min-width:901px){
-  #loginGate{padding:20px 32px 34px}
-  #loginGate .lg-stage{height:clamp(186px,19vw,214px);margin-top:12px}
+  #loginGate{padding:18px 32px 28px}
+  /* ฉากเป็นแถวของตัวเองแล้ว ความสูงจึงบวกเข้ากับแถวบนตรงๆ ไม่ได้ซ้อนในคอลัมน์
+     วัดแล้วจอ 1280x620 เกิน 29px · 1366x660 เกิน 10px ต้องรัดทั้งฉากและช่องว่างแถว */
+  #loginGate .lg-shell{row-gap:8px}
+  #loginGate .lg-stage{height:clamp(168px,17vw,200px);margin-top:2px}
   /* บรรทัดชี้แนะกับพื้นที่คำตอบกินที่เพิ่ม ต้องรัดเข้ามาเมื่อจอเตี้ย */
   #loginGate .lg-say{min-height:0}
   #loginGate .lg-roadhint{margin-top:6px}
-  #loginGate .lg-count{margin-top:14px;padding-top:14px}
-  #loginGate .lg-foot{margin-top:14px}
+  #loginGate .lg-count{margin-top:12px;padding-top:12px}
+  #loginGate .lg-shell{padding-bottom:16px}
+  #loginGate .lg-foot{margin-top:10px}
 }
 @media (max-width:560px){
   #loginGate .lg-stage,#loginGate .lg-lede{display:none}
@@ -1341,6 +1388,33 @@ body.locked{overflow:hidden}
           ไปจนถึงวันขึ้นระบบจริง พร้อมบอกว่าแต่ละงานค้างอยู่ฝั่งไหน</p>
         <div class="lg-detail" id="lgDetail" hidden></div>
       </div>
+
+      <div class="lg-count">
+        <span class="lg-days" id="lgDays">—</span>
+        <p><span id="lgDaysLbl">วันก่อนขึ้นระบบจริง</span><br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
+      </div>
+    </section>
+
+    <form id="loginForm" class="lg-card" autocomplete="on">
+      <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+      <div class="lg-brand">
+        <img src="SMALL_CIVIL_LOGO.png" alt="Civil Engineering">
+        <div>
+          <div class="lg-ttl">Project Tracker</div>
+          <div class="lg-sub">โครงการวางระบบ Oracle</div>
+        </div>
+      </div>
+      <div class="lg-field">
+        <label for="loginPass">รหัสผ่านทีม</label>
+        <div style="position:relative">
+          <input id="loginPass" type="password" name="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" autofocus style="padding-right:46px">
+          <button type="button" class="lg-eye" aria-label="แสดง/ซ่อนรหัสผ่าน" onclick="var i=document.getElementById('loginPass');var s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);"><svg class="eye-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+        </div>
+      </div>
+      <button id="loginBtn" class="lg-btn" type="submit">เข้าสู่ระบบ</button>
+      <div id="loginErr" class="lg-err"></div>
+      <div class="lg-note">ทั้งทีมใช้รหัสเดียวกัน ไม่ต้องกรอกชื่อผู้ใช้</div>
+    </form>
 
       <div class="lg-stage" aria-hidden="true">
         <div class="lg-zoom" id="lgZoom">
@@ -1392,33 +1466,6 @@ body.locked{overflow:hidden}
         </div>
         </div>
       </div>
-
-      <div class="lg-count">
-        <span class="lg-days" id="lgDays">—</span>
-        <p><span id="lgDaysLbl">วันก่อนขึ้นระบบจริง</span><br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
-      </div>
-    </section>
-
-    <form id="loginForm" class="lg-card" autocomplete="on">
-      <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-      <div class="lg-brand">
-        <img src="SMALL_CIVIL_LOGO.png" alt="Civil Engineering">
-        <div>
-          <div class="lg-ttl">Project Tracker</div>
-          <div class="lg-sub">โครงการวางระบบ Oracle</div>
-        </div>
-      </div>
-      <div class="lg-field">
-        <label for="loginPass">รหัสผ่านทีม</label>
-        <div style="position:relative">
-          <input id="loginPass" type="password" name="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" autofocus style="padding-right:46px">
-          <button type="button" class="lg-eye" aria-label="แสดง/ซ่อนรหัสผ่าน" onclick="var i=document.getElementById('loginPass');var s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);"><svg class="eye-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
-        </div>
-      </div>
-      <button id="loginBtn" class="lg-btn" type="submit">เข้าสู่ระบบ</button>
-      <div id="loginErr" class="lg-err"></div>
-      <div class="lg-note">ทั้งทีมใช้รหัสเดียวกัน ไม่ต้องกรอกชื่อผู้ใช้</div>
-    </form>
   </div>
   <div class="lg-foot">CIVIL ENGINEERING PUBLIC COMPANY LIMITED</div>
 </div>
@@ -1622,6 +1669,7 @@ body.locked{overflow:hidden}
      ที่มีรัศมีจาง — ตาอ่านเป็นของเปล่งแสงเหมือนกัน */
   function sparks(dt){
     if(RD.length<2)return;
+    var wasS=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
     SPARK.forEach(function(s){s.t+=dt/1000*s.v;});
     SPARK=SPARK.filter(function(s){return s.t<1.12;});
     SPARK.forEach(function(s){
@@ -1630,13 +1678,14 @@ body.locked{overflow:hidden}
         var f=(1-k/8);
         var head=Math.min(1,Math.max(0,(1-Math.abs(s.t-.5)*.55)));
         ctx.beginPath();ctx.arc(pt.x,pt.y,(k===0?3.4:2.4*f),0,6.2832);
-        ctx.fillStyle=(k===0?'rgba(12,72,186,':'rgba(46,118,208,')
+        ctx.fillStyle=(k===0?'rgba(225,245,255,':'rgba(120,195,255,')
           +(f*f*.95*head).toFixed(3)+')';ctx.fill();}
       var h=roadAt(s.t);
       if(h){ctx.beginPath();ctx.arc(h.x,h.y,11,0,6.2832);
-        ctx.fillStyle='rgba(78,148,238,.17)';ctx.fill();
+        ctx.fillStyle='rgba(90,175,255,.2)';ctx.fill();
         ctx.beginPath();ctx.arc(h.x,h.y,5.6,0,6.2832);
-        ctx.fillStyle='rgba(120,180,250,.2)';ctx.fill();}});}
+        ctx.fillStyle='rgba(150,210,255,.26)';ctx.fill();}});
+    ctx.globalCompositeOperation=wasS;}
 
   /* แสงที่ปลายทาง: วันขึ้นระบบจริง เต้นช้ามากจนแทบไม่รู้ว่าเต้น
      ให้รู้สึกว่าเป็นแหล่งกำเนิดแสง ไม่ใช่วงกลมสีที่แปะไว้เฉยๆ */
@@ -1645,12 +1694,14 @@ body.locked{overflow:hidden}
     var g=RD[GOAL],k=.88+Math.sin(BEAT/1400)*.12;
     /* หมุดลอยสูงกว่า canvas รัศมีจึงอยู่หลังตัวหมุดเสมอ เพิ่มความเข้มได้
        โดยไม่กลบตัวหมุด — ที่ .4 วัดจากภาพแล้วแทบมองไม่เห็น */
-    var rg=ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,58*k);
-    rg.addColorStop(0,'rgba(255,178,58,.62)');
-    rg.addColorStop(.38,'rgba(255,196,96,.28)');
-    rg.addColorStop(.72,'rgba(255,206,120,.09)');
-    rg.addColorStop(1,'rgba(255,206,120,0)');
-    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(g.x,g.y,58*k,0,6.2832);ctx.fill();}
+    var wasG=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
+    var rg=ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,66*k);
+    rg.addColorStop(0,'rgba(255,192,86,.55)');
+    rg.addColorStop(.34,'rgba(255,170,60,.24)');
+    rg.addColorStop(.7,'rgba(255,180,80,.08)');
+    rg.addColorStop(1,'rgba(255,180,80,0)');
+    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(g.x,g.y,66*k,0,6.2832);ctx.fill();
+    ctx.globalCompositeOperation=wasG;}
 
   /* ฝุ่นลอยในอากาศ ให้ฉากมีอนุภาคระหว่างของ ไม่ใช่สุญญากาศ */
   function dust(dt){
@@ -1659,7 +1710,7 @@ body.locked{overflow:hidden}
       if(d.x>W+4){d.x=-4;d.y=H*(.35+Math.random()*.55);}
       if(d.y<H*.22)d.y=H*.9;
       ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,6.2832);
-      ctx.fillStyle='rgba(72,120,180,'+d.a.toFixed(3)+')';ctx.fill();});}
+      ctx.fillStyle='rgba(158,205,255,'+d.a.toFixed(3)+')';ctx.fill();});}
 
   /* เส้นทาง 7 เฟสเป็นเส้นโค้งพุ่งขึ้น ไล่สีตามความคืบหน้าจริง
      เขียว=ผ่านแล้ว แดง=เฟสปัจจุบัน จางลงเป็นน้ำเงินสำหรับเฟสที่ยังไม่ถึง
@@ -1669,18 +1720,19 @@ body.locked{overflow:hidden}
     var g=ctx.createLinearGradient(RD[0].x,RD[0].y,RD[n-1].x,RD[n-1].y);
     /* ช่วง "ยังไม่ถึง" ยาวกว่าครึ่งเส้น ถ้าจางที่ .16–.3 รูปทรงที่พุ่งขึ้นก็หายไปด้วย
        ยังให้จางกว่าช่วงที่ผ่านแล้วอยู่ แต่ต้องเห็นเป็นเส้นเดียวกันตลอดสาย */
-    g.addColorStop(0,'rgba(38,150,80,.95)');
-    g.addColorStop(.17,'rgba(206,44,34,1)');
-    g.addColorStop(.44,'rgba(24,68,112,.6)');
-    g.addColorStop(1,'rgba(24,68,112,.42)');
-    [[9,.16],[4.2,.3],[2.6,1]].forEach(function(p){
+    g.addColorStop(0,'rgba(58,220,132,.95)');
+    g.addColorStop(.17,'rgba(255,92,70,1)');
+    g.addColorStop(.44,'rgba(104,172,240,.62)');
+    g.addColorStop(1,'rgba(104,172,240,.42)');
+    var wasR=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
+    [[10,.12],[4.6,.24],[2.4,1]].forEach(function(p){
       ctx.beginPath();ctx.moveTo(RD[0].x,RD[0].y);
       for(var i=1;i<n-1;i++)
         ctx.quadraticCurveTo(RD[i].x,RD[i].y,(RD[i].x+RD[i+1].x)/2,(RD[i].y+RD[i+1].y)/2);
       ctx.lineTo(RD[n-1].x,RD[n-1].y);
       ctx.globalAlpha=p[1];ctx.strokeStyle=g;ctx.lineWidth=p[0];
       ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();});
-    ctx.globalAlpha=1;}
+    ctx.globalAlpha=1;ctx.globalCompositeOperation=wasR;}
 
   /* ของเดิมวาด "หมึก" แต่ทุกอย่างรอบๆ เปล่งแสง ไม่เข้าชุดกัน
      วาดสามรอบซ้อนใต้ globalCompositeOperation='lighter' แสงจึงบวกกันและสว่างที่สุด
@@ -1693,16 +1745,17 @@ body.locked{overflow:hidden}
     for(var s=0.025;s<=upto;s+=0.025){
       var u=1-s;
       pts.push([u*u*L.a.x+2*u*s*mx+s*s*L.b.x, u*u*L.a.y+2*u*s*my+s*s*L.b.y]);}
-    /* พื้นสว่างแล้ว การบวกแสง (lighter) จะไม่เห็นอะไรเลยเพราะพื้นสว่างอยู่แล้ว
-       เปลี่ยนเป็นวาดซ้อนปกติด้วยหมึกเข้ม ชั้นนอกจางทำหน้าที่เป็นรัศมีนุ่มแทนแสงเรือง */
+    /* พื้นเข้มแล้ว กลับมาบวกแสงได้ — สามชั้นซ้อนกันทำให้สว่างที่สุดตรงที่เส้นมารวมกัน
+       คือปลายทั้งสองข้าง ซึ่งเป็นจุดที่ไดอะแกรมอยากเน้นพอดี ไม่ใช้ shadowBlur เพราะช้า */
     var was=ctx.globalCompositeOperation;
-    [[6,.08],[2.6,.16],[1.3,1]].forEach(function(p,k){
+    ctx.globalCompositeOperation='lighter';
+    [[7,.07],[3,.14],[1.4,1]].forEach(function(p,k){
       ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
       for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
       /* เส้นชั้นบนสุดเป็นเส้นประที่ไหล บอกทิศ SAP → NetSuite */
       if(k===2){ctx.setLineDash([5,13]);ctx.lineDashOffset=-FLOW;}
       else ctx.setLineDash([]);
-      ctx.strokeStyle='rgba(200,58,46,'+(alpha*p[1]).toFixed(3)+')';
+      ctx.strokeStyle='rgba(255,118,92,'+(alpha*p[1]).toFixed(3)+')';
       ctx.lineWidth=p[0];ctx.stroke();});
     ctx.setLineDash([]);ctx.globalCompositeOperation=was;}
 
@@ -1736,7 +1789,7 @@ body.locked{overflow:hidden}
       curve(L,grow,0.75*fade*back);
       if(grow>=1){
         ctx.beginPath();ctx.arc(L.b.x,L.b.y,3.4,0,6.2832);
-        ctx.fillStyle='rgba(190,48,38,'+(0.85*fade*back).toFixed(3)+')';ctx.fill();}}}
+        ctx.fillStyle='rgba(255,140,110,'+(0.9*fade*back).toFixed(3)+')';ctx.fill();}}}
 
   function stop(){if(raf)cancelAnimationFrame(raf);raf=0;
     if(timer)clearInterval(timer);timer=0;}
