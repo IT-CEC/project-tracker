@@ -814,8 +814,10 @@ body.locked{overflow:hidden}
 @property --i{syntax:"<number>";inherits:false;initial-value:0}
 @property --light{syntax:"<number>";inherits:true;initial-value:1}
 #loginGate{
-  --g-ink:#10304f;        /* น้ำเงินเข้มสำหรับตัวอักษร */
-  --g-ink2:#5b7086;
+  /* รูปอ้างอิงใช้ navy เข้มจัดกับเทากลาง ของเดิม #10304f อมเทาและอ่อนไป
+     หัวเรื่องเลยดูจมกับพื้น ส่วน ink2 อมฟ้าจนอ่านเป็นลิงก์ */
+  --g-ink:#0d2545;        /* น้ำเงินเข้มสำหรับตัวอักษร */
+  --g-ink2:#5d6b7d;
   --g-signal:#e2231a;     /* แดงจากโลโก้บริษัท */
   --g-rule:rgba(24,68,112,.14);
   --g-thai:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;
@@ -826,7 +828,7 @@ body.locked{overflow:hidden}
   /* ไล่สีใน oklab ตัดช่วงกลางขุ่นที่ทำให้เห็นขั้นสี */
   background:
     radial-gradient(1200px 680px at 22% 30% in oklab,#ffffff 0%,transparent 64%),
-    linear-gradient(168deg in oklab,#f7fafd 0%,#eaf0f7 56%,#dfe8f2 100%);
+    linear-gradient(168deg in oklab,#fbfdff 0%,#f1f5fa 56%,#e8eef6 100%);
 }
 /* เกรนละเอียดทับทั้งหน้า ปิดขั้นสีที่เหลือ
    ใช้เป็น background tile ไม่ใช่ filter:url() เพราะ SVG filter สดบนอิลิเมนต์ใหญ่
@@ -852,6 +854,10 @@ body.locked{overflow:hidden}
    ให้ใช้ตัวเดียวกับป้ายในฉาก หัวเรื่องกับไดอะแกรมจะพูดด้วยเสียงเดียวกัน */
 #loginGate .lg-h b{font-family:var(--g-tech);font-weight:600;white-space:nowrap;
   font-size:1.1em;letter-spacing:.005em}
+/* ต้นทางเทา ปลายทางแดง = สีเดียวกับกองสองฝั่งในฉาก หัวเรื่องจึงบอกทิศทาง
+   ไม่ใช่แค่ระบายคำให้เด่น */
+#loginGate .lg-h b:first-of-type{color:#7b8a9b}
+#loginGate .lg-h b:last-of-type{color:var(--g-signal)}
 #loginGate .lg-lede{font-size:15px;line-height:1.7;color:var(--g-ink2);margin:0;max-width:52ch;
   text-wrap:pretty}
 #loginGate .lg-count{display:flex;align-items:baseline;gap:12px;margin-top:18px;
@@ -905,6 +911,20 @@ body.locked{overflow:hidden}
   width:152%;height:144%;transform:translateZ(.5px);border-radius:50%;
   background:radial-gradient(ellipse at 54% 54%,rgba(30,62,98,.3),transparent 68%);
   pointer-events:none}
+/* เงาต้องจางไปพร้อมกองที่มันเป็นเงาของ วัดแล้วพบว่าเงาค้างที่ opacity 1 ตลอด
+   ขณะที่กองขึ้นลง 0→6 เพราะ opacity ขยับที่ .lg-slab ซึ่งเป็นลูก
+   ไม่ใช่ที่ .lg-side ที่ถือเงาไว้ — บนพื้นสว่างมันอ่านเป็นคราบเทาลอยโดยไม่มีของข้างบน
+   เงาหดลงตอนกองยุบด้วย ของเตี้ยลงเงาย่อมเล็ก */
+#loginGate .lg-from::before{animation:lgShadeOut 11s cubic-bezier(.4,0,.2,1) infinite}
+#loginGate .lg-to::before{opacity:0;animation:lgShadeIn 11s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes lgShadeOut{
+  0%,24%  {opacity:1;transform:translateZ(.5px) scale(1)}
+  48%,72% {opacity:.14;transform:translateZ(.5px) scale(.76)}
+  94%,100%{opacity:1;transform:translateZ(.5px) scale(1)}}
+@keyframes lgShadeIn{
+  0%,20%  {opacity:0;transform:translateZ(.5px) scale(.72)}
+  46%,74% {opacity:1;transform:translateZ(.5px) scale(1)}
+  96%,100%{opacity:0;transform:translateZ(.5px) scale(.72)}}
 /* วัดแล้วที่ 0%/86% กองล้นขอบเวทีทั้งสองข้าง (ซ้าย -14px ขวา 589 จากเวที 579)
    เพราะการหมุนเวทีเลื่อนตำแหน่งจริงออกจากค่า left ที่ตั้ง */
 #loginGate .lg-from{left:4%}
@@ -989,16 +1009,25 @@ body.locked{overflow:hidden}
   transform-style:preserve-3d;pointer-events:none}
 /* เส้นถนนวางบนพื้น ถ้าไม่มีเส้นนี้หมุดจะอ่านเป็นจุดกระจาย ไม่ใช่เส้นทางเดียวกัน */
 #loginGate .lg-road::before{content:'';position:absolute;left:-3%;right:-3%;top:-1px;height:2px;
-  background:linear-gradient(90deg,rgba(47,163,90,.75) 0%,rgba(216,52,42,.8) 16%,
-    rgba(24,68,112,.3) 34%,rgba(24,68,112,.16) 100%)}
+  /* เส้นทางจริงลอยอยู่ข้างบน (วาดบน canvas ผ่านหมุดทั้ง 7) เส้นนี้เหลือไว้บนพื้น
+     เป็นเงาของมัน จึงต้องเบากว่าเดิมมาก ไม่งั้นอ่านเป็นเส้นทางที่สอง */
+  background:linear-gradient(90deg,rgba(47,163,90,.3) 0%,rgba(216,52,42,.3) 16%,
+    rgba(24,68,112,.14) 34%,rgba(24,68,112,.07) 100%)}
 #loginGate .lg-ph{position:absolute;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
   transform-style:preserve-3d;cursor:pointer;background:none;border:0;padding:0;
   font-family:inherit;pointer-events:auto;
-  /* ยกพ้นพื้นนิดเดียว ไม่งั้น z เท่ากันแล้วเบราว์เซอร์เลือกพื้นเป็นตัวรับคลิก */
-  transform:translateZ(2px)}
+  /* ยกพ้นพื้นนิดเดียว ไม่งั้น z เท่ากันแล้วเบราว์เซอร์เลือกพื้นเป็นตัวรับคลิก
+     --rise คือความสูงของเฟสนั้นบนเส้นทาง เส้นถนนบนพื้นยังอยู่ ทำหน้าที่เป็น
+     เงาของเส้นทางที่ลอยอยู่ — รูปอ้างอิงก็มีเส้นคู่ขนานจางๆ ใต้เส้นหลักแบบเดียวกัน */
+  transform:translateZ(calc(2px + var(--rise,0px)))}
 /* แผ่นบนพื้น */
-#loginGate .lg-ph em{position:absolute;inset:0;display:block;border-radius:3px;
-  background:rgba(255,255,255,.9);border:1.5px solid rgba(120,150,182,.75);
+/* วงกลมแทนสี่เหลี่ยม — อ่านเป็นโหนดบนเส้นทางแบบไดอะแกรมในรูปอ้างอิง
+   ความหมายของสียังเหมือนเดิมทุกอย่าง เปลี่ยนแค่รูปทรง */
+#loginGate .lg-ph em{position:absolute;inset:0;display:block;border-radius:50%;
+  background:linear-gradient(135deg,#ffffff,#dfe9f4);border:1.5px solid rgba(96,130,168,.9);
+  /* หมุดลอยเหนือพื้นถึง 62px แต่ไม่มีเงา จึงอ่านเป็นวงกลมแบนจมพื้น
+     ใช้เงาทิ้งลงแบบเดียวกับแผ่นในกอง ซึ่งหลังเวทีเอียงอ่านเป็นเงาบนพื้น */
+  box-shadow:0 7px 0 -3px rgba(150,175,202,.55), 0 12px 16px -6px rgba(24,60,100,.4);
   transition:background .2s,border-color .2s,transform .25s cubic-bezier(.2,.9,.3,1)}
 /* เสาที่ยกตัวเลขขึ้นจากพื้น */
 #loginGate .lg-ph s{position:absolute;left:50%;bottom:50%;width:1px;height:34px;
@@ -1015,6 +1044,26 @@ body.locked{overflow:hidden}
 #loginGate .lg-ph:hover b{color:var(--g-ink)}
 #loginGate .lg-ph:hover s{height:50px}
 #loginGate .lg-ph:hover b{margin-bottom:50px}
+/* วันขึ้นระบบจริงคือแสงที่ปลายทาง — เรืองขาวนุ่ม ไม่เต้น
+   เพราะเฟสปัจจุบันเป็นตัวเดียวที่ได้เต้น ถ้าเต้นสองจุดตาจะไม่รู้จะมองไหน */
+/* แสงขาวบนพื้นขาวหายสนิท — วัดจากภาพแล้วมองไม่เห็นอะไรเลย
+   ใช้อำพันซึ่งเป็นสีเดียวที่สว่างและยังเห็นได้บนพื้นขาวอมฟ้า
+   และไม่ชนความหมายสีสถานะในฉาก (เขียว=ผ่าน แดง=ตอนนี้ น้ำเงิน=ยังไม่ถึง) */
+#loginGate .lg-ph.goal em::after{content:'';position:absolute;left:-160%;top:-160%;
+  width:420%;height:420%;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,196,92,.55) 0%,rgba(255,206,120,.22) 38%,transparent 70%)}
+#loginGate .lg-ph.goal em{border-color:#d79a2c;
+  background:linear-gradient(135deg,#fff6e4,#ffe2ac);
+  box-shadow:0 7px 0 -3px rgba(214,168,96,.6), 0 12px 18px -6px rgba(150,100,20,.35),
+             0 0 22px rgba(255,186,66,.5)}
+/* เสาของเฟสขึ้นระบบเป็นลำแสง ไม่ใช่เส้นบางเหมือนเฟสอื่น */
+#loginGate .lg-ph.goal s{width:2px;margin-left:-1px;
+  background:linear-gradient(0deg,rgba(232,156,32,.9),rgba(255,198,96,.06))}
+#loginGate .lg-ph.goal b{color:#a86a10}
+/* วงแหวนซ้อนรอบเฟสปัจจุบัน แบบโหนดบนจอ HUD ในรูปอ้างอิง บอกว่า "อยู่ตรงนี้" */
+#loginGate .lg-ph.now em::after{content:'';position:absolute;left:-55%;top:-55%;
+  width:210%;height:210%;border-radius:50%;pointer-events:none;
+  border:1px solid rgba(216,52,42,.34)}
 /* เฟสที่ผ่านไปแล้ว */
 #loginGate .lg-ph.done em{background:#dff3e6;border-color:#2fa35a}
 #loginGate .lg-ph.done b{color:#1e7a41}
@@ -1033,12 +1082,14 @@ body.locked{overflow:hidden}
 #loginGate .lg-ph.sel s{height:76px;background:linear-gradient(0deg,rgba(26,115,232,.85),rgba(26,115,232,.05))}
 #loginGate .lg-ph.sel b{margin-bottom:76px;font-size:22px}
 #loginGate .lg-ph.sel b{color:#1257b5}
-#loginGate .lg-road.picking .lg-ph:not(.sel){opacity:.22}
+#loginGate .lg-road.picking .lg-ph:not(.sel){opacity:.42}
 /* ระหว่างซูม กองสองฝั่งกับป้ายหรี่ลง ตาจะได้ไปอยู่ที่เฟสที่กำลังดู */
+/* .3 หรี่แรงไปจนทั้งเวทีดูซีด และ .lg-map คือเส้นทางที่เรากำลังให้เขาดูอยู่
+   จึงไม่ควรหรี่ไปด้วย หรี่เฉพาะของที่ไม่เกี่ยวกับเฟสที่เลือก */
 #loginGate .lg-stage.zoomed .lg-side,#loginGate .lg-stage.zoomed .lg-tag,
-#loginGate .lg-stage.zoomed .lg-map,#loginGate .lg-stage.zoomed .lg-track{
-  opacity:.3;transition:opacity .45s ease}
-#loginGate .lg-side,#loginGate .lg-tag,#loginGate .lg-map,#loginGate .lg-track{
+#loginGate .lg-stage.zoomed .lg-track{
+  opacity:.5;transition:opacity .45s ease}
+#loginGate .lg-side,#loginGate .lg-tag,#loginGate .lg-track{
   transition:opacity .45s ease}
 #loginGate .lg-ph,#loginGate .lg-road.picking .lg-ph{transition:opacity .25s}
 #loginGate .lg-ph:focus-visible em{outline:2px solid #6fb3ff;outline-offset:3px}
@@ -1063,7 +1114,7 @@ body.locked{overflow:hidden}
   #loginGate .lg-ph.now em{animation:none}
   #loginGate .lg-detail{animation:none}
   #loginGate .lg-zoom{transition:none}
-  #loginGate .lg-side,#loginGate .lg-tag,#loginGate .lg-map,#loginGate .lg-track{transition:none}}
+  #loginGate .lg-side,#loginGate .lg-tag,#loginGate .lg-track{transition:none}}
 
 /* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
 /* ══ การ์ดอยู่ในอากาศเดียวกับฉาก ══
@@ -1155,6 +1206,10 @@ body.locked{overflow:hidden}
   opacity:1;transform:translateZ(calc(var(--i) * 26px)) scale(1)}
 #loginGate.lg-exit .lg-from .lg-slab{animation:none!important;
   transition:opacity .35s ease;opacity:.05}
+#loginGate.lg-exit .lg-to::before{animation:none!important;
+  transition:opacity .3s ease;opacity:1;transform:translateZ(.5px) scale(1)}
+#loginGate.lg-exit .lg-from::before{animation:none!important;
+  transition:opacity .35s ease;opacity:.14}
 #loginGate.lg-exit .lg-cube{animation:none!important;transition:opacity .25s ease;opacity:0}
 #loginGate.lg-exit .lg-card{animation:lgCardOut .45s cubic-bezier(.4,0,1,1) forwards}
 @keyframes lgCardOut{to{opacity:0;transform:translateY(-20px) scale(.97)}}
@@ -1198,6 +1253,8 @@ body.locked{overflow:hidden}
   #loginGate .lg-slab,#loginGate .lg-cube{animation:none!important}
   #loginGate .lg-to .lg-slab{opacity:1;transform:translateZ(calc(var(--i) * 16px))}
   #loginGate .lg-cube{opacity:1;transform:translateZ(130px)}
+  #loginGate .lg-from::before,#loginGate .lg-to::before{
+    animation:none!important;opacity:1;transform:translateZ(.5px) scale(1)}
   #loginGate .lg-cube:nth-of-type(1){left:14%}
   #loginGate .lg-cube:nth-of-type(2){left:48%}
   #loginGate .lg-cube:nth-of-type(3){left:82%}
@@ -1306,14 +1363,18 @@ body.locked{overflow:hidden}
     {n:'02',t:'Solution Definition (BRD)',w:'มิ.ย. – ก.ย. 69', d:'เก็บความต้องการจากทุกแผนก', st:'now'},
     {n:'03',t:'Solution Build',        w:'ก.ย. 69 – ก.พ. 70', d:'ตั้งค่าและพัฒนาระบบ'},
     {n:'04',t:'Training & Testing (UAT)',w:'มี.ค. – พ.ค. 70',  d:'อบรมและทดสอบร่วมกัน'},
-    {n:'05',t:'Deployment & Go-Live',  w:'มิ.ย. – ก.ค. 70',   d:'นำระบบขึ้นใช้งานจริง'},
+    {n:'05',t:'Deployment & Go-Live',  w:'มิ.ย. – ก.ค. 70',   d:'นำระบบขึ้นใช้งานจริง',goal:1},
     {n:'06',t:'Hypercare',             w:'ก.ค. – ต.ค. 70',    d:'ดูแลใกล้ชิดหลังเปิดใช้'},
     {n:'07',t:'On-Going Support',      w:'ต่อเนื่อง 12 เดือน', d:'สนับสนุนการใช้งานต่อเนื่อง'}
   ];
   var esc=function(x){return String(x==null?'':x).replace(/</g,'&lt;');};
   road.innerHTML=PH.map(function(o,i){
-    return '<button type="button" class="lg-ph'+(o.st?' '+o.st:'')+'" data-i="'+i+'"'
-      +' style="left:'+(i/(PH.length-1)*100).toFixed(2)+'%"'
+    return '<button type="button" class="lg-ph'+(o.st?' '+o.st:'')+(o.goal?' goal':'')
+      +'" data-i="'+i+'"'
+      +' style="left:'+(i/(PH.length-1)*100).toFixed(2)+'%'
+      /* ไต่ขึ้นแบบเร่ง ไม่ใช่เชิงเส้น — เส้นจึงโค้งพุ่งขึ้นเหมือนกราฟในรูปอ้างอิง
+         ไม่ใช่ทางลาดตรง หลังเวทีหมุน 52 องศา Z กลายเป็นความสูงจริง */
+      +';--rise:'+(Math.pow(i/(PH.length-1),1.9)*62).toFixed(1)+'px"'
       +' aria-label="'+esc(o.n+' '+o.t)+'"><em></em><s></s><b>'+esc(o.n)+'</b></button>';}).join('');
   var sel=-1,hint=null;
   var stage=road.closest('.lg-stage'),zoom=document.getElementById('lgZoom');
@@ -1406,7 +1467,7 @@ body.locked{overflow:hidden}
 (function(){
   var cv=document.querySelector('#loginGate .lg-map');if(!cv||!cv.getContext)return;
   var gate=document.getElementById('loginGate'),stage=cv.parentNode;
-  var ctx=cv.getContext('2d'),W=0,H=0,A=[],B=[],links=[],raf=0,timer=0,last=0;
+  var ctx=cv.getContext('2d'),W=0,H=0,A=[],B=[],RD=[],links=[],raf=0,timer=0,last=0;
   var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   function anchors(sel){
@@ -1423,7 +1484,33 @@ body.locked{overflow:hidden}
     cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
     A=anchors('.lg-from');B=anchors('.lg-to');
+    /* อ่านตำแหน่งจริงของหมุดบนจอ ไม่คำนวณเอง เพราะเวทีหมุนอยู่และหมุดยกตาม --rise
+       เส้นที่ได้จึงผ่านหมุดเป๊ะทุกตัวไม่ว่าเวทีจะเอียงเท่าไหร่ */
+    RD=[].map.call(stage.querySelectorAll('.lg-ph'),function(p){
+      var b=p.getBoundingClientRect();
+      return {x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2};});
     return A.length>0&&B.length>0;}
+
+  /* เส้นทาง 7 เฟสเป็นเส้นโค้งพุ่งขึ้น ไล่สีตามความคืบหน้าจริง
+     เขียว=ผ่านแล้ว แดง=เฟสปัจจุบัน จางลงเป็นน้ำเงินสำหรับเฟสที่ยังไม่ถึง
+     สามชั้นซ้อน ชั้นนอกกว้างและจาง ทำหน้าที่เป็นรัศมีนุ่ม */
+  function road(){
+    var n=RD.length;if(n<2)return;
+    var g=ctx.createLinearGradient(RD[0].x,RD[0].y,RD[n-1].x,RD[n-1].y);
+    /* ช่วง "ยังไม่ถึง" ยาวกว่าครึ่งเส้น ถ้าจางที่ .16–.3 รูปทรงที่พุ่งขึ้นก็หายไปด้วย
+       ยังให้จางกว่าช่วงที่ผ่านแล้วอยู่ แต่ต้องเห็นเป็นเส้นเดียวกันตลอดสาย */
+    g.addColorStop(0,'rgba(38,150,80,.95)');
+    g.addColorStop(.17,'rgba(206,44,34,1)');
+    g.addColorStop(.44,'rgba(24,68,112,.6)');
+    g.addColorStop(1,'rgba(24,68,112,.42)');
+    [[9,.16],[4.2,.3],[2.6,1]].forEach(function(p){
+      ctx.beginPath();ctx.moveTo(RD[0].x,RD[0].y);
+      for(var i=1;i<n-1;i++)
+        ctx.quadraticCurveTo(RD[i].x,RD[i].y,(RD[i].x+RD[i+1].x)/2,(RD[i].y+RD[i+1].y)/2);
+      ctx.lineTo(RD[n-1].x,RD[n-1].y);
+      ctx.globalAlpha=p[1];ctx.strokeStyle=g;ctx.lineWidth=p[0];
+      ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();});
+    ctx.globalAlpha=1;}
 
   /* ของเดิมวาด "หมึก" แต่ทุกอย่างรอบๆ เปล่งแสง ไม่เข้าชุดกัน
      วาดสามรอบซ้อนใต้ globalCompositeOperation='lighter' แสงจึงบวกกันและสว่างที่สุด
@@ -1459,6 +1546,7 @@ body.locked{overflow:hidden}
     var dt=Math.min((now-last)||16,50);last=now;
     FLOW+=dt*0.045;
     ctx.clearRect(0,0,W,H);
+    road();
     for(var i=links.length-1;i>=0;i--){
       var L=links[i];L.t+=dt/2200;
       if(L.t>=1){links.splice(i,1);continue;}
@@ -1477,6 +1565,7 @@ body.locked{overflow:hidden}
     if(!size())return;
     if(still){                      /* ไม่เคลื่อนไหว: วาดค้างไว้สามเส้นแล้วจบ */
       ctx.clearRect(0,0,W,H);
+      road();
       [[0,3],[2,1],[3,2]].forEach(function(p){
         curve({a:A[p[0]],b:B[p[1]]},1,0.5);});
       return;}
