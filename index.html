@@ -1013,6 +1013,14 @@ body.locked{overflow:hidden}
   #loginGate .lg-days{font-size:36px}
   #loginGate .lg-foot{margin-top:26px}
 }
+/* จอโน้ตบุ๊กเตี้ย (1280x620) เนื้อหาเกินจอ 16px ต้องเลื่อนนิดหน่อยโดยไม่จำเป็น
+   ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
+@media (max-height:680px) and (min-width:901px){
+  #loginGate{padding:22px 32px}
+  #loginGate .lg-stage{height:clamp(196px,20vw,226px);margin-top:16px}
+  #loginGate .lg-count{margin-top:14px;padding-top:14px}
+  #loginGate .lg-foot{margin-top:14px}
+}
 @media (max-width:560px){
   #loginGate .lg-stage,#loginGate .lg-lede{display:none}
   #loginGate .lg-card{padding:26px 22px 20px}
@@ -1062,7 +1070,7 @@ body.locked{overflow:hidden}
 
       <div class="lg-count">
         <span class="lg-days" id="lgDays">—</span>
-        <p>วันก่อนขึ้นระบบจริง<br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
+        <p><span id="lgDaysLbl">วันก่อนขึ้นระบบจริง</span><br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
       </div>
     </section>
 
@@ -1093,10 +1101,18 @@ body.locked{overflow:hidden}
 /* ══ นับถอยหลังถึงวันขึ้นระบบ ══
    ข้อมูลจริงชิ้นเดียวที่ใส่ได้ก่อนยืนยันตัวตน วันที่เป็นค่าคงที่ ไม่ต้องอ่านฐานข้อมูล */
 (function(){
-  var el=document.getElementById('lgDays');if(!el)return;
+  var el=document.getElementById('lgDays'),lb=document.getElementById('lgDaysLbl');
+  if(!el)return;
   var go=new Date(2027,6,1),t=new Date();t.setHours(0,0,0,0);
-  var d=Math.ceil((go-t)/86400000);
-  el.textContent=d>0?d.toLocaleString('en-US'):'0';
+  var d=Math.round((go-t)/86400000);
+  /* ของเดิมพอเลยวัน Go-Live จะค้างที่ "0 วันก่อนขึ้นระบบจริง" ตลอดไป
+     ซึ่งผิดตั้งแต่วันถัดจาก 01/07/2027 เป็นต้นไป ต้องพลิกเป็นนับขึ้นแทน */
+  if(d>0){el.textContent=d.toLocaleString('en-US');
+    if(lb)lb.textContent='วันก่อนขึ้นระบบจริง';}
+  else if(d===0){el.textContent='วันนี้';el.style.fontSize='34px';
+    if(lb)lb.textContent='คือวันขึ้นระบบจริง';}
+  else{el.textContent=(-d).toLocaleString('en-US');
+    if(lb)lb.textContent='วันตั้งแต่ขึ้นระบบจริง';}
 })();
 
 /* ══ เส้นจับคู่ field ข้ามระบบ ══
