@@ -972,6 +972,36 @@ body.locked{overflow:hidden}
   color:rgba(159,182,205,.42)}
 #loginGate :focus-visible{outline:2px solid #6fb3ff;outline-offset:2px}
 
+/* ══ จังหวะตอนเข้าสู่ระบบสำเร็จ ══
+   อนิเมชันที่ดีตอบสนองการกระทำของคน ไม่ใช่วิ่งวนอยู่รอบตัวเฉยๆ
+   วินาทีเดียวที่ผู้ใช้ลงมือทำคือตอนกดปุ่ม จังหวะออกจึงควรอยู่ตรงนี้
+
+   ลำดับ: กอง Oracle ประกอบจนครบ → กริดพุ่งเข้าหาคนดู → การ์ดยกตัวแล้วสลาย
+   ระหว่าง 850ms นี้แอปกำลังบูตอยู่ข้างหลังพอดี จังหวะออกจึงกลบเวลารอไปด้วย */
+#loginGate.lg-exit{animation:lgGateOut .85s cubic-bezier(.55,0,.85,0) forwards;pointer-events:none}
+@keyframes lgGateOut{0%,55%{opacity:1}100%{opacity:0}}
+/* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป */
+#loginGate.lg-exit .lg-world{animation:lgWorldOut .85s cubic-bezier(.45,0,.75,.2) forwards}
+@keyframes lgWorldOut{
+  from{transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
+  to  {transform:rotateX(14deg) rotateZ(0deg) translateY(-8%) translateZ(620px)}}
+/* กอง Oracle ประกอบจนครบ ใช้ transition เพื่อให้ไหลจากตำแหน่งที่ค้างอยู่ ไม่ใช่กระโดด */
+#loginGate.lg-exit .lg-to .lg-slab{animation:none!important;
+  transition:opacity .3s ease,transform .5s cubic-bezier(.2,.9,.3,1);
+  transition-delay:calc(var(--i) * .04s);
+  opacity:1;transform:translateZ(calc(var(--i) * 26px)) scale(1)}
+#loginGate.lg-exit .lg-from .lg-slab{animation:none!important;
+  transition:opacity .35s ease;opacity:.05}
+#loginGate.lg-exit .lg-cube{animation:none!important;transition:opacity .25s ease;opacity:0}
+#loginGate.lg-exit .lg-card{animation:lgCardOut .45s cubic-bezier(.4,0,1,1) forwards}
+@keyframes lgCardOut{to{opacity:0;transform:translateY(-20px) scale(.97)}}
+#loginGate.lg-exit .lg-h,#loginGate.lg-exit .lg-lede,
+#loginGate.lg-exit .lg-count,#loginGate.lg-exit .lg-tag,#loginGate.lg-exit .lg-foot{
+  animation:lgFadeOut .3s ease forwards}
+@keyframes lgFadeOut{to{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  #loginGate.lg-exit,#loginGate.lg-exit *{animation:none!important;transition:none!important}}
+
 /* ── จอแคบ ────────────────────────────────────────────────────────────────── */
 @media (max-width:900px){
   #loginGate{padding:32px 22px}
@@ -1149,10 +1179,29 @@ body.locked{overflow:hidden}
   else window.addEventListener('resize',start);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
   else start();
-  /* เข้าระบบผ่านแล้ว auth.js ซ่อน #loginGate — ต้องหยุดวาดด้วย ไม่งั้น rAF วิ่งต่อ
-     ทั้งที่ไม่มีใครเห็น กินแบตและ CPU ของทุกคนที่เปิดแอปค้างไว้ */
+  /* ══ เข้าระบบผ่านแล้ว: เล่นจังหวะออกก่อนค่อยซ่อน ══
+     auth.js สั่ง display:none ทันทีที่ผ่าน เราดักตรงนั้นแล้วดึงกลับมา 850ms
+     เพื่อเล่นจังหวะออก — ทำแบบนี้เพราะ auth.js ไม่ควรต้องรู้เรื่องอนิเมชัน
+     และเราไม่อยากแตะไฟล์นั้นเลย
+
+     ต้องหยุดวาด canvas ตอนจบด้วย ไม่งั้น rAF วิ่งต่อทั้งที่ไม่มีใครเห็น
+     กินแบตและ CPU ของทุกคนที่เปิดแอปค้างไว้ */
+  var exiting=false,played=false;
   if(window.MutationObserver&&gate)new MutationObserver(function(){
-    if(gate.style.display==='none')stop();
+    if(exiting)return;
+    if(gate.style.display!=='none'){played=false;return;}  /* ถูกแสดงกลับ (ออกจากระบบ) = พร้อมเล่นใหม่ */
+    /* played กันวนไม่จบ: ตอนจบจังหวะเราสั่ง display:none เอง ซึ่ง trigger observer
+       ตัวนี้ซ้ำ ถ้าไม่มีธงนี้มันจะดึงหน้ากลับมาเล่นใหม่ไปเรื่อยๆ ไม่มีวันจบ */
+    if(played||still){stop();return;}
+    exiting=true;played=true;
+    gate.style.display='';             /* ดึงกลับมาเล่นจังหวะออก */
+    gate.classList.add('lg-exit');
+    setTimeout(function(){
+      gate.classList.remove('lg-exit');
+      /* ถ้าระหว่างนั้นถูกล็อกกลับ (กดออกจากระบบทันที) อย่าไปซ่อนทับคำสั่งเขา */
+      if(!document.body.classList.contains('locked'))gate.style.display='none';
+      exiting=false;stop();
+    },850);
   }).observe(gate,{attributes:true,attributeFilter:['style']});
   /* เปิดให้ตรวจได้จากข้างนอกว่าลูปยังวิ่งอยู่ไหม — ถ้าไม่มีตัวนี้ การทดสอบว่า
      "หยุดแล้วจริง" จะเช็คไม่ได้ แล้วก็ผ่านแบบปลอมได้ง่ายๆ */
