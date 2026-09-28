@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ERP Requirement Inventory</title>
 <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('erp_theme')||'light');</script>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -803,59 +803,349 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 <body class="locked">
 <!-- ══ Login gate (ธีม ISO-DMS corporate navy) — คง id เดิมให้ auth.js ทำงาน · ไม่แตะ UI แอป ══ -->
 <style id="loginGateCss">
+/* ══ หน้าเข้าสู่ระบบ ══
+   ภาษาภาพมาจากงานวิศวกรรมโยธา ไม่ใช่ "เว็บเทค" — พื้นเป็นกริดวางผังมีจุดลับสายตา
+   ระบบเก่ากับใหม่เป็นแผ่นโครงสร้างวางซ้อนบนพื้นนั้น สีบอกสถานะ: เทาเหล็ก = ระบบที่
+   กำลังปลด แดงบริษัท = ปลายทาง · เส้นที่ลากข้ามคือการจับคู่ field ข้ามระบบ
+   ซึ่งเป็นงานจริงของการย้าย ERP ไม่ใช่เอฟเฟกต์ประดับ */
 body.locked{overflow:hidden}
-#loginGate{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-y:auto;padding:28px;font-family:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;background:#0f2f52}
-#loginGate .lg-card{position:relative;width:100%;max-width:400px;background:#fff;border-radius:22px;box-shadow:0 30px 70px rgba(3,16,34,.45),0 2px 6px rgba(3,16,34,.18);padding:40px 36px 28px;text-align:center;animation:lgIn .5s cubic-bezier(.2,.7,.2,1) both}
-@keyframes lgIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-#loginGate .lg-logo{margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
-#loginGate .lg-logo img{height:72px;width:auto;display:block}
-#loginGate .lg-ttl{font-size:26px;font-weight:700;letter-spacing:-.015em;color:#0f2c4c;line-height:1.08}
-#loginGate .lg-sub{font-size:13px;color:#68788b;margin-top:6px;margin-bottom:30px}
-#loginGate .lg-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;background:transparent;color:#9aa7b6;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
+#loginGate{
+  --g-deep:#06192e; --g-steel:#7d97b0; --g-signal:#e2231a;
+  --g-paper:#f5f8fc; --g-rule:rgba(138,172,204,.32);
+  --g-thai:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;
+  --g-tech:'Barlow Condensed','Noto Sans Thai',sans-serif;
+  position:fixed;inset:0;z-index:100000;overflow-y:auto;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 32px;font-family:var(--g-thai);color:#dce8f5;
+  background:
+    radial-gradient(1100px 620px at 24% 36%,#12395f 0%,transparent 62%),
+    linear-gradient(168deg,#08213b 0%,var(--g-deep) 58%,#04121f 100%);
+}
+#loginGate .lg-shell{
+  width:100%;max-width:1090px;display:grid;gap:clamp(28px,4vw,56px);
+  grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr);align-items:center;
+}
+
+/* ── ฝั่งเล่าเรื่อง ───────────────────────────────────────────────────────── */
+#loginGate .lg-h{
+  font-size:clamp(27px,3.3vw,41px);font-weight:700;line-height:1.17;
+  letter-spacing:-.022em;color:#f2f7fc;margin:0 0 13px;max-width:15ch;
+}
+#loginGate .lg-h b{font-weight:700;white-space:nowrap}
+#loginGate .lg-lede{font-size:14.5px;line-height:1.72;color:#9fb6cd;margin:0;max-width:44ch}
+#loginGate .lg-count{display:flex;align-items:baseline;gap:12px;margin-top:18px;
+  padding-top:18px;border-top:1px solid rgba(125,151,176,.19)}
+#loginGate .lg-days{font-family:var(--g-tech);font-size:46px;font-weight:600;line-height:.84;
+  color:#fff;letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
+#loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:#9fb6cd;max-width:26ch}
+#loginGate .lg-count time{color:#e6eef7;font-weight:600;white-space:nowrap}
+
+/* ── ฉากสามมิติ ───────────────────────────────────────────────────────────
+   .lg-world หมุนทั้งก้อนครั้งเดียว ของข้างในวางด้วย translateZ ซึ่งกลายเป็น
+   "ความสูง" หลังหมุนแล้ว จึงเป็นสามมิติจริง ไม่ใช่ภาพลวงแบน
+   ระยะทางของลูกบาศก์ใช้ left เป็น % ของรางที่ครอบ เพราะ % ใน translate
+   อ้างอิงขนาดตัวเอง ไม่ใช่ระยะบนเวที */
+#loginGate .lg-stage{position:relative;height:clamp(238px,24vw,286px);margin:26px 0 0;
+  perspective:1050px;perspective-origin:50% 64%}
+#loginGate .lg-world{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
+#loginGate .lg-floor{position:absolute;left:-18%;top:-34%;width:136%;height:176%;
+  background:
+    repeating-linear-gradient(90deg,var(--g-rule) 0 1px,transparent 1px 44px),
+    repeating-linear-gradient(0deg,var(--g-rule) 0 1px,transparent 1px 44px),
+    linear-gradient(180deg,rgba(18,57,95,.44),rgba(6,25,46,0));
+  -webkit-mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
+          mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
+}
+#loginGate .lg-side{position:absolute;top:44%;width:16%;padding-bottom:16%;
+  transform-style:preserve-3d}
+#loginGate .lg-from{left:11%}
+#loginGate .lg-to{left:67%}
+/* ชั้นห่างกัน 26px และมีเงาทิ้งลงข้างล่างทำหน้าที่เป็นด้านข้างของแท่ง
+   ถ้าใช้แผ่นบางล้วน พอเอียงแล้วจะอ่านเป็นคราบสีเดียว ไม่ใช่กองที่ซ้อนกัน */
+#loginGate .lg-slab{position:absolute;inset:0;border-radius:2px;
+  transform:translateZ(calc(var(--i) * 26px));
+  background:linear-gradient(135deg,rgba(146,175,203,.46),rgba(112,140,168,.2));
+  border:1px solid rgba(178,203,227,.62);
+  box-shadow:0 0 0 1px rgba(6,25,46,.5) inset, 0 14px 0 -2px rgba(46,72,100,.34)}
+#loginGate .lg-from .lg-slab{animation:lgRetire 9s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay:calc(var(--i) * .45s)}
+#loginGate .lg-to .lg-slab{opacity:0;
+  background:linear-gradient(135deg,rgba(232,58,48,.52),rgba(170,30,24,.24));
+  border-color:rgba(255,146,136,.75);
+  box-shadow:0 0 0 1px rgba(46,8,6,.45) inset, 0 14px 0 -2px rgba(118,22,18,.5);
+  animation:lgErect 9s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay:calc(1.6s + var(--i) * .45s)}
+@keyframes lgRetire{
+  0%,7%  {opacity:1;transform:translateZ(calc(var(--i) * 26px))}
+  46%,100%{opacity:.07;transform:translateZ(0)}}
+@keyframes lgErect{
+  0%,5%  {opacity:0;transform:translateZ(0) scale(.8)}
+  40%,100%{opacity:1;transform:translateZ(calc(var(--i) * 26px)) scale(1)}}
+
+/* ลูกบาศก์ข้อมูลเดินทางข้ามเวที — หกหน้าจริง */
+#loginGate .lg-track{position:absolute;left:18%;top:50%;width:58%;height:0;
+  transform-style:preserve-3d}
+#loginGate .lg-cube{position:absolute;top:0;left:0;width:40px;height:40px;margin:-20px 0 0 -20px;
+  transform-style:preserve-3d;opacity:0;animation:lgCarry 9s linear infinite;animation-delay:var(--d)}
+#loginGate .lg-cube i{position:absolute;inset:0;display:block;
+  background:rgba(150,26,20,.5);border:1px solid rgba(255,146,136,.7)}
+#loginGate .lg-cube i:nth-child(1){transform:translateZ(20px)}
+#loginGate .lg-cube i:nth-child(2){transform:rotateY(90deg) translateZ(20px)}
+#loginGate .lg-cube i:nth-child(3){transform:rotateY(180deg) translateZ(20px)}
+#loginGate .lg-cube i:nth-child(4){transform:rotateY(-90deg) translateZ(20px)}
+#loginGate .lg-cube i:nth-child(5){transform:rotateX(90deg) translateZ(20px);
+  background:linear-gradient(135deg,rgba(255,96,84,.92),rgba(206,42,34,.8));
+  border-color:rgba(255,190,184,.95)}
+#loginGate .lg-cube i:nth-child(6){transform:rotateX(-90deg) translateZ(20px)}
+@keyframes lgCarry{
+  0%      {opacity:0;left:0%;  transform:translateZ(104px) rotateZ(0deg)}
+  9%      {opacity:1}
+  84%     {opacity:1}
+  100%    {opacity:0;left:100%;transform:translateZ(104px) rotateZ(270deg)}}
+
+/* ป้ายระบบ — อยู่บน .lg-stage ไม่ใช่ .lg-world จึงไม่เอียงตามพื้น อ่านออก */
+#loginGate .lg-tag{position:absolute;bottom:2px;font-family:var(--g-tech);
+  font-size:15.5px;font-weight:600;letter-spacing:.06em;line-height:1.12;white-space:nowrap}
+#loginGate .lg-tag small{display:block;font-family:var(--g-thai);font-size:10.5px;
+  font-weight:400;letter-spacing:0;opacity:.6;margin-top:3px}
+#loginGate .lg-tag-from{left:6%;color:#a2b8cd}
+#loginGate .lg-tag-to{right:7%;color:#ff8b82;text-align:right}
+#loginGate .lg-map{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
+#loginGate .lg-card{position:relative;width:100%;background:var(--g-paper);
+  border-radius:20px;padding:32px 32px 24px;text-align:left;
+  box-shadow:0 34px 80px rgba(2,12,24,.5),0 2px 5px rgba(2,12,24,.3);
+  animation:lgIn .55s cubic-bezier(.2,.7,.3,1) both}
+@keyframes lgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+#loginGate .lg-brand{display:flex;align-items:center;gap:13px;margin-bottom:25px}
+#loginGate .lg-brand img{height:44px;width:auto;display:block;flex:none}
+#loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:#0f2c4c;line-height:1.14}
+#loginGate .lg-sub{font-size:12px;color:#68788b;margin-top:3px;line-height:1.35}
+#loginGate .lg-field{margin-bottom:14px}
+#loginGate label{display:block;font-size:12px;font-weight:600;color:#5b6b7d;margin-bottom:7px}
+#loginGate input{width:100%;box-sizing:border-box;height:48px;padding:0 15px;
+  border:1.5px solid #dbe3ec;border-radius:12px;background:#fff;color:#1e2a38;
+  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
+#loginGate input::placeholder{color:#9aa7b6}
+#loginGate input:focus{border-color:#17436f;box-shadow:0 0 0 4px rgba(23,67,111,.13)}
+#loginGate .lg-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;
+  background:transparent;color:#9aa7b6;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
 #loginGate .lg-eye:hover{color:#5b6b7d;background:#eef2f7}
 #loginGate .lg-eye .eye-off{display:none}
 #loginGate .lg-eye.on .eye-on{display:none}
 #loginGate .lg-eye.on .eye-off{display:block}
-#loginGate .lg-field{text-align:left;margin-bottom:14px}
-#loginGate label{display:block;font-size:12px;font-weight:600;color:#5b6b7d;margin-bottom:7px}
-#loginGate input{width:100%;box-sizing:border-box;height:48px;padding:0 15px;border:1.5px solid #e3e8ef;border-radius:12px;background:#f7f9fc;color:#1e2a38;font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,background .15s,box-shadow .15s}
-#loginGate input::placeholder{color:#9aa7b6}
-#loginGate input:focus{border-color:#17436f;background:#fff;box-shadow:0 0 0 4px rgba(23,67,111,.13)}
-#loginGate .lg-btn{position:relative;width:100%;height:50px;margin-top:2px;border:0;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,#143f6a 0%,#0d2c4c 100%);color:#fff;font-size:15px;font-weight:600;font-family:inherit;box-shadow:0 8px 20px rgba(13,44,76,.28);transition:transform .06s,box-shadow .15s,filter .15s}
-#loginGate .lg-btn svg{flex:none}
+#loginGate .lg-btn{position:relative;width:100%;height:50px;margin-top:4px;border:0;
+  border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#143f6a 0%,#0d2c4c 100%);color:#fff;
+  font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;
+  box-shadow:0 6px 18px rgba(13,44,76,.3);transition:filter .15s,box-shadow .15s,transform .08s}
 #loginGate .lg-btn:hover{filter:brightness(1.09);box-shadow:0 10px 26px rgba(13,44,76,.36)}
 #loginGate .lg-btn:active{transform:translateY(1px)}
 #loginGate .lg-btn:disabled{cursor:default;filter:grayscale(.25) brightness(.97)}
 #loginGate .lg-btn.busy{color:transparent}
-#loginGate .lg-btn.busy svg{opacity:0}
-#loginGate .lg-btn.busy::after{content:'';position:absolute;left:50%;top:50%;width:19px;height:19px;margin:-9.5px 0 0 -9.5px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:lgspin .7s linear infinite}
+#loginGate .lg-btn.busy::after{content:'';position:absolute;left:50%;top:50%;width:19px;height:19px;
+  margin:-9.5px 0 0 -9.5px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;
+  border-radius:50%;animation:lgspin .7s linear infinite}
 @keyframes lgspin{to{transform:rotate(360deg)}}
-#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#d92d20;background:#fef3f2;border:1px solid #fee4e2;border-radius:9px;padding:9px 12px;text-align:left}
-#loginGate .lg-note{margin-top:20px;font-size:12px;color:#68788b;line-height:1.5}
-#loginGate .lg-pdpa{margin-top:12px;padding-top:13px;border-top:1px solid #eef1f5;font-size:11px;color:#9aa7b6;line-height:1.55}
-#loginGate .lg-foot{position:relative;margin-top:26px;text-align:center;font-size:11px;font-weight:600;letter-spacing:.16em;color:rgba(255,255,255,.42)}
-@media (max-width:430px){#loginGate .lg-card{padding:32px 24px 24px}#loginGate .lg-ttl{font-size:24px}#loginGate .lg-foot{letter-spacing:.1em;font-size:10px}}
-@media (prefers-reduced-motion:reduce){#loginGate .lg-card{animation:none}}
+#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#d92d20;background:#fef3f2;
+  border:1px solid #fee4e2;border-radius:9px;padding:9px 12px}
+#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid #e6ecf3;
+  font-size:12px;color:#68788b;line-height:1.5}
+#loginGate .lg-foot{margin-top:26px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
+  color:rgba(159,182,205,.46)}
+#loginGate :focus-visible{outline:2px solid #6fb3ff;outline-offset:2px}
+
+/* ── จอแคบ ────────────────────────────────────────────────────────────────── */
+@media (max-width:900px){
+  #loginGate{padding:32px 22px}
+  #loginGate .lg-shell{grid-template-columns:minmax(0,1fr);gap:24px;max-width:470px}
+  #loginGate .lg-h{font-size:25px;max-width:none}
+  #loginGate .lg-lede{max-width:none}
+  #loginGate .lg-stage{height:168px;margin-top:20px}
+  #loginGate .lg-count{margin-top:18px;padding-top:15px}
+  #loginGate .lg-days{font-size:36px}
+  #loginGate .lg-foot{margin-top:26px}
+}
+@media (max-width:560px){
+  #loginGate .lg-stage,#loginGate .lg-lede{display:none}
+  #loginGate .lg-card{padding:26px 22px 20px}
+  #loginGate .lg-h{font-size:22px;margin-bottom:0}
+  #loginGate .lg-count{margin-top:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  #loginGate .lg-card{animation:none}
+  #loginGate .lg-slab,#loginGate .lg-cube{animation:none!important}
+  #loginGate .lg-to .lg-slab{opacity:1;transform:translateZ(calc(var(--i) * 16px))}
+  #loginGate .lg-cube{opacity:1;transform:translateZ(104px)}
+  #loginGate .lg-cube:nth-of-type(1){left:14%}
+  #loginGate .lg-cube:nth-of-type(2){left:48%}
+  #loginGate .lg-cube:nth-of-type(3){left:82%}
+}
 </style>
 <div id="loginGate">
-  <form id="loginForm" class="lg-card" autocomplete="on">
-    <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-    <div class="lg-logo"><img src="SMALL_CIVIL_LOGO.png" alt="Civil Engineering"></div>
-    <div class="lg-ttl">Project Tracker</div>
-    <div class="lg-sub">Requirement · Project Automation 2026</div>
-    <div class="lg-field">
-      <label for="loginPass">รหัสผ่านทีม</label>
-      <div style="position:relative">
-        <input id="loginPass" type="password" name="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" autofocus style="padding-right:46px">
-        <button type="button" class="lg-eye" aria-label="แสดง/ซ่อนรหัสผ่าน" onclick="var i=document.getElementById('loginPass');var s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);"><svg class="eye-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+  <div class="lg-shell">
+    <section class="lg-story">
+      <h1 class="lg-h">กำลังย้ายระบบหลักของบริษัทจาก <b>SAP</b> ไป <b>Oracle Fusion</b></h1>
+      <p class="lg-lede">ที่นี่เก็บงานทุกใบของการเปลี่ยนระบบ ตั้งแต่เก็บความต้องการและ BRD
+        ไปจนถึงวันขึ้นระบบจริง พร้อมสถานะว่าแต่ละใบค้างอยู่ฝั่งไหน</p>
+
+      <div class="lg-stage" aria-hidden="true">
+        <div class="lg-world">
+          <div class="lg-floor"></div>
+          <div class="lg-side lg-from">
+            <i class="lg-slab" style="--i:0"></i><i class="lg-slab" style="--i:1"></i>
+            <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
+            <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
+          </div>
+          <div class="lg-side lg-to">
+            <i class="lg-slab" style="--i:0"></i><i class="lg-slab" style="--i:1"></i>
+            <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
+            <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
+          </div>
+          <div class="lg-track">
+            <div class="lg-cube" style="--d:0s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:3s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:6s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+        <canvas class="lg-map"></canvas>
+        <span class="lg-tag lg-tag-from">SAP ECC<small>ระบบเดิม</small></span>
+        <span class="lg-tag lg-tag-to">ORACLE FUSION<small>ปลายทาง</small></span>
       </div>
-    </div>
-    <button id="loginBtn" class="lg-btn" type="submit">เข้าสู่ระบบ</button>
-    <div id="loginErr" class="lg-err"></div>
-    <div class="lg-note">บัญชีเดียวร่วมกันทั้งทีม</div>
-  </form>
+
+      <div class="lg-count">
+        <span class="lg-days" id="lgDays">—</span>
+        <p>วันก่อนขึ้นระบบจริง<br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
+      </div>
+    </section>
+
+    <form id="loginForm" class="lg-card" autocomplete="on">
+      <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+      <div class="lg-brand">
+        <img src="SMALL_CIVIL_LOGO.png" alt="Civil Engineering">
+        <div>
+          <div class="lg-ttl">Project Tracker</div>
+          <div class="lg-sub">Requirement · Project Automation 2026</div>
+        </div>
+      </div>
+      <div class="lg-field">
+        <label for="loginPass">รหัสผ่านทีม</label>
+        <div style="position:relative">
+          <input id="loginPass" type="password" name="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" autofocus style="padding-right:46px">
+          <button type="button" class="lg-eye" aria-label="แสดง/ซ่อนรหัสผ่าน" onclick="var i=document.getElementById('loginPass');var s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);"><svg class="eye-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+        </div>
+      </div>
+      <button id="loginBtn" class="lg-btn" type="submit">เข้าสู่ระบบ</button>
+      <div id="loginErr" class="lg-err"></div>
+      <div class="lg-note">บัญชีเดียวร่วมกันทั้งทีม</div>
+    </form>
+  </div>
   <div class="lg-foot">CIVIL ENGINEERING PUBLIC COMPANY LIMITED</div>
 </div>
+<script>
+/* ══ นับถอยหลังถึงวันขึ้นระบบ ══
+   ข้อมูลจริงชิ้นเดียวที่ใส่ได้ก่อนยืนยันตัวตน วันที่เป็นค่าคงที่ ไม่ต้องอ่านฐานข้อมูล */
+(function(){
+  var el=document.getElementById('lgDays');if(!el)return;
+  var go=new Date(2027,6,1),t=new Date();t.setHours(0,0,0,0);
+  var d=Math.ceil((go-t)/86400000);
+  el.textContent=d>0?d.toLocaleString('en-US'):'0';
+})();
+
+/* ══ เส้นจับคู่ field ข้ามระบบ ══
+   ลากจากชั้นของ SAP ไปหาชั้นของ Oracle ทีละเส้นแล้วจางไป — เป็นภาพของงาน mapping
+   ที่ต้องทำจริงตอนย้าย ERP ไม่ใช่อนุภาคลอยแบบเว็บเทคทั่วไป
+
+   จุดปลายอ่านจากตำแหน่งจริงของแผ่นโครงสร้างบนจอ คิดใหม่เฉพาะตอนขนาดเปลี่ยน
+   เพราะแผ่นไม่ขยับ มีแต่ลูกบาศก์ที่วิ่ง */
+(function(){
+  var cv=document.querySelector('#loginGate .lg-map');if(!cv||!cv.getContext)return;
+  var gate=document.getElementById('loginGate'),stage=cv.parentNode;
+  var ctx=cv.getContext('2d'),W=0,H=0,A=[],B=[],links=[],raf=0,timer=0,last=0;
+  var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function anchors(sel){
+    var r=stage.getBoundingClientRect();
+    return [].map.call(stage.querySelectorAll(sel+' .lg-slab'),function(s){
+      var b=s.getBoundingClientRect();
+      return {x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2};});}
+
+  function size(){
+    var r=stage.getBoundingClientRect();
+    if(r.width<2||r.height<2)return false;
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    W=r.width;H=r.height;
+    cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    A=anchors('.lg-from');B=anchors('.lg-to');
+    return A.length>0&&B.length>0;}
+
+  function curve(L,upto,alpha){
+    var mx=(L.a.x+L.b.x)/2,my=Math.min(L.a.y,L.b.y)-H*0.26;
+    ctx.beginPath();ctx.moveTo(L.a.x,L.a.y);
+    for(var s=0.025;s<=upto;s+=0.025){
+      var u=1-s;
+      ctx.lineTo(u*u*L.a.x+2*u*s*mx+s*s*L.b.x, u*u*L.a.y+2*u*s*my+s*s*L.b.y);}
+    ctx.strokeStyle='rgba(255,138,128,'+alpha.toFixed(3)+')';
+    ctx.lineWidth=1.6;ctx.stroke();}
+
+  function spawn(){
+    if(!A.length||!B.length)return;
+    links.push({a:A[(Math.random()*A.length)|0],b:B[(Math.random()*B.length)|0],t:0});
+    if(links.length>3)links.shift();}
+
+  function draw(now){
+    raf=requestAnimationFrame(draw);
+    var dt=Math.min((now-last)||16,50);last=now;
+    ctx.clearRect(0,0,W,H);
+    for(var i=links.length-1;i>=0;i--){
+      var L=links[i];L.t+=dt/2200;
+      if(L.t>=1){links.splice(i,1);continue;}
+      /* 0→.55 เส้นงอกออกไป · .55→1 จางหาย */
+      var grow=Math.min(L.t/.55,1),fade=L.t<.55?1:1-(L.t-.55)/.45;
+      curve(L,grow,0.75*fade);
+      if(grow>=1){
+        ctx.beginPath();ctx.arc(L.b.x,L.b.y,3.4,0,6.2832);
+        ctx.fillStyle='rgba(255,168,160,'+(0.82*fade).toFixed(3)+')';ctx.fill();}}}
+
+  function stop(){if(raf)cancelAnimationFrame(raf);raf=0;
+    if(timer)clearInterval(timer);timer=0;}
+
+  function start(){
+    stop();
+    if(!size())return;
+    if(still){                      /* ไม่เคลื่อนไหว: วาดค้างไว้สามเส้นแล้วจบ */
+      ctx.clearRect(0,0,W,H);
+      [[0,3],[2,1],[3,2]].forEach(function(p){
+        curve({a:A[p[0]],b:B[p[1]]},1,0.45);});
+      return;}
+    spawn();
+    timer=setInterval(spawn,1500);
+    last=performance.now();raf=requestAnimationFrame(draw);}
+
+  /* หยุดวาดเมื่อสลับแท็บไปทำอย่างอื่น */
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden)stop();
+    else if(gate&&gate.style.display!=='none')start();});
+  if(window.ResizeObserver)new ResizeObserver(function(){
+    if(gate&&gate.style.display!=='none')start();}).observe(stage);
+  else window.addEventListener('resize',start);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
+  else start();
+  /* เข้าระบบผ่านแล้ว auth.js ซ่อน #loginGate — ต้องหยุดวาดด้วย ไม่งั้น rAF วิ่งต่อ
+     ทั้งที่ไม่มีใครเห็น กินแบตและ CPU ของทุกคนที่เปิดแอปค้างไว้ */
+  if(window.MutationObserver&&gate)new MutationObserver(function(){
+    if(gate.style.display==='none')stop();
+  }).observe(gate,{attributes:true,attributeFilter:['style']});
+  /* เปิดให้ตรวจได้จากข้างนอกว่าลูปยังวิ่งอยู่ไหม — ถ้าไม่มีตัวนี้ การทดสอบว่า
+     "หยุดแล้วจริง" จะเช็คไม่ได้ แล้วก็ผ่านแบบปลอมได้ง่ายๆ */
+  Object.defineProperty(window,'__lgSceneOn',{get:function(){return raf!==0;},configurable:true});
+  window.__lgStopScene=stop;
+})();
+</script>
 <!-- ══ end login gate ══ -->
 <style>
 #appLoading{position:fixed;inset:0;z-index:99990;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--bg);color:var(--ink2);font-family:'Noto Sans Thai',sans-serif}
