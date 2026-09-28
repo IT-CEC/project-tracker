@@ -816,7 +816,7 @@ body.locked{overflow:hidden}
   --g-tech:'Barlow Condensed','Noto Sans Thai',sans-serif;
   position:fixed;inset:0;z-index:100000;overflow-y:auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:40px 32px;font-family:var(--g-thai);color:#dce8f5;
+  padding:40px 32px 76px;font-family:var(--g-thai);color:#dce8f5;
   background:
     radial-gradient(1100px 620px at 24% 36%,#12395f 0%,transparent 62%),
     linear-gradient(168deg,#08213b 0%,var(--g-deep) 58%,#04121f 100%);
@@ -833,12 +833,16 @@ body.locked{overflow:hidden}
   font-size:clamp(25px,2.9vw,37px);font-weight:700;line-height:1.2;
   letter-spacing:-.022em;color:#f2f7fc;margin:0 0 13px;max-width:24ch;text-wrap:balance;
 }
-#loginGate .lg-h b{font-weight:700;white-space:nowrap}
-#loginGate .lg-lede{font-size:14.5px;line-height:1.72;color:#9fb6cd;margin:0;max-width:46ch;
+/* ของเดิม <b> เป็น 700/Noto เหมือนตัวอักษรรอบข้างเป๊ะ จึงไม่ได้ทำอะไรเลย
+   ทั้งที่ SAP กับ Oracle NetSuite เป็นประธานของประโยค
+   ให้ใช้ตัวเดียวกับป้ายในฉาก หัวเรื่องกับไดอะแกรมจะพูดด้วยเสียงเดียวกัน */
+#loginGate .lg-h b{font-family:var(--g-tech);font-weight:600;white-space:nowrap;
+  font-size:1.1em;letter-spacing:.005em}
+#loginGate .lg-lede{font-size:15px;line-height:1.7;color:#9fb6cd;margin:0;max-width:52ch;
   text-wrap:pretty}
 #loginGate .lg-count{display:flex;align-items:baseline;gap:12px;margin-top:18px;
   padding-top:18px;border-top:1px solid rgba(125,151,176,.19)}
-#loginGate .lg-days{font-family:var(--g-tech);font-size:46px;font-weight:600;line-height:.84;
+#loginGate .lg-days{font-family:var(--g-tech);font-size:44px;font-weight:600;line-height:.84;
   color:#fff;letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
 #loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:#9fb6cd;max-width:26ch}
 #loginGate .lg-count time{color:#e6eef7;font-weight:600;white-space:nowrap}
@@ -906,15 +910,20 @@ body.locked{overflow:hidden}
   background:linear-gradient(135deg,rgba(226,92,80,.8),rgba(178,44,36,.7));
   border-color:rgba(242,176,168,.8)}
 #loginGate .lg-cube i:nth-child(6){transform:rotateX(-90deg) translateZ(20px)}
+/* ของเดิมลูกบาศก์วิ่งเส้นตรง (Z คงที่) แต่เส้น mapping โค้งขึ้น
+   ทั้งคู่เดินทางจาก SAP ไป NetSuite เหมือนกันแต่ไปคนละทาง ดูแล้วขัดกันเอง
+   ให้ Z สูงขึ้นกลางทางแล้วลดลง — หลังหมุนเวที Z คือความสูง จึงได้เส้นโค้ง
+   รูปเดียวกับที่ canvas วาด */
 @keyframes lgCarry{
-  0%      {opacity:0;left:0%;  transform:translateZ(104px) rotateZ(0deg)}
+  0%      {opacity:0;left:0%;  transform:translateZ(58px)  rotateZ(0deg)}
   9%      {opacity:1}
+  50%     {                    transform:translateZ(158px) rotateZ(135deg)}
   84%     {opacity:1}
-  100%    {opacity:0;left:100%;transform:translateZ(104px) rotateZ(270deg)}}
+  100%    {opacity:0;left:100%;transform:translateZ(58px)  rotateZ(270deg)}}
 
 /* ป้ายระบบ — อยู่บน .lg-stage ไม่ใช่ .lg-world จึงไม่เอียงตามพื้น อ่านออก */
 #loginGate .lg-tag{position:absolute;bottom:2px;font-family:var(--g-tech);
-  font-size:15.5px;font-weight:600;letter-spacing:.06em;line-height:1.12;white-space:nowrap}
+  font-size:15px;font-weight:600;letter-spacing:.06em;line-height:1.12;white-space:nowrap}
 #loginGate .lg-tag small{display:block;font-family:var(--g-thai);font-size:10.5px;
   font-weight:400;letter-spacing:0;opacity:.6;margin-top:3px}
 #loginGate .lg-tag-from{left:6%;color:#a2b8cd}
@@ -922,12 +931,15 @@ body.locked{overflow:hidden}
 #loginGate .lg-map{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
 /* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
-/* ขอบบางสีเหล็กกับเส้นคาดบนใช้สีเดียวกับฉาก ทำให้การ์ดเป็นส่วนหนึ่งของภาพ
-   ไม่ใช่สี่เหลี่ยมขาวที่บังเอิญมาวางทับ */
-#loginGate .lg-card{position:relative;width:100%;background:var(--g-paper);
+/* ══ การ์ดอยู่ในอากาศเดียวกับฉาก ══
+   ของเดิมเป็นเกือบขาวบนน้ำเงินเข้ม อ่านเหมือนฟอร์มจากแอปอื่นมาแปะทับโปสเตอร์
+   ซึ่งเป็นรอยต่อที่ชัดที่สุดบนหน้านี้ — พื้นเข้มขึ้นมาจากตระกูลสีเดียวกับพื้นหลัง
+   ยกขึ้นด้วยแสงขอบบนแทนการใช้สีขาว */
+#loginGate .lg-card{position:relative;width:100%;
+  background:linear-gradient(180deg,rgba(21,55,90,.92) 0%,rgba(11,33,57,.94) 100%);
   border-radius:20px;padding:32px 32px 24px;text-align:left;overflow:hidden;
-  border:1px solid rgba(158,186,212,.3);
-  box-shadow:0 34px 80px rgba(2,12,24,.5),0 2px 5px rgba(2,12,24,.3);
+  border:1px solid rgba(158,186,212,.2);
+  box-shadow:0 34px 80px rgba(2,12,24,.6),inset 0 1px 0 rgba(190,215,238,.12);
   animation:lgIn .55s cubic-bezier(.2,.7,.3,1) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* เส้นคาดบน: ไล่จากเทาเหล็ก (ระบบเดิม) ไปแดง (ปลายทาง) — เรื่องเดียวกับฉากย่อลงมา */
@@ -935,27 +947,38 @@ body.locked{overflow:hidden}
   background:linear-gradient(90deg,rgba(125,151,176,.85) 0%,rgba(125,151,176,.3) 38%,rgba(196,62,54,.75) 100%)}
 #loginGate .lg-brand{display:flex;align-items:center;gap:13px;margin-bottom:25px}
 #loginGate .lg-brand img{height:44px;width:auto;display:block;flex:none}
-#loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:#0f2c4c;line-height:1.14}
-#loginGate .lg-sub{font-size:12px;color:#68788b;margin-top:3px;line-height:1.35}
+#loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:#eef4fa;line-height:1.14}
+#loginGate .lg-sub{font-size:13px;color:#93aec7;margin-top:3px;line-height:1.35}
 #loginGate .lg-field{margin-bottom:14px}
-#loginGate label{display:block;font-size:12px;font-weight:600;color:#5b6b7d;margin-bottom:7px}
+#loginGate label{display:block;font-size:13px;font-weight:600;color:#a7bdd2;margin-bottom:7px}
 #loginGate input{width:100%;box-sizing:border-box;height:48px;padding:0 15px;
-  border:1.5px solid #dbe3ec;border-radius:12px;background:#fff;color:#1e2a38;
-  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
-#loginGate input::placeholder{color:#9aa7b6}
-#loginGate input:focus{border-color:#17436f;box-shadow:0 0 0 4px rgba(23,67,111,.13)}
+  border:1.5px solid rgba(158,186,212,.26);border-radius:12px;
+  background:rgba(4,18,34,.55);color:#eaf2fa;
+  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+#loginGate input::placeholder{color:#7e97ae}
+#loginGate input:focus{border-color:#6fb3ff;background:rgba(4,18,34,.75);
+  box-shadow:0 0 0 4px rgba(111,179,255,.16)}
+/* เบราว์เซอร์ยัดพื้นขาวมาให้ตอน autofill ต้องทับด้วย inset shadow เพราะ
+   background ธรรมดาสู้ user-agent style ไม่ได้ */
+#loginGate input:-webkit-autofill,
+#loginGate input:-webkit-autofill:hover,
+#loginGate input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#eaf2fa;
+  -webkit-box-shadow:0 0 0 1000px #0a2038 inset;
+  caret-color:#eaf2fa;transition:background-color 9999s}
 #loginGate .lg-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);
   display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;
-  background:transparent;color:#9aa7b6;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
-#loginGate .lg-eye:hover{color:#5b6b7d;background:#eef2f7}
+  background:transparent;color:#7e97ae;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
+#loginGate .lg-eye:hover{color:#cfe0f0;background:rgba(158,186,212,.14)}
 #loginGate .lg-eye .eye-off{display:none}
 #loginGate .lg-eye.on .eye-on{display:none}
 #loginGate .lg-eye.on .eye-off{display:block}
 #loginGate .lg-btn{position:relative;width:100%;height:50px;margin-top:4px;border:0;
   border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,#143f6a 0%,#0d2c4c 100%);color:#fff;
+  /* บนการ์ดเข้ม ปุ่มน้ำเงินเข้มจะจมหายไป ต้องสว่างกว่าพื้นจึงจะเป็นปุ่มหลักจริง */
+  background:linear-gradient(180deg,#2f7fd4 0%,#1d5fa8 100%);color:#fff;
   font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;
-  box-shadow:0 6px 18px rgba(13,44,76,.3);transition:filter .15s,box-shadow .15s,transform .08s}
+  box-shadow:0 8px 22px rgba(29,95,168,.36);transition:filter .15s,box-shadow .15s,transform .08s}
 #loginGate .lg-btn:hover{filter:brightness(1.09);box-shadow:0 10px 26px rgba(13,44,76,.36)}
 #loginGate .lg-btn:active{transform:translateY(1px)}
 #loginGate .lg-btn:disabled{cursor:default;filter:grayscale(.25) brightness(.97)}
@@ -964,11 +987,16 @@ body.locked{overflow:hidden}
   margin:-9.5px 0 0 -9.5px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;
   border-radius:50%;animation:lgspin .7s linear infinite}
 @keyframes lgspin{to{transform:rotate(360deg)}}
-#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#d92d20;background:#fef3f2;
-  border:1px solid #fee4e2;border-radius:9px;padding:9px 12px}
-#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid #e6ecf3;
-  font-size:12px;color:#68788b;line-height:1.5}
-#loginGate .lg-foot{margin-top:20px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
+#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#ffb4ac;
+  background:rgba(180,40,32,.18);border:1px solid rgba(255,140,130,.34);
+  border-radius:9px;padding:9px 12px}
+#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid rgba(158,186,212,.16);
+  font-size:13px;color:#93aec7;line-height:1.5}
+/* ของเดิมทั้งก้อนลอยกลางจอ (ที่ว่างบน 164px ล่าง 164px เท่ากันเป๊ะ)
+   ไม่มีอะไรให้ยึด เพิ่มเส้นฐานเต็มความกว้างให้ทั้งสองคอลัมน์วางอยู่บนมัน
+   และดันขึ้นเหนือกึ่งกลางเล็กน้อย เพราะกึ่งกลางเรขาคณิตมักดูต่ำกว่าที่ตาคาด */
+#loginGate .lg-shell{padding-bottom:26px;border-bottom:1px solid rgba(158,186,212,.16)}
+#loginGate .lg-foot{margin-top:14px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
   color:rgba(159,182,205,.42)}
 #loginGate :focus-visible{outline:2px solid #6fb3ff;outline-offset:2px}
 
@@ -1015,8 +1043,8 @@ body.locked{overflow:hidden}
 }
 /* จอโน้ตบุ๊กเตี้ย (1280x620) เนื้อหาเกินจอ 16px ต้องเลื่อนนิดหน่อยโดยไม่จำเป็น
    ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
-@media (max-height:680px) and (min-width:901px){
-  #loginGate{padding:22px 32px}
+@media (max-height:740px) and (min-width:901px){
+  #loginGate{padding:20px 32px 34px}
   #loginGate .lg-stage{height:clamp(196px,20vw,226px);margin-top:16px}
   #loginGate .lg-count{margin-top:14px;padding-top:14px}
   #loginGate .lg-foot{margin-top:14px}
@@ -1031,7 +1059,7 @@ body.locked{overflow:hidden}
   #loginGate .lg-card{animation:none}
   #loginGate .lg-slab,#loginGate .lg-cube{animation:none!important}
   #loginGate .lg-to .lg-slab{opacity:1;transform:translateZ(calc(var(--i) * 16px))}
-  #loginGate .lg-cube{opacity:1;transform:translateZ(104px)}
+  #loginGate .lg-cube{opacity:1;transform:translateZ(130px)}
   #loginGate .lg-cube:nth-of-type(1){left:14%}
   #loginGate .lg-cube:nth-of-type(2){left:48%}
   #loginGate .lg-cube:nth-of-type(3){left:82%}
