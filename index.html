@@ -852,7 +852,7 @@ body.locked{overflow:hidden}
    "ความสูง" หลังหมุนแล้ว จึงเป็นสามมิติจริง ไม่ใช่ภาพลวงแบน
    ระยะทางของลูกบาศก์ใช้ left เป็น % ของรางที่ครอบ เพราะ % ใน translate
    อ้างอิงขนาดตัวเอง ไม่ใช่ระยะบนเวที */
-#loginGate .lg-stage{position:relative;height:clamp(226px,22vw,262px);margin:22px 0 0;
+#loginGate .lg-stage{position:relative;height:clamp(250px,25vw,304px);margin:20px 0 0;
   perspective:1050px;perspective-origin:50% 64%}
 #loginGate .lg-world{position:absolute;inset:0;transform-style:preserve-3d;
   transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
@@ -864,10 +864,12 @@ body.locked{overflow:hidden}
   -webkit-mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
           mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
 }
-#loginGate .lg-side{position:absolute;top:44%;width:16%;padding-bottom:16%;
+#loginGate .lg-side{position:absolute;top:46%;width:13%;padding-bottom:13%;
   transform-style:preserve-3d}
-#loginGate .lg-from{left:11%}
-#loginGate .lg-to{left:67%}
+/* วัดแล้วที่ 0%/86% กองล้นขอบเวทีทั้งสองข้าง (ซ้าย -14px ขวา 589 จากเวที 579)
+   เพราะการหมุนเวทีเลื่อนตำแหน่งจริงออกจากค่า left ที่ตั้ง */
+#loginGate .lg-from{left:4%}
+#loginGate .lg-to{left:81%}
 /* ชั้นห่างกัน 26px และมีเงาทิ้งลงข้างล่างทำหน้าที่เป็นด้านข้างของแท่ง
    ถ้าใช้แผ่นบางล้วน พอเอียงแล้วจะอ่านเป็นคราบสีเดียว ไม่ใช่กองที่ซ้อนกัน */
 #loginGate .lg-slab{position:absolute;inset:0;border-radius:2px;
@@ -929,6 +931,77 @@ body.locked{overflow:hidden}
 #loginGate .lg-tag-from{left:6%;color:#a2b8cd}
 #loginGate .lg-tag-to{right:7%;color:#f0968d;text-align:right}
 #loginGate .lg-map{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+
+/* ══ เส้นทาง 7 เฟส วางบนพื้นเดียวกับกองทั้งสองฝั่ง ══
+   เฟสพวกนี้คือเฟสเดียวกับที่แอปใช้ (01–07) และตรงกับแผ่นข่าวที่ส่งในองค์กร
+   ฉากจึงไม่ได้เล่าแค่ "ย้ายจาก A ไป B" แต่เล่าว่าเดินทางยังไงและตอนนี้อยู่ไหน */
+#loginGate .lg-road{position:absolute;left:21%;right:21%;top:52%;height:0;
+  transform-style:preserve-3d}
+/* เส้นถนนวางบนพื้น ถ้าไม่มีเส้นนี้หมุดจะอ่านเป็นจุดกระจาย ไม่ใช่เส้นทางเดียวกัน */
+#loginGate .lg-road::before{content:'';position:absolute;left:-3%;right:-3%;top:-1px;height:2px;
+  background:linear-gradient(90deg,rgba(150,220,180,.5) 0%,rgba(255,146,136,.55) 16%,
+    rgba(158,186,212,.34) 34%,rgba(158,186,212,.2) 100%)}
+#loginGate .lg-ph{position:absolute;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
+  transform-style:preserve-3d;cursor:pointer;background:none;border:0;padding:0;
+  font-family:inherit}
+/* แผ่นบนพื้น */
+#loginGate .lg-ph em{position:absolute;inset:0;display:block;border-radius:3px;
+  background:rgba(158,186,212,.24);border:1.5px solid rgba(186,210,232,.6);
+  transition:background .2s,border-color .2s,transform .25s cubic-bezier(.2,.9,.3,1)}
+/* เสาที่ยกตัวเลขขึ้นจากพื้น */
+#loginGate .lg-ph s{position:absolute;left:50%;bottom:50%;width:1px;height:34px;
+  margin-left:-.5px;display:block;text-decoration:none;
+  background:linear-gradient(0deg,rgba(178,203,227,.5),rgba(178,203,227,.06));
+  transform-origin:50% 100%;transform:rotateZ(7deg) rotateX(-52deg);
+  transition:height .25s cubic-bezier(.2,.9,.3,1)}
+/* ตัวเลขหันเข้าหาคนดูเสมอ ด้วยการหมุนสวนกับเวที ไม่งั้นจะนอนราบอ่านไม่ออก */
+#loginGate .lg-ph b{position:absolute;left:50%;bottom:50%;margin:0 0 34px -22px;
+  width:44px;text-align:center;font-family:var(--g-tech);font-size:18px;font-weight:600;
+  color:#b6cadd;letter-spacing:.04em;transform-origin:50% 100%;
+  transform:rotateZ(7deg) rotateX(-52deg);transition:color .2s,margin-bottom .25s}
+#loginGate .lg-ph:hover em{background:rgba(158,186,212,.3);border-color:rgba(206,227,246,.7)}
+#loginGate .lg-ph:hover b{color:#dceaf7}
+#loginGate .lg-ph:hover s{height:50px}
+#loginGate .lg-ph:hover b{margin-bottom:50px}
+/* เฟสที่ผ่านไปแล้ว */
+#loginGate .lg-ph.done em{background:rgba(120,190,150,.26);border-color:rgba(150,220,180,.55)}
+#loginGate .lg-ph.done b{color:#8fc9a8}
+/* เฟสปัจจุบัน — เต้นเบาๆ ให้ตาไปหยุดตรงนี้ก่อน */
+#loginGate .lg-ph.now em{background:rgba(196,62,54,.42);border-color:rgba(255,146,136,.85);
+  animation:lgPulse 2.4s ease-in-out infinite}
+#loginGate .lg-ph.now b{color:#ff9b91}
+#loginGate .lg-ph.now s{height:58px;width:2px;margin-left:-1px;
+  background:linear-gradient(0deg,rgba(255,146,136,.85),rgba(255,146,136,.06))}
+#loginGate .lg-ph.now b{margin-bottom:58px;font-size:20px}
+@keyframes lgPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,120,110,.4)}
+  50%{box-shadow:0 0 0 9px rgba(255,120,110,0)}}
+/* เฟสที่ถูกเลือกอยู่ */
+#loginGate .lg-ph.sel em{background:rgba(120,170,230,.5);border-color:#9ecbff;
+  transform:scale(1.25)}
+#loginGate .lg-ph.sel b{color:#cfe6ff}
+#loginGate .lg-road.picking .lg-ph:not(.sel){opacity:.3}
+#loginGate .lg-ph,#loginGate .lg-road.picking .lg-ph{transition:opacity .25s}
+#loginGate .lg-ph:focus-visible em{outline:2px solid #6fb3ff;outline-offset:3px}
+
+/* ══ พื้นที่คำโปรยกับรายละเอียดเฟสใช้ที่เดียวกัน ══
+   กดเฟสแล้วข้อความสลับในที่เดิม ไม่มี layout กระโดด และรู้สึกเหมือนหน้าตอบคำถามเรา */
+#loginGate .lg-say{min-height:82px}
+#loginGate .lg-detail{animation:lgSayIn .28s cubic-bezier(.2,.8,.3,1) both}
+@keyframes lgSayIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+#loginGate .lg-detail h2{margin:0 0 3px;font-size:15px;font-weight:700;color:#eaf3fb;
+  line-height:1.35;display:flex;align-items:baseline;gap:9px}
+#loginGate .lg-detail h2 i{font-family:var(--g-tech);font-style:normal;font-size:15px;
+  font-weight:600;color:#7fb4ea;letter-spacing:.04em;flex:none}
+#loginGate .lg-detail .lg-when{font-family:var(--g-tech);font-size:15px;color:#8fa8c0;
+  letter-spacing:.03em;margin:0 0 4px}
+#loginGate .lg-detail p{margin:0;font-size:15px;line-height:1.6;color:#9fb6cd;max-width:46ch}
+#loginGate .lg-detail .lg-back{margin-top:7px;border:0;background:none;padding:0;
+  font-family:inherit;font-size:13px;font-weight:600;color:#7fb4ea;cursor:pointer}
+#loginGate .lg-detail .lg-back:hover{text-decoration:underline}
+#loginGate .lg-roadhint{margin-top:9px;font-size:13px;color:#7e97ae}
+@media (prefers-reduced-motion:reduce){
+  #loginGate .lg-ph.now em{animation:none}
+  #loginGate .lg-detail{animation:none}}
 
 /* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
 /* ══ การ์ดอยู่ในอากาศเดียวกับฉาก ══
@@ -1045,7 +1118,10 @@ body.locked{overflow:hidden}
    ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
 @media (max-height:740px) and (min-width:901px){
   #loginGate{padding:20px 32px 34px}
-  #loginGate .lg-stage{height:clamp(196px,20vw,226px);margin-top:16px}
+  #loginGate .lg-stage{height:clamp(186px,19vw,214px);margin-top:12px}
+  /* บรรทัดชี้แนะกับพื้นที่คำตอบกินที่เพิ่ม ต้องรัดเข้ามาเมื่อจอเตี้ย */
+  #loginGate .lg-say{min-height:0}
+  #loginGate .lg-roadhint{margin-top:6px}
   #loginGate .lg-count{margin-top:14px;padding-top:14px}
   #loginGate .lg-foot{margin-top:14px}
 }
@@ -1069,8 +1145,11 @@ body.locked{overflow:hidden}
   <div class="lg-shell">
     <section class="lg-story">
       <h1 class="lg-h">กำลังย้ายระบบ ERP ของบริษัทจาก <b>SAP</b> ไป <b>Oracle NetSuite</b></h1>
-      <p class="lg-lede">ที่นี่รวมทุกงานของการเปลี่ยนระบบ ตั้งแต่เก็บความต้องการและ BRD
-        ไปจนถึงวันขึ้นระบบจริง พร้อมบอกว่าแต่ละงานค้างอยู่ฝั่งไหน</p>
+      <div class="lg-say">
+        <p class="lg-lede" id="lgLede">ที่นี่รวมทุกงานของการเปลี่ยนระบบ ตั้งแต่เก็บความต้องการและ BRD
+          ไปจนถึงวันขึ้นระบบจริง พร้อมบอกว่าแต่ละงานค้างอยู่ฝั่งไหน</p>
+        <div class="lg-detail" id="lgDetail" hidden></div>
+      </div>
 
       <div class="lg-stage" aria-hidden="true">
         <div class="lg-world">
@@ -1085,6 +1164,7 @@ body.locked{overflow:hidden}
             <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
             <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
           </div>
+          <div class="lg-road" id="lgRoad"></div>
           <div class="lg-track">
             <div class="lg-cube" style="--d:0s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <div class="lg-cube" style="--d:3.7s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
@@ -1141,6 +1221,55 @@ body.locked{overflow:hidden}
     if(lb)lb.textContent='คือวันขึ้นระบบจริง';}
   else{el.textContent=(-d).toLocaleString('en-US');
     if(lb)lb.textContent='วันตั้งแต่ขึ้นระบบจริง';}
+})();
+
+/* ══ เส้นทาง 7 เฟส ══
+   เนื้อหาถอดจากแผ่นข่าว CIVIL NEWSLETTER Q2/2026 หน้า 23 ตรงตามที่ประกาศในองค์กร
+   ไม่ได้อ่านจากฐานข้อมูล เพราะหน้านี้อยู่ก่อนยืนยันตัวตน และตัวเลขที่ประกาศไปแล้ว
+   ต้องตรงกับที่คนเห็นในแผ่น ไม่ใช่เปลี่ยนตามข้อมูลที่ทีมแก้รายวัน */
+(function(){
+  var road=document.getElementById('lgRoad');if(!road)return;
+  var lede=document.getElementById('lgLede'),det=document.getElementById('lgDetail');
+  var PH=[
+    {n:'01',t:'Planning & Kick-Off',    w:'พ.ค. 69',           d:'วางแผนและเริ่มโครงการ',      st:'done'},
+    {n:'02',t:'Solution Definition (BRD)',w:'มิ.ย. – ก.ย. 69', d:'เก็บความต้องการจากทุกแผนก', st:'now'},
+    {n:'03',t:'Solution Build',        w:'ก.ย. 69 – ก.พ. 70', d:'ตั้งค่าและพัฒนาระบบ'},
+    {n:'04',t:'Training & Testing (UAT)',w:'มี.ค. – พ.ค. 70',  d:'อบรมและทดสอบร่วมกัน'},
+    {n:'05',t:'Deployment & Go-Live',  w:'มิ.ย. – ก.ค. 70',   d:'นำระบบขึ้นใช้งานจริง'},
+    {n:'06',t:'Hypercare',             w:'ก.ค. – ต.ค. 70',    d:'ดูแลใกล้ชิดหลังเปิดใช้'},
+    {n:'07',t:'On-Going Support',      w:'ต่อเนื่อง 12 เดือน', d:'สนับสนุนการใช้งานต่อเนื่อง'}
+  ];
+  var esc=function(x){return String(x==null?'':x).replace(/</g,'&lt;');};
+  road.innerHTML=PH.map(function(o,i){
+    return '<button type="button" class="lg-ph'+(o.st?' '+o.st:'')+'" data-i="'+i+'"'
+      +' style="left:'+(i/(PH.length-1)*100).toFixed(2)+'%"'
+      +' aria-label="'+esc(o.n+' '+o.t)+'"><em></em><s></s><b>'+esc(o.n)+'</b></button>';}).join('');
+  var sel=-1,hint=null;
+  function show(i){
+    sel=i;road.classList.add('picking');
+    [].forEach.call(road.children,function(el,k){el.classList.toggle('sel',k===i);});
+    var o=PH[i];
+    det.innerHTML='<h2><i>'+esc(o.n)+'</i>'+esc(o.t)+'</h2>'
+      +'<div class="lg-when">'+esc(o.w)+'</div>'
+      +'<p>'+esc(o.d)+'</p>'
+      +'<button type="button" class="lg-back">ย้อนกลับ</button>';
+    det.querySelector('.lg-back').onclick=clear;
+    det.hidden=false;lede.style.display='none';
+    if(hint)hint.style.display='none';}
+  function clear(){
+    sel=-1;road.classList.remove('picking');
+    [].forEach.call(road.children,function(el){el.classList.remove('sel');});
+    det.hidden=true;det.innerHTML='';lede.style.display='';
+    if(hint)hint.style.display='';}
+  road.addEventListener('click',function(e){
+    var btn=e.target.closest?e.target.closest('.lg-ph'):null;if(!btn)return;
+    var i=+btn.dataset.i;if(i===sel)clear();else show(i);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&sel>=0)clear();});
+  /* บอกให้รู้ว่ากดได้ ไม่งั้นไม่มีใครรู้ว่าฉากมีอะไรให้กด */
+  hint=document.createElement('div');
+  hint.className='lg-roadhint';hint.textContent='กดที่เฟสบนเส้นทางเพื่อดูรายละเอียด';
+  lede.parentNode.appendChild(hint);
 })();
 
 /* ══ เส้นจับคู่ field ข้ามระบบ ══
