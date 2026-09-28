@@ -873,7 +873,12 @@ body.locked{overflow:hidden}
    ระยะทางของลูกบาศก์ใช้ left เป็น % ของรางที่ครอบ เพราะ % ใน translate
    อ้างอิงขนาดตัวเอง ไม่ใช่ระยะบนเวที */
 #loginGate .lg-stage{position:relative;height:clamp(250px,25vw,304px);margin:20px 0 0;
-  perspective:1050px;perspective-origin:calc(50% + var(--ox,0px)) calc(64% + var(--oy,0px))}
+  perspective:1050px;
+  /* --ox/--oy มาจากเมาส์ · --fx/--fy มาจากการซูมเข้าหาเฟส
+     ต้องแยกตัวแปรกัน เพราะ --ox ถูก rAF เขียนทับทุกเฟรม ถ้าใช้ตัวเดียวกันจะตีกัน */
+  perspective-origin:calc(50% + var(--ox,0px) + var(--fx,0px))
+                     calc(64% + var(--oy,0px) + var(--fy,0px));
+  transition:perspective-origin .62s cubic-bezier(.22,.82,.25,1)}
 /* ชั้นซูม: ดันกล้องเข้าหาเฟสที่กด แล้วเลื่อนให้เฟสนั้นมาอยู่กลางเวที
    แยกจากชั้นกล้องเพราะชั้นกล้องถูก rAF เขียนทุกเฟรม ถ้าใส่ transition ลงไปด้วย
    การขยับตามเมาส์จะหน่วงเป็นยางยืด */
@@ -1114,6 +1119,7 @@ body.locked{overflow:hidden}
   #loginGate .lg-ph.now em{animation:none}
   #loginGate .lg-detail{animation:none}
   #loginGate .lg-zoom{transition:none}
+  #loginGate .lg-stage{transition:none}
   #loginGate .lg-side,#loginGate .lg-tag,#loginGate .lg-track{transition:none}}
 
 /* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
@@ -1385,15 +1391,26 @@ body.locked{overflow:hidden}
     var sr=stage.getBoundingClientRect(),r=el.getBoundingClientRect();
     var dx=(sr.left+sr.width/2)-(r.left+r.width/2);
     var dy=(sr.top+sr.height*.52)-(r.top+r.height/2);
-    zoom.style.setProperty('--zx',(dx*.78).toFixed(1)+'px');
-    zoom.style.setProperty('--zy',(dy*.62).toFixed(1)+'px');
-    zoom.style.setProperty('--zz','138px');
+    /* ต้องหนีบระยะไว้ ไม่งั้นเฟสที่ปลายสองข้างจะเหวี่ยงฉากออกนอกเวที
+       วัดแล้วเฟส 01 ทะลุขวา 505px จนไปถึงคอลัมน์การ์ด ส่วนเฟส 07 ทะลุซ้าย 470px
+       จนเหลือที่ว่างโบ๋ครึ่งจอ — เลื่อนพอให้รู้ว่ากล้องขยับเข้าหา ไม่ใช่เลื่อนให้ถึงกลางจริง */
+    var cap=function(v,m){return Math.max(-m,Math.min(m,v));};
+    var zx=cap(dx*.5,72),zy=cap(dy*.42,34);
+    zoom.style.setProperty('--zx',zx.toFixed(1)+'px');
+    zoom.style.setProperty('--zy',zy.toFixed(1)+'px');
+    zoom.style.setProperty('--zz','96px');
+    /* เลื่อนของใต้จุดลับสายตาที่อยู่นิ่ง ทำให้ฉากบิดเฉือนคนละแบบในแต่ละเฟส
+       วัดจากภาพแล้วเฟส 01 ถนนเรียงเกือบเป็นเส้นตรงพุ่งเข้าหาการ์ด
+       ให้จุดลับสายตาตามของไปด้วย มุมมองจะคงรูปเดิมไม่ว่าซูมไปที่เฟสไหน */
+    stage.style.setProperty('--fx',(-zx*.55).toFixed(1)+'px');
+    stage.style.setProperty('--fy',(-zy*.55).toFixed(1)+'px');
     stage.classList.add('zoomed');}
   function unfocus(){
     if(!zoom)return;
     zoom.style.setProperty('--zx','0px');zoom.style.setProperty('--zy','0px');
     zoom.style.setProperty('--zz','0px');
-    if(stage)stage.classList.remove('zoomed');}
+    if(stage){stage.style.setProperty('--fx','0px');stage.style.setProperty('--fy','0px');
+      stage.classList.remove('zoomed');}}
   function show(i){
     sel=i;road.classList.add('picking');
     [].forEach.call(road.children,function(el,k){el.classList.toggle('sel',k===i);});
@@ -1552,10 +1569,13 @@ body.locked{overflow:hidden}
       if(L.t>=1){links.splice(i,1);continue;}
       /* 0→.55 เส้นงอกออกไป · .55→1 จางหาย */
       var grow=Math.min(L.t/.55,1),fade=L.t<.55?1:1-(L.t-.55)/.45;
-      curve(L,grow,0.75*fade);
+      /* ตอนกดดูเฟส เส้นย้ายข้อมูลไม่ใช่เรื่องที่กำลังดูอยู่ ต้องถอยให้เส้นทางเฟส
+         หรี่ด้วย CSS ไม่ได้เพราะสองเส้นอยู่บน canvas เดียวกัน จึงลดตอนวาดแทน */
+      var back=stage.classList.contains('zoomed')?0.26:1;
+      curve(L,grow,0.75*fade*back);
       if(grow>=1){
         ctx.beginPath();ctx.arc(L.b.x,L.b.y,3.4,0,6.2832);
-        ctx.fillStyle='rgba(190,48,38,'+(0.85*fade).toFixed(3)+')';ctx.fill();}}}
+        ctx.fillStyle='rgba(190,48,38,'+(0.85*fade*back).toFixed(3)+')';ctx.fill();}}}
 
   function stop(){if(raf)cancelAnimationFrame(raf);raf=0;
     if(timer)clearInterval(timer);timer=0;}
