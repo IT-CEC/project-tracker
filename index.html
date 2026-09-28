@@ -827,12 +827,15 @@ body.locked{overflow:hidden}
 }
 
 /* ── ฝั่งเล่าเรื่อง ───────────────────────────────────────────────────────── */
+/* ชื่อ "Oracle NetSuite" ยาวกว่าเดิม ถ้าปล่อยกว้าง 15ch จะตัดเป็นสี่บรรทัด
+   แล้ว "จาก SAP ไป" ลอยเป็นบรรทัดเดี่ยว อ่านสะดุด กว้างพอให้ลงสองบรรทัดพอดี */
 #loginGate .lg-h{
-  font-size:clamp(27px,3.3vw,41px);font-weight:700;line-height:1.17;
-  letter-spacing:-.022em;color:#f2f7fc;margin:0 0 13px;max-width:15ch;
+  font-size:clamp(25px,2.9vw,37px);font-weight:700;line-height:1.2;
+  letter-spacing:-.022em;color:#f2f7fc;margin:0 0 13px;max-width:24ch;text-wrap:balance;
 }
 #loginGate .lg-h b{font-weight:700;white-space:nowrap}
-#loginGate .lg-lede{font-size:14.5px;line-height:1.72;color:#9fb6cd;margin:0;max-width:44ch}
+#loginGate .lg-lede{font-size:14.5px;line-height:1.72;color:#9fb6cd;margin:0;max-width:46ch;
+  text-wrap:pretty}
 #loginGate .lg-count{display:flex;align-items:baseline;gap:12px;margin-top:18px;
   padding-top:18px;border-top:1px solid rgba(125,151,176,.19)}
 #loginGate .lg-days{font-family:var(--g-tech);font-size:46px;font-weight:600;line-height:.84;
@@ -845,7 +848,7 @@ body.locked{overflow:hidden}
    "ความสูง" หลังหมุนแล้ว จึงเป็นสามมิติจริง ไม่ใช่ภาพลวงแบน
    ระยะทางของลูกบาศก์ใช้ left เป็น % ของรางที่ครอบ เพราะ % ใน translate
    อ้างอิงขนาดตัวเอง ไม่ใช่ระยะบนเวที */
-#loginGate .lg-stage{position:relative;height:clamp(238px,24vw,286px);margin:26px 0 0;
+#loginGate .lg-stage{position:relative;height:clamp(226px,22vw,262px);margin:22px 0 0;
   perspective:1050px;perspective-origin:50% 64%}
 #loginGate .lg-world{position:absolute;inset:0;transform-style:preserve-3d;
   transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
@@ -865,38 +868,43 @@ body.locked{overflow:hidden}
    ถ้าใช้แผ่นบางล้วน พอเอียงแล้วจะอ่านเป็นคราบสีเดียว ไม่ใช่กองที่ซ้อนกัน */
 #loginGate .lg-slab{position:absolute;inset:0;border-radius:2px;
   transform:translateZ(calc(var(--i) * 26px));
-  background:linear-gradient(135deg,rgba(146,175,203,.46),rgba(112,140,168,.2));
-  border:1px solid rgba(178,203,227,.62);
-  box-shadow:0 0 0 1px rgba(6,25,46,.5) inset, 0 14px 0 -2px rgba(46,72,100,.34)}
-#loginGate .lg-from .lg-slab{animation:lgRetire 9s cubic-bezier(.4,0,.2,1) infinite;
-  animation-delay:calc(var(--i) * .45s)}
+  background:linear-gradient(135deg,rgba(158,186,212,.54),rgba(120,148,176,.26));
+  border:1px solid rgba(190,213,234,.7);
+  box-shadow:0 0 0 1px rgba(6,25,46,.5) inset, 0 14px 0 -2px rgba(52,80,110,.4)}
+#loginGate .lg-from .lg-slab{animation:lgRetire 11s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay:calc(var(--i) * .2s)}
 #loginGate .lg-to .lg-slab{opacity:0;
-  background:linear-gradient(135deg,rgba(232,58,48,.52),rgba(170,30,24,.24));
-  border-color:rgba(255,146,136,.75);
-  box-shadow:0 0 0 1px rgba(46,8,6,.45) inset, 0 14px 0 -2px rgba(118,22,18,.5);
-  animation:lgErect 9s cubic-bezier(.4,0,.2,1) infinite;
-  animation-delay:calc(1.6s + var(--i) * .45s)}
+  background:linear-gradient(135deg,rgba(196,62,54,.42),rgba(142,34,28,.2));
+  border-color:rgba(232,132,122,.58);
+  box-shadow:0 0 0 1px rgba(46,8,6,.4) inset, 0 14px 0 -2px rgba(98,24,20,.42);
+  animation:lgErect 11s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay:calc(var(--i) * .2s)}
+/* ลูปครบวง: SAP เต็มช่วงต้น → ยุบ → ค้างต่ำ → กลับมาเต็มตอนจบเพื่อวนต่อได้เนียน
+   Oracle ตรงข้าม ช่วงคาบเกี่ยว 26–48% คือจังหวะที่เห็นทั้งสองฝั่งพร้อมกัน
+   ซึ่งเป็นใจความของภาพ: กำลังย้าย ไม่ใช่ย้ายเสร็จแล้ว */
 @keyframes lgRetire{
-  0%,7%  {opacity:1;transform:translateZ(calc(var(--i) * 26px))}
-  46%,100%{opacity:.07;transform:translateZ(0)}}
+  0%,24%  {opacity:1;transform:translateZ(calc(var(--i) * 26px))}
+  48%,72% {opacity:.1;transform:translateZ(0)}
+  94%,100%{opacity:1;transform:translateZ(calc(var(--i) * 26px))}}
 @keyframes lgErect{
-  0%,5%  {opacity:0;transform:translateZ(0) scale(.8)}
-  40%,100%{opacity:1;transform:translateZ(calc(var(--i) * 26px)) scale(1)}}
+  0%,20%  {opacity:0;transform:translateZ(0) scale(.82)}
+  46%,74% {opacity:1;transform:translateZ(calc(var(--i) * 26px)) scale(1)}
+  96%,100%{opacity:0;transform:translateZ(0) scale(.82)}}
 
 /* ลูกบาศก์ข้อมูลเดินทางข้ามเวที — หกหน้าจริง */
 #loginGate .lg-track{position:absolute;left:18%;top:50%;width:58%;height:0;
   transform-style:preserve-3d}
 #loginGate .lg-cube{position:absolute;top:0;left:0;width:40px;height:40px;margin:-20px 0 0 -20px;
-  transform-style:preserve-3d;opacity:0;animation:lgCarry 9s linear infinite;animation-delay:var(--d)}
+  transform-style:preserve-3d;opacity:0;animation:lgCarry 11s linear infinite;animation-delay:var(--d)}
 #loginGate .lg-cube i{position:absolute;inset:0;display:block;
-  background:rgba(150,26,20,.5);border:1px solid rgba(255,146,136,.7)}
+  background:rgba(132,28,22,.46);border:1px solid rgba(230,134,124,.6)}
 #loginGate .lg-cube i:nth-child(1){transform:translateZ(20px)}
 #loginGate .lg-cube i:nth-child(2){transform:rotateY(90deg) translateZ(20px)}
 #loginGate .lg-cube i:nth-child(3){transform:rotateY(180deg) translateZ(20px)}
 #loginGate .lg-cube i:nth-child(4){transform:rotateY(-90deg) translateZ(20px)}
 #loginGate .lg-cube i:nth-child(5){transform:rotateX(90deg) translateZ(20px);
-  background:linear-gradient(135deg,rgba(255,96,84,.92),rgba(206,42,34,.8));
-  border-color:rgba(255,190,184,.95)}
+  background:linear-gradient(135deg,rgba(226,92,80,.8),rgba(178,44,36,.7));
+  border-color:rgba(242,176,168,.8)}
 #loginGate .lg-cube i:nth-child(6){transform:rotateX(-90deg) translateZ(20px)}
 @keyframes lgCarry{
   0%      {opacity:0;left:0%;  transform:translateZ(104px) rotateZ(0deg)}
@@ -910,15 +918,21 @@ body.locked{overflow:hidden}
 #loginGate .lg-tag small{display:block;font-family:var(--g-thai);font-size:10.5px;
   font-weight:400;letter-spacing:0;opacity:.6;margin-top:3px}
 #loginGate .lg-tag-from{left:6%;color:#a2b8cd}
-#loginGate .lg-tag-to{right:7%;color:#ff8b82;text-align:right}
+#loginGate .lg-tag-to{right:7%;color:#f0968d;text-align:right}
 #loginGate .lg-map{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
 /* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
+/* ขอบบางสีเหล็กกับเส้นคาดบนใช้สีเดียวกับฉาก ทำให้การ์ดเป็นส่วนหนึ่งของภาพ
+   ไม่ใช่สี่เหลี่ยมขาวที่บังเอิญมาวางทับ */
 #loginGate .lg-card{position:relative;width:100%;background:var(--g-paper);
-  border-radius:20px;padding:32px 32px 24px;text-align:left;
+  border-radius:20px;padding:32px 32px 24px;text-align:left;overflow:hidden;
+  border:1px solid rgba(158,186,212,.3);
   box-shadow:0 34px 80px rgba(2,12,24,.5),0 2px 5px rgba(2,12,24,.3);
   animation:lgIn .55s cubic-bezier(.2,.7,.3,1) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+/* เส้นคาดบน: ไล่จากเทาเหล็ก (ระบบเดิม) ไปแดง (ปลายทาง) — เรื่องเดียวกับฉากย่อลงมา */
+#loginGate .lg-card::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,rgba(125,151,176,.85) 0%,rgba(125,151,176,.3) 38%,rgba(196,62,54,.75) 100%)}
 #loginGate .lg-brand{display:flex;align-items:center;gap:13px;margin-bottom:25px}
 #loginGate .lg-brand img{height:44px;width:auto;display:block;flex:none}
 #loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:#0f2c4c;line-height:1.14}
@@ -954,8 +968,8 @@ body.locked{overflow:hidden}
   border:1px solid #fee4e2;border-radius:9px;padding:9px 12px}
 #loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid #e6ecf3;
   font-size:12px;color:#68788b;line-height:1.5}
-#loginGate .lg-foot{margin-top:26px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
-  color:rgba(159,182,205,.46)}
+#loginGate .lg-foot{margin-top:20px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
+  color:rgba(159,182,205,.42)}
 #loginGate :focus-visible{outline:2px solid #6fb3ff;outline-offset:2px}
 
 /* ── จอแคบ ────────────────────────────────────────────────────────────────── */
@@ -988,7 +1002,7 @@ body.locked{overflow:hidden}
 <div id="loginGate">
   <div class="lg-shell">
     <section class="lg-story">
-      <h1 class="lg-h">กำลังย้ายระบบหลักของบริษัทจาก <b>SAP</b> ไป <b>Oracle Fusion</b></h1>
+      <h1 class="lg-h">กำลังย้ายระบบหลักของบริษัทจาก <b>SAP</b> ไป <b>Oracle NetSuite</b></h1>
       <p class="lg-lede">ที่นี่เก็บงานทุกใบของการเปลี่ยนระบบ ตั้งแต่เก็บความต้องการและ BRD
         ไปจนถึงวันขึ้นระบบจริง พร้อมสถานะว่าแต่ละใบค้างอยู่ฝั่งไหน</p>
 
@@ -1007,13 +1021,13 @@ body.locked{overflow:hidden}
           </div>
           <div class="lg-track">
             <div class="lg-cube" style="--d:0s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="lg-cube" style="--d:3s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="lg-cube" style="--d:6s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:3.7s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:7.4s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           </div>
         </div>
         <canvas class="lg-map"></canvas>
         <span class="lg-tag lg-tag-from">SAP ECC<small>ระบบเดิม</small></span>
-        <span class="lg-tag lg-tag-to">ORACLE FUSION<small>ปลายทาง</small></span>
+        <span class="lg-tag lg-tag-to">ORACLE NETSUITE<small>ปลายทาง</small></span>
       </div>
 
       <div class="lg-count">
@@ -1089,7 +1103,7 @@ body.locked{overflow:hidden}
     for(var s=0.025;s<=upto;s+=0.025){
       var u=1-s;
       ctx.lineTo(u*u*L.a.x+2*u*s*mx+s*s*L.b.x, u*u*L.a.y+2*u*s*my+s*s*L.b.y);}
-    ctx.strokeStyle='rgba(255,138,128,'+alpha.toFixed(3)+')';
+    ctx.strokeStyle='rgba(236,136,126,'+alpha.toFixed(3)+')';
     ctx.lineWidth=1.6;ctx.stroke();}
 
   function spawn(){
@@ -1109,7 +1123,7 @@ body.locked{overflow:hidden}
       curve(L,grow,0.75*fade);
       if(grow>=1){
         ctx.beginPath();ctx.arc(L.b.x,L.b.y,3.4,0,6.2832);
-        ctx.fillStyle='rgba(255,168,160,'+(0.82*fade).toFixed(3)+')';ctx.fill();}}}
+        ctx.fillStyle='rgba(240,162,152,'+(0.82*fade).toFixed(3)+')';ctx.fill();}}}
 
   function stop(){if(raf)cancelAnimationFrame(raf);raf=0;
     if(timer)clearInterval(timer);timer=0;}
