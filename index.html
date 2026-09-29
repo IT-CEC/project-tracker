@@ -1451,13 +1451,29 @@ body.locked{overflow:hidden}
 
    ลำดับ: กอง Oracle ประกอบจนครบ → กริดพุ่งเข้าหาคนดู → การ์ดยกตัวแล้วสลาย
    ระหว่าง 850ms นี้แอปกำลังบูตอยู่ข้างหลังพอดี จังหวะออกจึงกลบเวลารอไปด้วย */
-#loginGate.lg-exit{animation:lgGateOut .85s cubic-bezier(.55,0,.85,0) forwards;pointer-events:none}
-@keyframes lgGateOut{0%,55%{opacity:1}100%{opacity:0}}
-/* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป */
-#loginGate.lg-exit .lg-world{animation:lgWorldOut .85s cubic-bezier(.45,0,.75,.2) forwards}
+#loginGate.lg-exit{animation:lgGateOut .95s cubic-bezier(.55,0,.85,0) forwards;
+  pointer-events:none;
+  /* ฉากหลุดกรอบเวทีได้แล้ว จึงต้องกันแถบเลื่อนที่ชั้นนี้แทน */
+  overflow:hidden}
+@keyframes lgGateOut{0%,52%{opacity:1}100%{opacity:0}}
+/* เวทีเลิกตัดและเลิก mask ตอนพุ่งออก — ไม่งั้นฉากที่ควรทะลุผ่านคนดู
+   ถูกขังอยู่ในกล่อง 1000×318 กลางหน้า เห็นเป็นการซูมในกรอบ ไม่ใช่การพุ่งผ่าน
+   (พื้นมีการจางของตัวเองอยู่แล้ว ขอบจึงไม่กระโดดตอนถอด mask) */
+#loginGate.lg-exit .lg-stage{overflow:visible;
+  -webkit-mask-image:none;mask-image:none}
+/* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป
+   ของเดิมใช้โค้งเดียว cubic-bezier(.45,0,.75,.2) ซึ่งจุดคุมทั้งสองอยู่ต่ำ
+   วัดจริงแล้วผ่านไปครึ่งเวลาเดินทางได้แค่ 5% ของระยะ ที่เหลือ 70% อัดอยู่ใน
+   ช่วงท้าย 9% — ตาอ่านว่านิ่งค้างแล้วกระตุกหายไป ไม่ใช่พุ่ง
+   คราวนี้แยกเป็นสองช่วง: กล้องเงยขึ้นจากโต๊ะก่อนแบบออกตัวทันที
+   แล้วค่อยเร่งพุ่งทะลุ ระยะทางจึงไหลตลอดเส้น ไม่มีช่วงไหนค้าง */
+#loginGate.lg-exit .lg-world{animation:lgWorldOut .95s linear forwards}
 @keyframes lgWorldOut{
-  from{transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
-  to  {transform:rotateX(14deg) rotateZ(0deg) translateY(-8%) translateZ(620px)}}
+  0%  {transform:rotateX(52deg) rotateZ(-7deg) translateY(4%) translateZ(0);
+       animation-timing-function:cubic-bezier(.19,.64,.35,.98)}
+  40% {transform:rotateX(33deg) rotateZ(-3.4deg) translateY(-1%) translateZ(135px);
+       animation-timing-function:cubic-bezier(.52,0,.8,.46)}
+  100%{transform:rotateX(9deg) rotateZ(0deg) translateY(-10%) translateZ(730px)}}
 /* กอง Oracle ประกอบจนครบ ใช้ transition เพื่อให้ไหลจากตำแหน่งที่ค้างอยู่ ไม่ใช่กระโดด */
 #loginGate.lg-exit .lg-to .lg-slab{animation:none!important;
   transition:opacity .3s ease,transform .5s cubic-bezier(.2,.9,.3,1);
@@ -1475,7 +1491,13 @@ body.locked{overflow:hidden}
 #loginGate.lg-exit .lg-from::before{animation:none!important;
   transition:opacity .35s ease;opacity:.14}
 #loginGate.lg-exit .lg-cube{animation:none!important;transition:opacity .25s ease;opacity:0}
-#loginGate.lg-exit .lg-card{animation:lgCardOut .45s cubic-bezier(.4,0,1,1) forwards}
+/* เส้นทางกับเส้นโค้งย้ายระบบวาดอยู่บน canvas ซึ่งเป็นภาพสองมิติ มันจึงไม่ไปกับ
+   .lg-world ที่กำลังพุ่ง — ค้างอยู่กับที่ให้เห็นว่าหลุดจากกัน
+   ดันมันเข้าหาคนดูด้วย translateZ พร้อมจางไป ทั้งฉากจึงออกไปเป็นก้อนเดียวกัน */
+#loginGate.lg-exit .lg-map{
+  transition:opacity .4s ease,transform .62s cubic-bezier(.5,0,.8,.46);
+  opacity:0;transform:translateZ(320px)}
+#loginGate.lg-exit .lg-card{animation:lgCardOut .5s cubic-bezier(.4,0,1,1) forwards}
 @keyframes lgCardOut{to{opacity:0;transform:translateY(-20px) scale(.97)}}
 #loginGate.lg-exit .lg-h,#loginGate.lg-exit .lg-lede,
 #loginGate.lg-exit .lg-count,#loginGate.lg-exit .lg-tag,#loginGate.lg-exit .lg-foot{
