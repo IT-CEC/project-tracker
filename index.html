@@ -809,74 +809,280 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
    กำลังปลด แดงบริษัท = ปลายทาง · เส้นที่ลากข้ามคือการจับคู่ field ข้ามระบบ
    ซึ่งเป็นงานจริงของการย้าย ERP ไม่ใช่เอฟเฟกต์ประดับ */
 body.locked{overflow:hidden}
+/* ลงทะเบียน --i ให้เป็นตัวเลขจริง ไม่งั้นมันเป็นแค่โทเคนที่ interpolate ไม่ได้
+   และ --light ใช้ไล่ความสว่างตามชั้น (แสงทิศเดียว แบบที่เอนจินเกมทำมาหลายสิบปี) */
+@property --i{syntax:"<number>";inherits:false;initial-value:0}
+@property --light{syntax:"<number>";inherits:true;initial-value:1}
 #loginGate{
-  --g-deep:#06192e; --g-steel:#7d97b0; --g-signal:#e2231a;
-  --g-paper:#f5f8fc; --g-rule:rgba(138,172,204,.32);
+  /* พลิกเป็นพื้นเข้ม เพราะการเปล่งแสงต้องมีความมืดถึงจะเรือง
+     บนพื้นขาวการบวกแสงไม่ให้ผลอะไรเลย เอฟเฟกต์ทุกตัวในฉากจึงเป็นได้แค่ "เส้น"
+     ไม่ใช่ "แสง" — แดงต้องสว่างกว่าแดงโลโก้เดิมด้วย ไม่งั้นจมกับพื้นน้ำเงินเข้ม */
+  --g-ink:#e9f2fc;
+  --g-ink2:#93acc6;
+  --g-signal:#ff5244;
+  --g-rule:rgba(122,170,225,.13);
   --g-thai:'Noto Sans Thai',-apple-system,BlinkMacSystemFont,sans-serif;
   --g-tech:'Barlow Condensed','Noto Sans Thai',sans-serif;
-  position:fixed;inset:0;z-index:100000;overflow-y:auto;
+  /* ตั้งแค่ overflow-y ทำให้แกน x กลายเป็น auto ตามสเปก พอฉากล้นออกข้าง
+     (ซึ่งตั้งใจ เพราะพื้นมีมาสก์บัง) เลยมีแถบเลื่อนแนวนอนที่จอ 1280–1366 */
+  position:fixed;inset:0;z-index:100000;overflow-x:hidden;overflow-y:auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:40px 32px;font-family:var(--g-thai);color:#dce8f5;
+  /* 76px ล่างเผื่อไว้เยอะเกินจำเป็น รัดลงเพื่อคืนที่ให้เนื้อหา */
+  padding:34px 32px 44px;font-family:var(--g-thai);color:var(--g-ink);
+  /* ไล่สีใน oklab ตัดช่วงกลางขุ่นที่ทำให้เห็นขั้นสี */
   background:
-    radial-gradient(1100px 620px at 24% 36%,#12395f 0%,transparent 62%),
-    linear-gradient(168deg,#08213b 0%,var(--g-deep) 58%,#04121f 100%);
+    radial-gradient(1250px 720px at 26% 24% in oklab,#12395f 0%,transparent 62%),
+    linear-gradient(168deg in oklab,#06203a 0%,#04142a 56%,#020b18 100%);
 }
+/* เกรนละเอียดทับทั้งหน้า ปิดขั้นสีที่เหลือ
+   ใช้เป็น background tile ไม่ใช่ filter:url() เพราะ SVG filter สดบนอิลิเมนต์ใหญ่
+   กิน CPU หนักตอน first paint ส่วน tile เบราว์เซอร์ rasterise ครั้งเดียวแล้วจบ */
+#loginGate::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  opacity:.075;mix-blend-mode:overlay;background-size:170px 170px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='170' height='170' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+#loginGate .lg-shell,#loginGate .lg-foot{position:relative;z-index:2}
+/* ของเดิมฉากถูกอัดอยู่ในคอลัมน์ซ้ายกว้างราว 580px ทั้งที่มันคือพระเอกของหน้า
+   และเหลือที่ว่างใต้การ์ดเป็นแถบเปล่า ย้ายฉากลงมาเป็นแถวของตัวเองเต็มความกว้าง
+   ฉากจึงกว้างขึ้นเท่าตัว ถนน 7 เฟสมีที่หายใจ และที่ว่างข้างล่างถูกใช้ */
 #loginGate .lg-shell{
-  width:100%;max-width:1090px;display:grid;gap:clamp(28px,4vw,56px);
-  grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr);align-items:center;
+  width:100%;max-width:1280px;display:grid;
+  column-gap:clamp(26px,3.6vw,58px);row-gap:clamp(12px,1.8vw,26px);
+  grid-template-columns:minmax(0,1fr) minmax(330px,368px);
+  grid-template-rows:auto auto;align-items:start;
 }
+#loginGate .lg-story{grid-column:1;grid-row:1;align-self:center}
+#loginGate .lg-card{grid-column:2;grid-row:1}
+#loginGate .lg-stage{grid-column:1 / -1;grid-row:2}
 
 /* ── ฝั่งเล่าเรื่อง ───────────────────────────────────────────────────────── */
 /* ชื่อ "Oracle NetSuite" ยาวกว่าเดิม ถ้าปล่อยกว้าง 15ch จะตัดเป็นสี่บรรทัด
    แล้ว "จาก SAP ไป" ลอยเป็นบรรทัดเดี่ยว อ่านสะดุด กว้างพอให้ลงสองบรรทัดพอดี */
 #loginGate .lg-h{
-  font-size:clamp(25px,2.9vw,37px);font-weight:700;line-height:1.2;
-  letter-spacing:-.022em;color:#f2f7fc;margin:0 0 13px;max-width:24ch;text-wrap:balance;
+  /* nowrap อย่างเดียวไม่พอ ที่จอ 1280 หัวเรื่องกว้าง 802px จนดันคอลัมน์
+     และทั้งหน้าล้นลงไป 38px ต้องให้ขนาดตัวอักษรหดตามความกว้างจอด้วย */
+  font-size:clamp(20px,2.35vw,34px);font-weight:700;line-height:1.2;
+  /* ต้องอยู่แถวเดียว ไม่ตกบรรทัด — ที่ 24ch มันตกบรรทัดแล้วทั้งหน้าล้นจอ 941px
+     ไป 22px ด้วย ปล่อยความกว้างอิสระแล้วห้ามตัดคำแทน */
+  letter-spacing:-.022em;color:var(--g-ink);margin:0 0 12px;max-width:none;
+  white-space:nowrap;
 }
-#loginGate .lg-h b{font-weight:700;white-space:nowrap}
-#loginGate .lg-lede{font-size:14.5px;line-height:1.72;color:#9fb6cd;margin:0;max-width:46ch;
-  text-wrap:pretty}
+/* ของเดิม <b> เป็น 700/Noto เหมือนตัวอักษรรอบข้างเป๊ะ จึงไม่ได้ทำอะไรเลย
+   ทั้งที่ SAP กับ Oracle NetSuite เป็นประธานของประโยค
+   ให้ใช้ตัวเดียวกับป้ายในฉาก หัวเรื่องกับไดอะแกรมจะพูดด้วยเสียงเดียวกัน */
+#loginGate .lg-h b{font-family:var(--g-tech);font-weight:600;white-space:nowrap;
+  font-size:1.1em;letter-spacing:.005em}
+/* ERP ใช้ฟ้าเดียวกับ SAP ด้านล่าง หัวเรื่องกับบรรทัดต้นทางจึงพูดด้วยเสียงเดียวกัน */
+#loginGate .lg-h .lg-erp{font-style:normal;color:#3f9ae8;
+  text-shadow:0 0 24px rgba(63,154,232,.4)}
+/* บรรทัด "จาก … ไป …" เป็นข้อมูลรอง ไม่ใช่พาดหัว จึงเล็กลงและขึ้นบรรทัดใหม่เสมอ */
+#loginGate .lg-h span{display:block;margin-top:7px;font-size:.62em;font-weight:600;
+  letter-spacing:0;color:var(--g-ink2)}
+/* สีตามแบรนด์ทั้งสองระบบ — ขอสีดำสำหรับ NetSuite แต่บนพื้นเข้มสีดำหายไปทั้งคำ
+   โลโก้ที่เป็นดำบนพื้นขาวจะกลับเป็นขาวเมื่ออยู่บนพื้นมืด ซึ่งเป็นวิธีมาตรฐาน
+   ส่วน SAP ใช้น้ำเงินของแบรนด์ที่สดพอจะอ่านออกบนพื้นน้ำเงินเข้ม */
+#loginGate .lg-h b:first-of-type{color:#3f9ae8;text-shadow:0 0 22px rgba(63,154,232,.4)}
+#loginGate .lg-h .lg-orcl{font-style:normal;color:#ff4438;
+  text-shadow:0 0 22px rgba(255,68,56,.45)}
+/* ขอสีดำสำหรับ NetSuite — บนพื้นน้ำเงินเข้มสีดำมีคอนทราสต์ราว 1.4:1 คืออ่านไม่ออก
+   จึงวางบนแผ่นสว่างแบบล็อกอัปโลโก้ ได้สีดำจริงตามที่ขอและยังอ่านออก */
+#loginGate .lg-h .lg-ns{font-style:normal;color:#0a0a0a;background:#f2f6fb;
+  padding:.04em .3em .1em;border-radius:5px;
+  box-shadow:0 0 22px rgba(190,220,255,.28)}
+#loginGate .lg-lede{margin:0}
+/* สามข้อนี้คือคำที่สื่อสารไปทั้งองค์กรแล้ว ใช้คำเดิมทุกตัวอักษร
+   เส้นคั่นบางระหว่างข้อทำหน้าที่เดียวกับในแผ่นข่าว คือบอกว่าเป็นรายการสามชั้น
+   ไม่ใช่ย่อหน้าเดียวที่ถูกตัด */
+#loginGate .lg-goalttl{font-size:13px;font-weight:600;color:var(--g-ink2);
+  margin:0 0 11px;letter-spacing:.01em}
+#loginGate .lg-pillars{list-style:none;margin:0;padding:0;max-width:44ch}
+#loginGate .lg-pillars li{display:flex;align-items:flex-start;gap:12px;
+  padding:9px 0;border-top:1px solid rgba(122,170,225,.13)}
+#loginGate .lg-pillars li:first-child{border-top:0;padding-top:0}
+#loginGate .lg-pillars svg{width:26px;height:26px;flex:none;margin-top:1px;
+  fill:none;stroke:var(--pc);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 0 7px color-mix(in srgb,var(--pc) 45%,transparent))}
+#loginGate .lg-pillars b{display:block;font-family:var(--g-tech);font-size:16px;
+  font-weight:600;letter-spacing:.055em;color:var(--pc);line-height:1.1}
+#loginGate .lg-pillars span{display:block;font-size:13px;line-height:1.5;
+  color:var(--g-ink2);margin-top:2px}
 #loginGate .lg-count{display:flex;align-items:baseline;gap:12px;margin-top:18px;
-  padding-top:18px;border-top:1px solid rgba(125,151,176,.19)}
-#loginGate .lg-days{font-family:var(--g-tech);font-size:46px;font-weight:600;line-height:.84;
-  color:#fff;letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
-#loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:#9fb6cd;max-width:26ch}
-#loginGate .lg-count time{color:#e6eef7;font-weight:600;white-space:nowrap}
+  padding-top:18px;border-top:1px solid rgba(122,170,225,.2)}
+#loginGate .lg-days{font-family:var(--g-tech);font-size:44px;font-weight:600;line-height:.84;
+  color:var(--g-ink);letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
+#loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:var(--g-ink2);max-width:26ch}
+#loginGate .lg-count time{color:var(--g-ink);font-weight:600;white-space:nowrap}
 
 /* ── ฉากสามมิติ ───────────────────────────────────────────────────────────
    .lg-world หมุนทั้งก้อนครั้งเดียว ของข้างในวางด้วย translateZ ซึ่งกลายเป็น
    "ความสูง" หลังหมุนแล้ว จึงเป็นสามมิติจริง ไม่ใช่ภาพลวงแบน
    ระยะทางของลูกบาศก์ใช้ left เป็น % ของรางที่ครอบ เพราะ % ใน translate
    อ้างอิงขนาดตัวเอง ไม่ใช่ระยะบนเวที */
-#loginGate .lg-stage{position:relative;height:clamp(226px,22vw,262px);margin:22px 0 0;
-  perspective:1050px;perspective-origin:50% 64%}
+/* ══ ชั้น HUD ══
+   อ้างอิงเป็นฉากนีออนบนพื้นมืด ซึ่งพึ่งการเปล่งแสง — บนพื้นสว่างการบวกแสง
+   ไม่ให้ผลอะไรเลย จึงแปลเป็นภาษาเดียวกันแต่ใช้เส้นคมแทนแสงเรือง
+   คือ HUD แบบพิมพ์เขียววิศวกรรม ซึ่งเข้ากับงานของบริษัทด้วย */
+/* เดิมมีกรอบมุมสี่มุมประกบเวที พอเอาขอบแข็งของเวทีออกแล้ว มุมทั้งสี่กลายเป็น
+   สิ่งเดียวที่ยังบอกว่า "ตรงนี้เป็นกล่อง" — ถอนออก ฉากจึงไม่มีกรอบเลย
+   ภาษา HUD ยังอยู่ครบที่ตารางพื้น เส้นวงจร เรติเคิล และแบบอักษร */
+/* ของในฉากวางด้วย % ของเวที พอเวทีกว้างเต็มแถว ทุกชิ้นถูกขยายตามจนกองกลายเป็น
+   แผ่นยักษ์และล้นขอบ — คุมความกว้างไว้ ฉากจึงกว้างกว่าเดิมเกือบเท่าตัว
+   (จาก ~580 เป็น ~1000) โดยสัดส่วนของในฉากยังเหมือนเดิม */
+/* ตอนซูม ฉากถูกดึงเข้าหากล้องจึงโตขึ้นและไปเพิ่มพื้นที่เลื่อนของทั้งหน้า
+   แถบเลื่อนเลยโผล่กลางอนิเมชัน — overflow:clip ตัดโดยไม่สร้างกล่องเลื่อน
+   และไม่ส่งการล้นต่อไปให้ตัวแม่ ส่วน clip-margin เผื่อให้ป้ายกับเลขที่ยกสูง
+   ไม่ถูกตัดหัว */
+/* ไม่ว่าจะเผื่อระยะตัดไว้เท่าไร ตอนซูมฉากก็ขยายจนมีของแข็ง (กองสองฝั่ง พื้น)
+   ไปพาดแนวตัดอยู่ดี และเผื่อเกิน ~120px พื้นที่เลื่อนของหน้าก็กลับมา
+   ทางที่ถูกคือให้ภาพจางหายเองก่อนถึงขอบ แล้วขอบจะไม่มีอะไรให้ตัด
+   mask อยู่บน .lg-stage ได้เพราะตัวมันถือ perspective ไม่ได้ถือ preserve-3d
+   ฉากสามมิติถูกคำนวณจบข้างในแล้วค่อยถูก mask ทับ ความลึกจึงไม่เสีย */
+#loginGate .lg-stage{--hud:#57a0e4;position:relative;overflow:clip;
+  --fade:4%;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),
+      #000 calc(100% - var(--fade)),transparent 100%),
+    linear-gradient(180deg,#000 0,#000 93%,transparent 100%);
+  -webkit-mask-repeat:no-repeat;-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),
+      #000 calc(100% - var(--fade)),transparent 100%),
+    linear-gradient(180deg,#000 0,#000 93%,transparent 100%);
+  mask-repeat:no-repeat;mask-composite:intersect;
+  height:clamp(250px,23vw,318px);
+  width:100%;max-width:1000px;margin:6px auto 0;
+  perspective:1050px;
+  /* --ox/--oy มาจากเมาส์ · --fx/--fy มาจากการซูมเข้าหาเฟส
+     ต้องแยกตัวแปรกัน เพราะ --ox ถูก rAF เขียนทับทุกเฟรม ถ้าใช้ตัวเดียวกันจะตีกัน */
+  perspective-origin:calc(50% + var(--ox,0px) + var(--fx,0px))
+                     calc(64% + var(--oy,0px) + var(--fy,0px));
+  transition:perspective-origin 1.3s cubic-bezier(.3,.05,.15,1)}
+/* ชั้นซูม: ดันกล้องเข้าหาเฟสที่กด แล้วเลื่อนให้เฟสนั้นมาอยู่กลางเวที
+   แยกจากชั้นกล้องเพราะชั้นกล้องถูก rAF เขียนทุกเฟรม ถ้าใส่ transition ลงไปด้วย
+   การขยับตามเมาส์จะหน่วงเป็นยางยืด */
+#loginGate .lg-zoom{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:translate3d(var(--zx,0px),var(--zy,0px),var(--zz,0px));
+  /* ช้าลงเกือบเท่าตัวและออกตัวนุ่มกว่าเดิม จังหวะเข้าจึงรู้สึกเป็นการถูกดึงเข้าไป
+     ไม่ใช่การกระโดดไปถึง — ปลายโค้งแบนยาวทำให้กล้องค่อยๆ นิ่งแทนที่จะหยุดกึก */
+  /* โค้งนี้ออกตัวทันทีแต่ไม่กระชาก แล้วค่อยๆ นิ่งยาว = ความรู้สึกถูกดึงเข้าไป
+     โค้งที่แบนสนิทตอนต้นทำให้รู้สึกว่าหน่วงก่อนแล้วค่อยพุ่ง */
+  transition:transform 1.3s cubic-bezier(.3,.05,.15,1);
+  will-change:transform}
+/* กล้องเอียงตามเมาส์เล็กน้อย ±4 องศา — บนไดอะแกรม ความยับยั้งชั่งใจอ่านเป็นความมั่นใจ
+   และจุดลับสายตาขยับด้วย ซึ่งเป็นสัญญาณความลึกที่แรงกว่าการหมุนวัตถุและไม่มีต้นทุน */
+#loginGate .lg-cam{position:absolute;inset:0;transform-style:preserve-3d;
+  transform:rotateX(var(--py,0deg)) rotateY(var(--px,0deg))}
 #loginGate .lg-world{position:absolute;inset:0;transform-style:preserve-3d;
   transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
+/* พื้น กอง และลูกบาศก์เป็นของประดับ ต้องไม่แย่งรับคลิกจากหมุดเฟส
+   วัดด้วย elementFromPoint แล้วพบว่าหมุด 02/04/07 ถูก .lg-floor กับ .lg-road บังอยู่ */
+#loginGate .lg-floor,#loginGate .lg-side,#loginGate .lg-track,
+#loginGate .lg-wire{pointer-events:none}
+/* เส้นวงจรบนพื้น — ภาษาเดียวกับผังอาคารในรูปอ้างอิง เดินเป็นมุมฉากตามตารางพื้น
+   ไม่ใช่เส้นโค้งอิสระ อยู่ใต้ของทุกอย่างจึงอ่านเป็นระบบสายที่ฝังอยู่ในพื้น
+   vector-effect ทำให้เส้นคงความหนา 1px แม้ viewBox จะถูกยืดไม่เท่ากันสองแกน */
+#loginGate .lg-wire{position:absolute;left:-2%;top:-14%;width:104%;height:130%;overflow:visible;
+  /* จางที่ขอบเหมือนตารางพื้น ไม่งั้นเส้นโผล่พ้นพื้นออกไปเป็นรอยลอยในอากาศ */
+  -webkit-mask-image:radial-gradient(40% 38% at 50% 50%,#000 30%,transparent 96%);
+          mask-image:radial-gradient(40% 38% at 50% 50%,#000 30%,transparent 96%)}
+#loginGate .lg-wire path{vector-effect:non-scaling-stroke;fill:none}
+#loginGate .lg-wire .lw-base path{stroke:rgba(88,170,245,.32);stroke-width:1}
+#loginGate .lg-wire .lw-node path{stroke:rgba(126,200,255,.6);stroke-width:3.6;stroke-linecap:round}
+/* พัลส์วิ่งไปทางเดียวกับการย้ายระบบ ใช้เส้นประยาวช่วงเดียววิ่งไปตามเส้นเดิม */
+/* พัลส์เรืองแสงจริงบนพื้นเข้ม drop-shadow ทำหน้าที่เป็นรัศมี */
+#loginGate .lg-wire .lw-pulse{filter:drop-shadow(0 0 4px rgba(120,200,255,.8))}
+#loginGate .lg-wire .lw-pulse path{fill:none;stroke:rgba(180,228,255,.95);stroke-width:1.6;
+  stroke-dasharray:7 260;animation:lgWire 6.5s linear infinite}
+#loginGate .lg-wire .lw-pulse path:nth-child(2){animation-duration:8.5s;animation-delay:-3s}
+@keyframes lgWire{from{stroke-dashoffset:267}to{stroke-dashoffset:0}}
+/* กลับมาใช้ plus-lighter ได้แล้วเพราะพื้นเข้ม ไฟส่องจึงเป็นแสงจริงไม่ใช่เงา */
+#loginGate .lg-floor::after{content:"";position:absolute;inset:0;pointer-events:none;
+  mix-blend-mode:plus-lighter;opacity:var(--spot,0);transition:opacity .4s ease;
+  background:radial-gradient(300px 300px at calc(50% + var(--lx,0px)) calc(50% + var(--ly,0px)),
+    rgba(96,170,240,.3),transparent 72%)}
+/* เส้นกวาดวิ่งไปทางเดียวกับการย้ายระบบ SAP → NetSuite ไม่ใช่กวาดไปมาเฉยๆ
+   อยู่บน .lg-floor ซึ่งเอียงไปกับพื้นแล้ว เส้นจึงนอนไปกับพื้นจริงไม่ใช่ลอยทับหน้าจอ */
+#loginGate .lg-floor::before{content:"";position:absolute;inset:0;pointer-events:none;
+  /* ที่ .6 บนพื้นเข้มมันกลายเป็นแถบขาวกว้างกลางฉากที่กลบเส้นทางทั้งเส้น
+     เรดาร์ควรเป็นเส้นบางที่ผ่านไป ไม่ใช่ไฟหน้ารถ */
+  mix-blend-mode:plus-lighter;opacity:.5;
+  background-image:linear-gradient(90deg,transparent 0 48.4%,
+    rgba(70,150,235,.07) 49.2%,rgba(130,200,255,.2) 50%,rgba(70,150,235,.07) 50.8%,
+    transparent 51.6% 100%);
+  background-size:210% 100%;background-repeat:no-repeat;
+  animation:lgSweep 9s cubic-bezier(.5,0,.5,1) infinite}
+@keyframes lgSweep{
+  0%     {background-position:-14% 0;opacity:0}
+  8%,78% {opacity:.5}
+  92%,100%{background-position:118% 0;opacity:0}}
 #loginGate .lg-floor{position:absolute;left:-18%;top:-34%;width:136%;height:176%;
   background:
     repeating-linear-gradient(90deg,var(--g-rule) 0 1px,transparent 1px 44px),
     repeating-linear-gradient(0deg,var(--g-rule) 0 1px,transparent 1px 44px),
-    linear-gradient(180deg,rgba(18,57,95,.44),rgba(6,25,46,0));
-  -webkit-mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
-          mask-image:radial-gradient(64% 58% at 50% 46%,#000 30%,transparent 100%);
+    linear-gradient(180deg,rgba(22,66,116,.5),rgba(4,18,36,0));
+  /* รัศมีเดิม 64%/58% ของกล่องพื้น (ซึ่งกว้าง 136% ของเวที) แปลว่าพื้นยังทึบอยู่
+     ตอนที่ overflow:clip ตัด ขอบเลยออกมาเป็นเส้นตรงสี่เหลี่ยมคาตา
+     ย่อรัศมีให้แอลฟาเป็นศูนย์ก่อนถึงแนวตัด — แม้ตอนซูมซึ่งขยายฉากอีก 17%
+     พอไม่มีอะไรเหลือให้ตัด รูปทรงที่ตาเห็นจึงเป็นแอ่งแสงบนพื้นตามเพอร์สเปกทีฟ */
+  -webkit-mask-image:radial-gradient(40% 34% at 50% 46%,#000 52%,transparent 100%);
+          mask-image:radial-gradient(40% 34% at 50% 46%,#000 52%,transparent 100%);
 }
-#loginGate .lg-side{position:absolute;top:44%;width:16%;padding-bottom:16%;
+/* ขยายแผ่นจาก 8.4% เพราะป้ายย้ายมาอยู่บนแผ่นแล้ว ต้องมีที่ให้ตัวหนังสือหายใจ
+   ที่ 10.6% กองซ้ายเบียดหมุด 01 อยู่ 29px จึงถอยมาที่ 9.6% แล้ววัดใหม่ */
+#loginGate .lg-side{position:absolute;top:46%;width:9.6%;padding-bottom:9.6%;
   transform-style:preserve-3d}
-#loginGate .lg-from{left:11%}
-#loginGate .lg-to{left:67%}
+/* บนพื้นเข้ม "เงา" มองไม่เห็นเพราะพื้นมืดอยู่แล้ว เปลี่ยนเป็นแอ่งแสงที่กองสาดลงพื้นแทน
+   ทำหน้าที่เดิมคือบอกว่ากองแตะพื้นอยู่ตรงไหน แต่เป็นภาษาของฉากเรืองแสง */
+#loginGate .lg-side::before{content:"";position:absolute;left:-46%;top:-40%;
+  width:192%;height:180%;transform:translateZ(.5px);border-radius:50%;
+  mix-blend-mode:plus-lighter;pointer-events:none;
+  background:radial-gradient(ellipse at 52% 52%,rgba(110,175,245,.22),transparent 66%)}
+#loginGate .lg-to::before{
+  background:radial-gradient(ellipse at 52% 52%,rgba(255,110,80,.28),transparent 66%)}
+/* เงาต้องจางไปพร้อมกองที่มันเป็นเงาของ วัดแล้วพบว่าเงาค้างที่ opacity 1 ตลอด
+   ขณะที่กองขึ้นลง 0→6 เพราะ opacity ขยับที่ .lg-slab ซึ่งเป็นลูก
+   ไม่ใช่ที่ .lg-side ที่ถือเงาไว้ — บนพื้นสว่างมันอ่านเป็นคราบเทาลอยโดยไม่มีของข้างบน
+   เงาหดลงตอนกองยุบด้วย ของเตี้ยลงเงาย่อมเล็ก */
+#loginGate .lg-from::before{animation:lgShadeOut 11s cubic-bezier(.4,0,.2,1) infinite}
+#loginGate .lg-to::before{opacity:0;animation:lgShadeIn 11s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes lgShadeOut{
+  0%,24%  {opacity:1;transform:translateZ(.5px) scale(1)}
+  48%,72% {opacity:.14;transform:translateZ(.5px) scale(.76)}
+  94%,100%{opacity:1;transform:translateZ(.5px) scale(1)}}
+@keyframes lgShadeIn{
+  0%,20%  {opacity:0;transform:translateZ(.5px) scale(.72)}
+  46%,74% {opacity:1;transform:translateZ(.5px) scale(1)}
+  96%,100%{opacity:0;transform:translateZ(.5px) scale(.72)}}
+/* วัดแล้วที่ 0%/86% กองล้นขอบเวทีทั้งสองข้าง (ซ้าย -14px ขวา 589 จากเวที 579)
+   เพราะการหมุนเวทีเลื่อนตำแหน่งจริงออกจากค่า left ที่ตั้ง */
+/* ร่นเข้ามาจาก 4% เพราะป้ายที่อยู่กลางกองจะไปตกในแถบจางริมซ้ายของเวที
+   กองขวาไม่ต้องขยับ ถ้าร่นเข้ามาจะไปทับหมุด 07 ที่ 78% */
+/* ถอยลงจากแนวเดียวกับกองขวาเล็กน้อย ไม่งั้นขอบขวาของแผ่นไปชนป้าย
+   "Planning & Kick-Off" ของหมุด 01 พอดี */
+#loginGate .lg-from{left:5.6%;top:57%}
+#loginGate .lg-to{left:81%}
 /* ชั้นห่างกัน 26px และมีเงาทิ้งลงข้างล่างทำหน้าที่เป็นด้านข้างของแท่ง
    ถ้าใช้แผ่นบางล้วน พอเอียงแล้วจะอ่านเป็นคราบสีเดียว ไม่ใช่กองที่ซ้อนกัน */
 #loginGate .lg-slab{position:absolute;inset:0;border-radius:2px;
   transform:translateZ(calc(var(--i) * 26px));
-  background:linear-gradient(135deg,rgba(158,186,212,.54),rgba(120,148,176,.26));
-  border:1px solid rgba(190,213,234,.7);
-  box-shadow:0 0 0 1px rgba(6,25,46,.5) inset, 0 14px 0 -2px rgba(52,80,110,.4)}
+  /* ต้องทึบพอ ไม่งั้นหกแผ่นซ้อนกันแล้วอัลฟาบวกกันจนอ่านเป็นก้อนเดียว
+     ไม่ใช่กองที่มีชั้น — ระบบเดิมเป็นโครงเย็น ไม่มีความร้อน ตรงข้ามกับ NetSuite */
+  background:linear-gradient(135deg,rgba(74,112,158,.88),rgba(28,56,92,.92));
+  border:1px solid rgba(120,168,220,.42);
+  border-top-color:rgba(205,232,255,.85);border-left-color:rgba(176,212,248,.65);
+  border-bottom-color:rgba(38,74,116,.85);border-right-color:rgba(46,84,126,.8);
+  box-shadow:0 10px 0 -2px rgba(20,46,78,.75), 0 14px 22px -8px rgba(0,0,0,.55),
+             0 0 18px rgba(110,175,240,.14);
+  filter:brightness(var(--light))}
+/* ชั้นบนรับแสงมากกว่าชั้นล่าง */
+#loginGate .lg-slab{--light:calc(.93 + var(--i) * .026)}
 #loginGate .lg-from .lg-slab{animation:lgRetire 11s cubic-bezier(.4,0,.2,1) infinite;
   animation-delay:calc(var(--i) * .2s)}
 #loginGate .lg-to .lg-slab{opacity:0;
-  background:linear-gradient(135deg,rgba(196,62,54,.42),rgba(142,34,28,.2));
-  border-color:rgba(232,132,122,.58);
-  box-shadow:0 0 0 1px rgba(46,8,6,.4) inset, 0 14px 0 -2px rgba(98,24,20,.42);
+  /* ระบบใหม่คือของที่กำลังติดขึ้นมา จึงร้อนและเปล่งแสงจริง */
+  background:linear-gradient(135deg,rgba(226,76,54,.94),rgba(138,30,20,.95));
+  border-color:rgba(255,124,98,.6);
+  border-top-color:rgba(255,208,186,.95);border-left-color:rgba(255,164,140,.78);
+  border-bottom-color:rgba(108,22,15,.9);border-right-color:rgba(126,30,22,.82);
+  box-shadow:0 10px 0 -2px rgba(80,18,12,.8), 0 14px 22px -8px rgba(0,0,0,.55),
+             0 0 30px rgba(255,92,62,.34);
   animation:lgErect 11s cubic-bezier(.4,0,.2,1) infinite;
   animation-delay:calc(var(--i) * .2s)}
 /* ลูปครบวง: SAP เต็มช่วงต้น → ยุบ → ค้างต่ำ → กลับมาเต็มตอนจบเพื่อวนต่อได้เนียน
@@ -896,67 +1102,329 @@ body.locked{overflow:hidden}
   transform-style:preserve-3d}
 #loginGate .lg-cube{position:absolute;top:0;left:0;width:40px;height:40px;margin:-20px 0 0 -20px;
   transform-style:preserve-3d;opacity:0;animation:lgCarry 11s linear infinite;animation-delay:var(--d)}
+/* สีลูกบาศก์ = แผนกที่ข้อมูลกำลังย้าย ตามที่แผ่นข่าวระบุไว้ห้าแผนก
+   ไม่ใช่สีสุ่ม แต่ละสีมีความหมายของมัน */
 #loginGate .lg-cube i{position:absolute;inset:0;display:block;
-  background:rgba(132,28,22,.46);border:1px solid rgba(230,134,124,.6)}
+  background:var(--cd,#c2342a);border:1px solid var(--cb,#8e2018)}
 #loginGate .lg-cube i:nth-child(1){transform:translateZ(20px)}
 #loginGate .lg-cube i:nth-child(2){transform:rotateY(90deg) translateZ(20px)}
 #loginGate .lg-cube i:nth-child(3){transform:rotateY(180deg) translateZ(20px)}
 #loginGate .lg-cube i:nth-child(4){transform:rotateY(-90deg) translateZ(20px)}
 #loginGate .lg-cube i:nth-child(5){transform:rotateX(90deg) translateZ(20px);
-  background:linear-gradient(135deg,rgba(226,92,80,.8),rgba(178,44,36,.7));
-  border-color:rgba(242,176,168,.8)}
+  background:var(--ct,#e9564a);border-color:var(--ct,#e9564a);filter:brightness(1.12)}
 #loginGate .lg-cube i:nth-child(6){transform:rotateX(-90deg) translateZ(20px)}
+/* ของเดิมลูกบาศก์วิ่งเส้นตรง (Z คงที่) แต่เส้น mapping โค้งขึ้น
+   ทั้งคู่เดินทางจาก SAP ไป NetSuite เหมือนกันแต่ไปคนละทาง ดูแล้วขัดกันเอง
+   ให้ Z สูงขึ้นกลางทางแล้วลดลง — หลังหมุนเวที Z คือความสูง จึงได้เส้นโค้ง
+   รูปเดียวกับที่ canvas วาด */
 @keyframes lgCarry{
-  0%      {opacity:0;left:0%;  transform:translateZ(104px) rotateZ(0deg)}
+  0%      {opacity:0;left:0%;  transform:translateZ(58px)  rotateZ(0deg)}
   9%      {opacity:1}
+  50%     {                    transform:translateZ(158px) rotateZ(135deg)}
   84%     {opacity:1}
-  100%    {opacity:0;left:100%;transform:translateZ(104px) rotateZ(270deg)}}
+  100%    {opacity:0;left:100%;transform:translateZ(58px)  rotateZ(270deg)}}
 
-/* ป้ายระบบ — อยู่บน .lg-stage ไม่ใช่ .lg-world จึงไม่เอียงตามพื้น อ่านออก */
-#loginGate .lg-tag{position:absolute;bottom:2px;font-family:var(--g-tech);
-  font-size:15.5px;font-weight:600;letter-spacing:.06em;line-height:1.12;white-space:nowrap}
-#loginGate .lg-tag small{display:block;font-family:var(--g-thai);font-size:10.5px;
-  font-weight:400;letter-spacing:0;opacity:.6;margin-top:3px}
-#loginGate .lg-tag-from{left:6%;color:#a2b8cd}
-#loginGate .lg-tag-to{right:7%;color:#f0968d;text-align:right}
+/* ป้ายระบบอยู่ในกองของตัวเอง ไม่ใช่ลอยอยู่ใต้เวที — ชื่อจึงติดอยู่กับของที่มันเรียก
+   ไม่ต้องให้ตากวาดหาว่าป้ายนี้เป็นของกองไหน
+   วางที่กลางกองแล้วยกด้วย translateZ ให้ลอยอยู่กลางความสูงของแท่ง
+   แล้วหมุนสวนกับเวที (rotateZ(7) rotateX(-52)) แบบเดียวกับตัวเลขเฟส
+   ตัวหนังสือจึงหันเข้าหาคนดูตรงๆ ไม่นอนราบไปกับพื้นจนอ่านไม่ออก */
+/* ทำไมเดิมถึงดูเบี้ยว: เวทีหมุน rotateZ(-7deg) ขอบแนวนอนของแผ่นจึงลาดอยู่ -7°
+   แต่ป้ายหมุนสวนกลับทั้ง rotateZ และ rotateX ตัวหนังสือจึงตั้งฉากกับจอพอดี (0°)
+   ไปนั่งบนแผ่นที่ลาด -7° — ต่างกัน 7° ตาจับได้ทันทีว่าไม่ไปด้วยกัน
+   คราวนี้ไม่หมุนสวนเลย ปล่อยให้ตัวหนังสือนอนอยู่ในระนาบเดียวกับแผ่น
+   ขอบตัวอักษรจึงขนานกับขอบแผ่นเองทุกด้าน แล้วยืดแนวตั้ง 1/cos(52°) ≈ 1.62
+   ชดเชยการหดจากมุมมอง สัดส่วนที่ตาเห็นกลับมาปกติ ไม่แบนเตี้ย
+   จัดกึ่งกลางด้วย margin ไม่ใช่ translate(-50%,-50%) เพราะการเลื่อนที่ปนอยู่ใน
+   ลิสต์ transform จะถูกหมุน/ยืดไปด้วย ป้ายเลยหลุดไปโผล่บนหัวเวที (วัดได้ที่ y -2%) */
+#loginGate .lg-tag{position:absolute;left:50%;top:50%;z-index:2;
+  width:190%;margin:-17px 0 0 -95%;
+  font-family:var(--g-tech);text-align:center;pointer-events:none;color:#fff;
+  text-shadow:0 0 12px rgba(10,22,40,.9),0 1px 3px rgba(0,0,0,.85);
+  transform:translateZ(var(--tgz)) scaleY(1.62)}
+#loginGate .lg-tag b{display:block;font-size:14px;font-weight:700;letter-spacing:.05em;
+  line-height:1.16}
+/* ป้ายต้องนั่งอยู่บนแผ่นบนสุด ไม่ใช่ลอยนิ่งอยู่ที่ความสูงเดียว —
+   แผ่นบนสุด (--i:5) อยู่ที่ 130px และขึ้นลงตลอดลูป 11 วิ ป้ายที่ตรึง Z ไว้
+   จึงจมอยู่ใต้แผ่นตอนกองสูง และลอยค้างกลางอากาศตอนกองยุบ
+   ให้ป้ายวิ่งตามจังหวะเดียวกับแผ่นบนสุด (ดีเลย์ 1s = 5 × .2s เท่าแผ่นนั้น)
+   --tgz ลงทะเบียนเป็น <length> ค่าถึงไล่ระดับได้ ไม่กระโดดเป็นขั้น */
+@property --tgz{syntax:'<length>';inherits:false;initial-value:138px}
+#loginGate .lg-tag-from{animation:lgTagFrom 11s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay:1s}
+#loginGate .lg-tag-to{animation:lgTagTo 11s cubic-bezier(.4,0,.2,1) infinite;
+  animation-delay:1s}
+@keyframes lgTagFrom{
+  0%,24%  {--tgz:138px;opacity:1}
+  48%,72% {--tgz:12px;opacity:.45}
+  94%,100%{--tgz:138px;opacity:1}}
+@keyframes lgTagTo{
+  0%,20%  {--tgz:12px;opacity:.3}
+  46%,74% {--tgz:138px;opacity:1}
+  96%,100%{--tgz:12px;opacity:.3}}
+#loginGate .lg-tag small{display:block;font-family:var(--g-thai);font-size:9.5px;
+  font-weight:400;letter-spacing:0;opacity:.85;margin-top:2px;
+  text-shadow:0 0 10px rgba(190,230,255,.5),0 1px 3px rgba(0,0,0,.75)}
 #loginGate .lg-map{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 
+/* ══ เส้นทาง 7 เฟส วางบนพื้นเดียวกับกองทั้งสองฝั่ง ══
+   เฟสพวกนี้คือเฟสเดียวกับที่แอปใช้ (01–07) และตรงกับแผ่นข่าวที่ส่งในองค์กร
+   ฉากจึงไม่ได้เล่าแค่ "ย้ายจาก A ไป B" แต่เล่าว่าเดินทางยังไงและตอนนี้อยู่ไหน */
+/* วัดตอนกองสูงเต็ม (กรณีแย่สุด) ที่ 21%/21% หมุด 07 ทับกอง NetSuite 18px
+   และหมุด 01 เฉียดกอง SAP เหลือ 3px — ร่นเข้ามาให้เว้นระยะจริงทั้งสองปลาย */
+/* ขยายระยะถนนเพื่อให้ป้ายชื่อเฟสไม่ชนกัน — ที่ 24%/26% หมุดห่างกัน 83px
+   แต่ป้ายกว้าง 94px จึงทับกันทุกคู่ · กองอยู่ที่ 4–12.4% และ 81–89.4%
+   ขอบถนนใหม่จึงยังไม่ชนกอง */
+#loginGate .lg-road{position:absolute;left:17%;right:22%;top:52%;height:0;
+  transform-style:preserve-3d;pointer-events:none}
+/* เส้นถนนวางบนพื้น ถ้าไม่มีเส้นนี้หมุดจะอ่านเป็นจุดกระจาย ไม่ใช่เส้นทางเดียวกัน */
+#loginGate .lg-road::before{content:'';position:absolute;left:-3%;right:-3%;top:-1px;height:2px;
+  /* เส้นทางจริงลอยอยู่ข้างบน (วาดบน canvas ผ่านหมุดทั้ง 7) เส้นนี้เหลือไว้บนพื้น
+     เป็นเงาของมัน จึงต้องเบากว่าเดิมมาก ไม่งั้นอ่านเป็นเส้นทางที่สอง */
+  background:linear-gradient(90deg,rgba(62,220,138,.34) 0%,rgba(255,90,70,.34) 16%,
+    rgba(110,175,240,.16) 34%,rgba(110,175,240,.08) 100%)}
+#loginGate .lg-ph{position:absolute;top:0;width:40px;height:40px;margin:-20px 0 0 -20px;
+  transform-style:preserve-3d;cursor:pointer;background:none;border:0;padding:0;
+  font-family:inherit;pointer-events:auto;
+  /* ยกพ้นพื้นนิดเดียว ไม่งั้น z เท่ากันแล้วเบราว์เซอร์เลือกพื้นเป็นตัวรับคลิก
+     --rise คือความสูงของเฟสนั้นบนเส้นทาง เส้นถนนบนพื้นยังอยู่ ทำหน้าที่เป็น
+     เงาของเส้นทางที่ลอยอยู่ — รูปอ้างอิงก็มีเส้นคู่ขนานจางๆ ใต้เส้นหลักแบบเดียวกัน */
+  transform:translateZ(calc(2px + var(--rise,0px)))}
+/* แผ่นบนพื้น */
+/* วงกลมแทนสี่เหลี่ยม — อ่านเป็นโหนดบนเส้นทางแบบไดอะแกรมในรูปอ้างอิง
+   ความหมายของสียังเหมือนเดิมทุกอย่าง เปลี่ยนแค่รูปทรง */
+#loginGate .lg-ph em{position:absolute;inset:0;display:block;border-radius:50%;
+  /* แกนเข้มขอบเรือง — เป็นโหนดบนจอเครื่องมือ ไม่ใช่แผ่นทึบวางบนพื้น */
+  background:radial-gradient(circle at 42% 36%,rgba(150,205,255,.34),rgba(9,32,58,.9));
+  border:1.5px solid rgba(146,198,246,.85);
+  box-shadow:0 7px 0 -3px rgba(12,34,60,.8), 0 12px 16px -6px rgba(0,0,0,.5),
+             0 0 15px rgba(118,186,252,.34);
+  transition:background .2s,border-color .2s,transform .25s cubic-bezier(.2,.9,.3,1)}
+/* เสาที่ยกตัวเลขขึ้นจากพื้น */
+/* เดิมเส้นยืดด้วย height และตัวเลขขยับด้วย margin-bottom ซึ่งสั่ง layout ใหม่
+   ทุกเฟรม — ทั้งที่มันอยู่ในกิ่งสามมิติที่มีพื้น เส้นวงจร และ canvas อยู่ด้วย
+   ตอนถอยกล้องออกจากเฟส เส้นทุกอันจึงยืดพร้อมกันแบบกระตุกเป็นขั้น
+   เปลี่ยนมายืดด้วย scaleY และยกตัวเลขด้วย translateY ซึ่งวิ่งบนตัวประกอบภาพ
+   ไม่แตะ layout เลย และจับจังหวะให้ยาวเท่ากล้อง จะได้ถอยออกมาพร้อมกัน */
+#loginGate .lg-ph s{position:absolute;left:50%;bottom:50%;width:1px;height:34px;
+  margin-left:-.5px;display:block;text-decoration:none;
+  background:linear-gradient(0deg,rgba(130,190,250,.7),rgba(130,190,250,.04));
+  transform-origin:50% 100%;
+  transform:rotateZ(7deg) rotateX(-52deg) scaleY(var(--st,1));
+  transition:transform .5s cubic-bezier(.3,.05,.15,1)}
+/* ตัวเลขหันเข้าหาคนดูเสมอ ด้วยการหมุนสวนกับเวที ไม่งั้นจะนอนราบอ่านไม่ออก */
+#loginGate .lg-ph b{position:absolute;left:50%;bottom:50%;margin:0 0 34px -22px;
+  width:44px;text-align:center;font-family:var(--g-tech);font-size:18px;font-weight:600;
+  color:#9db8d2;letter-spacing:.04em;transform-origin:50% 100%;
+  transform:translateY(calc(0px - var(--bl,0px))) rotateZ(7deg) rotateX(-52deg);
+  transition:color .2s,transform .5s cubic-bezier(.3,.05,.15,1)}
+/* ชื่อเฟสใต้หมุด หันเข้าหาคนดูเหมือนตัวเลข ไม่งั้นนอนราบไปกับพื้นจนอ่านไม่ออก
+   ระยะห่างระหว่างหมุดราว 72px ป้ายจึงกว้างได้แค่นี้ ชื่อยาวขึ้นบรรทัดใหม่เอง */
+#loginGate .lg-ph u{position:absolute;left:50%;top:50%;margin:23px 0 0 -48px;width:96px;
+  display:block;text-decoration:none;text-align:center;pointer-events:none;
+  font-size:9px;font-weight:600;line-height:1.3;letter-spacing:.002em;color:#9cb6d0;
+  transform-origin:50% 0;transform:rotateZ(7deg) rotateX(-52deg);
+  transition:color .2s,opacity .2s}
+#loginGate .lg-ph:hover u{color:#dbeaf8}
+#loginGate .lg-ph.done u{color:#6fc79a}
+#loginGate .lg-ph.now u{color:#ff9384;font-weight:700}
+#loginGate .lg-ph.goal u{color:#ffc247}
+#loginGate .lg-ph.sel u{color:#a5d6ff;font-weight:700}
+/* ดาวบอกว่าตอนนี้อยู่เฟสไหน แบบเดียวกับที่สื่อสารไปในแผ่นข่าว
+   วางเหนือตัวเลข ซึ่งเป็นจุดที่ตากวาดถึงก่อนเพราะสูงที่สุดของหมุด */
+#loginGate .lg-ph.now b::before{content:'★';display:block;font-size:13px;line-height:1;
+  margin-bottom:2px;color:#ffc247;text-shadow:0 0 12px rgba(255,194,71,.85)}
+#loginGate .lg-ph:hover em{border-color:#a8d4ff;
+  box-shadow:0 7px 0 -3px rgba(12,34,60,.8),0 0 24px rgba(140,200,255,.6)}
+#loginGate .lg-ph:hover b{color:var(--g-ink)}
+#loginGate .lg-ph:hover{--st:1.47;--bl:16px}
+/* วันขึ้นระบบจริงคือแสงที่ปลายทาง — เรืองขาวนุ่ม ไม่เต้น
+   เพราะเฟสปัจจุบันเป็นตัวเดียวที่ได้เต้น ถ้าเต้นสองจุดตาจะไม่รู้จะมองไหน */
+/* แสงขาวบนพื้นขาวหายสนิท — วัดจากภาพแล้วมองไม่เห็นอะไรเลย
+   ใช้อำพันซึ่งเป็นสีเดียวที่สว่างและยังเห็นได้บนพื้นขาวอมฟ้า
+   และไม่ชนความหมายสีสถานะในฉาก (เขียว=ผ่าน แดง=ตอนนี้ น้ำเงิน=ยังไม่ถึง) */
+/* รัศมีแสงของเฟสนี้ไปวาดบน canvas แทน CSS
+   ทดสอบด้วยการปิดทีละชั้นแล้วพบว่า pseudo-element ที่ใหญ่กว่าพ่อแม่หลายเท่า
+   ในโครง preserve-3d ถูก rasterise แล้วตัดเป็นสี่เหลี่ยม ต่อให้สั่ง border-radius:50%
+   ก็ยังเห็นขอบแข็ง — canvas ไม่มีปัญหานี้และรู้ตำแหน่งหมุดจริงอยู่แล้ว */
+#loginGate .lg-ph.goal em{border-color:#ffc247;
+  background:radial-gradient(circle at 42% 36%,rgba(255,220,140,.5),rgba(62,40,4,.88));
+  box-shadow:0 7px 0 -3px rgba(48,32,4,.8),0 0 26px rgba(255,186,66,.6)}
+/* เสาของเฟสขึ้นระบบเป็นลำแสง ไม่ใช่เส้นบางเหมือนเฟสอื่น */
+#loginGate .lg-ph.goal s{width:2px;margin-left:-1px;
+  background:linear-gradient(0deg,rgba(255,190,72,.95),rgba(255,210,120,.05))}
+#loginGate .lg-ph.goal b{color:#ffc247}
+/* วงแหวนซ้อนรอบเฟสปัจจุบัน แบบโหนดบนจอ HUD ในรูปอ้างอิง บอกว่า "อยู่ตรงนี้" */
+#loginGate .lg-ph.now em::after{content:'';position:absolute;left:-55%;top:-55%;
+  width:210%;height:210%;border-radius:50%;pointer-events:none;
+  border:1px solid rgba(216,52,42,.34)}
+/* เรติเคิลหมุน — วงแหวนมีช่วงขาด หมุนช้าๆ รอบหมุดที่สำคัญ
+   เป็นลูกของ em จึงนอนไปกับพื้น อ่านเป็นวงเล็งที่ฉายลงพื้น ไม่ใช่สติกเกอร์แปะจอ
+   ใส่เฉพาะเฟสปัจจุบันกับวันขึ้นระบบจริง สองจุดที่ต้องรู้ ไม่ใส่ทุกหมุดเพราะจะรก */
+/* เดิมทั้ง 02 และ 05 มีวงแหวนหมุนเหมือนกัน คนดูจึงแยกไม่ออกว่ามันบอกอะไร
+   ให้วงแหวนเป็นเครื่องหมายเฉพาะของ "เฟสที่อยู่ตอนนี้" อย่างเดียว
+   ส่วน 05 บอกตัวเองด้วยแสงอำพันกับดวงที่สว่างกว่าเพื่อน ซึ่งไม่ซ้ำกับใคร */
+#loginGate .lg-ph.now em::before{
+  content:'';position:absolute;left:-108%;top:-108%;width:316%;height:316%;
+  border-radius:50%;pointer-events:none;
+  /* ต้องปิดขอบนอกด้วย ไม่งั้นทึบตั้งแต่ 46.5% ไปจนสุดขอบ กลายเป็นแผ่นวงกลม
+     ไม่ใช่วงแหวน — วัดจากภาพแล้วเห็นเป็นคราบสีใต้หมุดแทนที่จะเป็นวงเล็ง */
+  -webkit-mask:radial-gradient(circle,transparent 0 45.5%,#000 47% 49.2%,transparent 50.4%);
+          mask:radial-gradient(circle,transparent 0 45.5%,#000 47% 49.2%,transparent 50.4%);
+  animation:lgRet 11s linear infinite}
+#loginGate .lg-ph.now em::before{
+  background:conic-gradient(from 0deg,rgba(216,52,42,.6) 0 16%,transparent 16% 34%,
+    rgba(216,52,42,.3) 34% 42%,transparent 42% 66%,rgba(216,52,42,.45) 66% 78%,transparent 78%)}
+@keyframes lgRet{to{transform:rotate(360deg)}}
+/* เฟสที่ผ่านไปแล้ว */
+#loginGate .lg-ph.done em{border-color:#41dc8c;
+  background:radial-gradient(circle at 42% 36%,rgba(110,255,180,.34),rgba(6,44,28,.9));
+  box-shadow:0 7px 0 -3px rgba(6,40,26,.8),0 0 18px rgba(62,220,138,.45)}
+#loginGate .lg-ph.done b{color:#5fe8a0}
+/* เฟสปัจจุบัน — เต้นเบาๆ ให้ตาไปหยุดตรงนี้ก่อน */
+#loginGate .lg-ph.now em{border-color:#ff6a58;
+  background:radial-gradient(circle at 42% 36%,rgba(255,150,130,.4),rgba(62,12,8,.9));
+  animation:lgPulse 2.4s ease-in-out infinite}
+#loginGate .lg-ph.now b{color:#ff8271}
+#loginGate .lg-ph.now{--st:1.71;--bl:24px}
+#loginGate .lg-ph.now s{width:2px;margin-left:-1px;
+  background:linear-gradient(0deg,rgba(255,106,88,.9),rgba(255,106,88,.05))}
+#loginGate .lg-ph.now b{font-size:20px}
+@keyframes lgPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,90,70,.5),0 0 20px rgba(255,90,70,.5)}
+  50%    {box-shadow:0 0 0 10px rgba(255,90,70,0),0 0 30px rgba(255,90,70,.28)}}
+/* เฟสที่ถูกเลือกอยู่ */
+#loginGate .lg-ph.sel em{border-color:#8ccaff;
+  background:radial-gradient(circle at 42% 36%,rgba(170,220,255,.55),rgba(8,40,76,.9));
+  transform:scale(1.45);box-shadow:0 0 44px rgba(124,196,255,.8)}
+#loginGate .lg-ph.sel{--st:2.24;--bl:42px}
+#loginGate .lg-ph.sel s{background:linear-gradient(0deg,rgba(124,196,255,.95),rgba(124,196,255,.04))}
+#loginGate .lg-ph.sel b{font-size:22px}
+#loginGate .lg-ph.sel b{color:#a5d6ff}
+/* หมุดอื่นถอยห่างออกไป ไม่ใช่แค่จางลง — ดวงหดและป้ายจางเร็วกว่า
+   ตาจึงอ่านว่าเรากำลังเข้าไปหาอันที่เลือก ไม่ใช่อันอื่นถูกปิดไฟ
+   ไม่ใช้ filter:blur เพราะ filter ทำให้กิ่ง preserve-3d ถูกยุบเป็นระนาบเดียว */
+#loginGate .lg-road.picking .lg-ph:not(.sel){opacity:.34}
+#loginGate .lg-road.picking .lg-ph:not(.sel) em{transform:scale(.72)}
+#loginGate .lg-road.picking .lg-ph:not(.sel) u{opacity:0}
+#loginGate .lg-ph em{transition:background .2s,border-color .2s,
+  transform .55s cubic-bezier(.17,.78,.19,1),box-shadow .3s}
+/* ระหว่างซูม กองสองฝั่งกับป้ายหรี่ลง ตาจะได้ไปอยู่ที่เฟสที่กำลังดู */
+/* .3 หรี่แรงไปจนทั้งเวทีดูซีด และ .lg-map คือเส้นทางที่เรากำลังให้เขาดูอยู่
+   จึงไม่ควรหรี่ไปด้วย หรี่เฉพาะของที่ไม่เกี่ยวกับเฟสที่เลือก */
+#loginGate .lg-stage.zoomed .lg-side,
+#loginGate .lg-stage.zoomed .lg-track{
+  opacity:.5;transition:opacity .45s ease}
+#loginGate .lg-side,#loginGate .lg-track{
+  transition:opacity .45s ease}
+#loginGate .lg-ph,#loginGate .lg-road.picking .lg-ph{transition:opacity .5s ease}
+#loginGate .lg-ph:focus-visible em{outline:2px solid #6fb3ff;outline-offset:3px}
+
+/* ══ พื้นที่คำโปรยกับรายละเอียดเฟสใช้ที่เดียวกัน ══
+   กดเฟสแล้วข้อความสลับในที่เดิม ไม่มี layout กระโดด และรู้สึกเหมือนหน้าตอบคำถามเรา */
+/* ปลายทางสามข้อสูงกว่าแผงรายละเอียดมาก พอสลับกันความสูงทั้งหน้าหด
+   แล้วทุกอย่างจัดกึ่งกลางใหม่ การ์ดเข้าระบบจึงกระโดด (วัดจากภาพ ขอบบนขยับ 53px)
+   ซ้อนสองอันในช่องกริดเดียวกัน ความสูงจึงเท่ากับอันที่สูงกว่าเสมอ ไม่ว่าจะแสดงอันไหน
+   ใช้ visibility ไม่ใช่ display เพราะ display:none ทำให้ช่องยุบกลับไปเท่าเดิม */
+#loginGate .lg-say{display:grid}
+#loginGate .lg-say>.lg-lede,#loginGate .lg-say>.lg-detail{grid-area:1/1;min-width:0}
+#loginGate .lg-say.showdet>.lg-lede{visibility:hidden;pointer-events:none}
+#loginGate .lg-say>.lg-detail[hidden]{display:none}
+/* ข้อความรอให้กล้องเดินทางไปเกือบถึงก่อน แล้วค่อยขึ้น ถ้ามาพร้อมกันจะแย่งกันดู
+   และทำให้จังหวะกล้องที่ช้าลงเสียเปล่า */
+/* เลิกอนิเมต filter:blur — เป็นสมบัติที่บังคับให้วาดชั้นใหม่ทั้งชั้นทุกเฟรม
+   ขณะที่กล้องกำลังเคลื่อนอยู่พอดี จึงเป็นต้นเหตุของอาการสะดุด
+   จังหวะจบพร้อมกล้อง (.5 + .62 = 1.12s ≈ 1.15s) ข้อความจึงนิ่งพร้อมภาพ
+   ไม่ใช่นิ่งก่อนแล้วรอ */
+#loginGate .lg-detail{animation:lgSayIn .7s cubic-bezier(.17,.78,.19,1) .58s both}
+@keyframes lgSayIn{
+  from{opacity:0;transform:translate3d(0,14px,0) scale(.98)}
+  to  {opacity:1;transform:none}}
+#loginGate .lg-detail h2{margin:0 0 3px;font-size:15px;font-weight:700;color:var(--g-ink);
+  line-height:1.35;display:flex;align-items:baseline;gap:9px}
+#loginGate .lg-detail h2 i{font-family:var(--g-tech);font-style:normal;font-size:15px;
+  font-weight:600;color:#7cc4ff;letter-spacing:.04em;flex:none}
+#loginGate .lg-detail .lg-when{font-family:var(--g-tech);font-size:15px;color:#8ba5c0;
+  letter-spacing:.03em;margin:0 0 4px}
+#loginGate .lg-detail p{margin:0;font-size:15px;line-height:1.6;color:var(--g-ink2);max-width:46ch}
+#loginGate .lg-detail .lg-back{margin-top:7px;border:0;background:none;padding:0;
+  font-family:inherit;font-size:13px;font-weight:600;color:#7cc4ff;cursor:pointer}
+#loginGate .lg-detail .lg-back:hover{text-decoration:underline}
+#loginGate .lg-roadhint{margin-top:9px;font-size:13px;color:#7b93ab}
+@media (prefers-reduced-motion:reduce){
+  #loginGate .lg-ph.now em{animation:none}
+  #loginGate .lg-floor::before{animation:none;background-position:50% 0}
+  #loginGate .lg-wire .lw-pulse{display:none}
+  #loginGate .lg-ph.now em::before{animation:none}
+  #loginGate .lg-detail{animation:none}
+  #loginGate .lg-ph em{transition:none}
+  #loginGate .lg-zoom{transition:none}
+  #loginGate .lg-stage{transition:none}
+  #loginGate .lg-side,#loginGate .lg-tag,#loginGate .lg-track{transition:none}}
+
 /* ── การ์ดเข้าระบบ ────────────────────────────────────────────────────────── */
-/* ขอบบางสีเหล็กกับเส้นคาดบนใช้สีเดียวกับฉาก ทำให้การ์ดเป็นส่วนหนึ่งของภาพ
-   ไม่ใช่สี่เหลี่ยมขาวที่บังเอิญมาวางทับ */
-#loginGate .lg-card{position:relative;width:100%;background:var(--g-paper);
+/* ══ การ์ดอยู่ในอากาศเดียวกับฉาก ══
+   ของเดิมเป็นเกือบขาวบนน้ำเงินเข้ม อ่านเหมือนฟอร์มจากแอปอื่นมาแปะทับโปสเตอร์
+   ซึ่งเป็นรอยต่อที่ชัดที่สุดบนหน้านี้ — พื้นเข้มขึ้นมาจากตระกูลสีเดียวกับพื้นหลัง
+   ยกขึ้นด้วยแสงขอบบนแทนการใช้สีขาว */
+#loginGate .lg-card{position:relative;width:100%;
+  /* บนพื้นเข้ม การ์ดยกตัวด้วยขอบที่รับแสงและกระจกฝ้า ไม่ใช่เงาเป็นชั้น
+     เงาบนพื้นเข้มมองไม่เห็น ต้องให้ขอบด้านบนสว่างแทนเพื่อบอกว่ามันลอยอยู่ */
+  background:linear-gradient(180deg,rgba(19,48,80,.84) 0%,rgba(8,26,47,.9) 100%);
+  /* backdrop-filter ถูกคำนวณใหม่ทุกเฟรมที่ของข้างหลังขยับ ซึ่งคือตลอดช่วงซูม
+     พื้นการ์ดทึบ .84–.9 อยู่แล้ว ลดลงมาจึงแทบไม่ต่างทางสายตาแต่ถูกลงมาก */
+  -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
   border-radius:20px;padding:32px 32px 24px;text-align:left;overflow:hidden;
-  border:1px solid rgba(158,186,212,.3);
-  box-shadow:0 34px 80px rgba(2,12,24,.5),0 2px 5px rgba(2,12,24,.3);
+  border:1px solid rgba(122,175,235,.2);
+  box-shadow:0 30px 70px rgba(0,0,0,.5),0 2px 0 rgba(0,0,0,.2),
+             inset 0 1px 0 rgba(170,212,255,.16);
   animation:lgIn .55s cubic-bezier(.2,.7,.3,1) both}
 @keyframes lgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 /* เส้นคาดบน: ไล่จากเทาเหล็ก (ระบบเดิม) ไปแดง (ปลายทาง) — เรื่องเดียวกับฉากย่อลงมา */
-#loginGate .lg-card::before{content:'';position:absolute;left:0;right:0;top:0;height:2px;
-  background:linear-gradient(90deg,rgba(125,151,176,.85) 0%,rgba(125,151,176,.3) 38%,rgba(196,62,54,.75) 100%)}
+#loginGate .lg-card::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;
+  background:linear-gradient(90deg,#4a6a8c 0%,#7ca6d0 38%,var(--g-signal) 100%);
+  box-shadow:0 0 14px rgba(255,82,68,.4)}
 #loginGate .lg-brand{display:flex;align-items:center;gap:13px;margin-bottom:25px}
-#loginGate .lg-brand img{height:44px;width:auto;display:block;flex:none}
-#loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:#0f2c4c;line-height:1.14}
-#loginGate .lg-sub{font-size:12px;color:#68788b;margin-top:3px;line-height:1.35}
+/* โลโก้ CIVIL FAST ตัดพื้นขาวออกแล้ว คำว่า CIVIL เดิมเป็นกรมท่าเข้มซึ่งจมหาย
+   บนการ์ดพื้นเข้ม จึงพลิกเป็นขาวแบบโลโก้กลับสี ส่วน FAST คงไล่สีเดิมทุกจุด */
+#loginGate .lg-brand img{height:40px;width:auto;display:block;flex:none}
+#loginGate .lg-ttl{font-size:20px;font-weight:700;letter-spacing:-.018em;color:var(--g-ink);line-height:1.14}
+#loginGate .lg-sub{font-size:13px;color:#8ba5c0;margin-top:3px;line-height:1.35}
 #loginGate .lg-field{margin-bottom:14px}
-#loginGate label{display:block;font-size:12px;font-weight:600;color:#5b6b7d;margin-bottom:7px}
+#loginGate label{display:block;font-size:13px;font-weight:600;color:#9ab3cc;margin-bottom:7px}
 #loginGate input{width:100%;box-sizing:border-box;height:48px;padding:0 15px;
-  border:1.5px solid #dbe3ec;border-radius:12px;background:#fff;color:#1e2a38;
-  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s}
-#loginGate input::placeholder{color:#9aa7b6}
-#loginGate input:focus{border-color:#17436f;box-shadow:0 0 0 4px rgba(23,67,111,.13)}
+  border:1.5px solid rgba(122,175,235,.24);border-radius:12px;
+  background:rgba(3,15,31,.62);color:#eaf3fd;
+  font-size:15px;font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+#loginGate input::placeholder{color:#6d87a2}
+#loginGate input:focus{border-color:#5fa8e8;background:rgba(3,15,31,.8);
+  box-shadow:0 0 0 4px rgba(95,168,232,.18),0 0 22px rgba(95,168,232,.16)}
+/* เบราว์เซอร์ยัดพื้นขาวมาให้ตอน autofill ต้องทับด้วย inset shadow เพราะ
+   background ธรรมดาสู้ user-agent style ไม่ได้ */
+#loginGate input:-webkit-autofill,
+#loginGate input:-webkit-autofill:hover,
+#loginGate input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#eaf3fd;
+  -webkit-box-shadow:0 0 0 1000px #0a2138 inset;
+  caret-color:#eaf3fd;transition:background-color 9999s}
 #loginGate .lg-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);
   display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;
-  background:transparent;color:#9aa7b6;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
-#loginGate .lg-eye:hover{color:#5b6b7d;background:#eef2f7}
+  background:transparent;color:#7f99b4;cursor:pointer;border-radius:8px;transition:color .15s,background .15s}
+#loginGate .lg-eye:hover{color:#dbeaf8;background:rgba(122,175,235,.14)}
 #loginGate .lg-eye .eye-off{display:none}
 #loginGate .lg-eye.on .eye-on{display:none}
 #loginGate .lg-eye.on .eye-off{display:block}
 #loginGate .lg-btn{position:relative;width:100%;height:50px;margin-top:4px;border:0;
   border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(180deg,#143f6a 0%,#0d2c4c 100%);color:#fff;
+  /* บนการ์ดเข้ม ปุ่มน้ำเงินเข้มจะจมหายไป ต้องสว่างกว่าพื้นจึงจะเป็นปุ่มหลักจริง */
+  background:linear-gradient(180deg,#3d93ea 0%,#1f6ec4 100%);color:#fff;
   font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;
-  box-shadow:0 6px 18px rgba(13,44,76,.3);transition:filter .15s,box-shadow .15s,transform .08s}
-#loginGate .lg-btn:hover{filter:brightness(1.09);box-shadow:0 10px 26px rgba(13,44,76,.36)}
+  box-shadow:0 8px 22px rgba(0,0,0,.4),0 0 26px rgba(61,147,234,.34),
+             inset 0 1px 0 rgba(255,255,255,.22);
+  transition:filter .15s,box-shadow .15s,transform .08s}
+#loginGate .lg-btn:hover{filter:brightness(1.1);
+  box-shadow:0 10px 28px rgba(0,0,0,.45),0 0 34px rgba(61,147,234,.5),
+             inset 0 1px 0 rgba(255,255,255,.28)}
 #loginGate .lg-btn:active{transform:translateY(1px)}
 #loginGate .lg-btn:disabled{cursor:default;filter:grayscale(.25) brightness(.97)}
 #loginGate .lg-btn.busy{color:transparent}
@@ -964,24 +1432,104 @@ body.locked{overflow:hidden}
   margin:-9.5px 0 0 -9.5px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;
   border-radius:50%;animation:lgspin .7s linear infinite}
 @keyframes lgspin{to{transform:rotate(360deg)}}
-#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#d92d20;background:#fef3f2;
-  border:1px solid #fee4e2;border-radius:9px;padding:9px 12px}
-#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid #e6ecf3;
-  font-size:12px;color:#68788b;line-height:1.5}
-#loginGate .lg-foot{margin-top:20px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
-  color:rgba(159,182,205,.42)}
-#loginGate :focus-visible{outline:2px solid #6fb3ff;outline-offset:2px}
+#loginGate .lg-err{display:none;margin-top:13px;font-size:13px;color:#ffb3a8;
+  background:rgba(150,32,22,.24);border:1px solid rgba(255,120,100,.36);
+  border-radius:9px;padding:9px 12px}
+#loginGate .lg-note{margin-top:18px;padding-top:15px;border-top:1px solid rgba(122,175,235,.16);
+  font-size:13px;color:#8ba5c0;line-height:1.5}
+/* ของเดิมทั้งก้อนลอยกลางจอ (ที่ว่างบน 164px ล่าง 164px เท่ากันเป๊ะ)
+   ไม่มีอะไรให้ยึด เพิ่มเส้นฐานเต็มความกว้างให้ทั้งสองคอลัมน์วางอยู่บนมัน
+   และดันขึ้นเหนือกึ่งกลางเล็กน้อย เพราะกึ่งกลางเรขาคณิตมักดูต่ำกว่าที่ตาคาด */
+#loginGate .lg-shell{padding-bottom:26px;border-bottom:1px solid rgba(122,170,225,.16)}
+#loginGate .lg-foot{margin-top:14px;font-size:10.5px;font-weight:500;letter-spacing:.05em;
+  color:rgba(147,172,198,.52)}
+#loginGate :focus-visible{outline:2px solid #7cc4ff;outline-offset:2px}
+
+/* ══ จังหวะตอนเข้าสู่ระบบสำเร็จ ══
+   อนิเมชันที่ดีตอบสนองการกระทำของคน ไม่ใช่วิ่งวนอยู่รอบตัวเฉยๆ
+   วินาทีเดียวที่ผู้ใช้ลงมือทำคือตอนกดปุ่ม จังหวะออกจึงควรอยู่ตรงนี้
+
+   ลำดับ: กอง Oracle ประกอบจนครบ → กริดพุ่งเข้าหาคนดู → การ์ดยกตัวแล้วสลาย
+   ระหว่าง 850ms นี้แอปกำลังบูตอยู่ข้างหลังพอดี จังหวะออกจึงกลบเวลารอไปด้วย */
+#loginGate.lg-exit{animation:lgGateOut .85s cubic-bezier(.55,0,.85,0) forwards;pointer-events:none}
+@keyframes lgGateOut{0%,55%{opacity:1}100%{opacity:0}}
+/* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป */
+#loginGate.lg-exit .lg-world{animation:lgWorldOut .85s cubic-bezier(.45,0,.75,.2) forwards}
+@keyframes lgWorldOut{
+  from{transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
+  to  {transform:rotateX(14deg) rotateZ(0deg) translateY(-8%) translateZ(620px)}}
+/* กอง Oracle ประกอบจนครบ ใช้ transition เพื่อให้ไหลจากตำแหน่งที่ค้างอยู่ ไม่ใช่กระโดด */
+#loginGate.lg-exit .lg-to .lg-slab{animation:none!important;
+  transition:opacity .3s ease,transform .5s cubic-bezier(.2,.9,.3,1);
+  transition-delay:calc(var(--i) * .04s);
+  opacity:1;transform:translateZ(calc(var(--i) * 26px)) scale(1)}
+#loginGate.lg-exit .lg-from .lg-slab{animation:none!important;
+  transition:opacity .35s ease;opacity:.05}
+/* ป้ายไปกับกองของมัน: ป้ายระบบเดิมจางไปพร้อมกอง ป้ายระบบใหม่ขึ้นมาเต็ม */
+#loginGate.lg-exit .lg-tag{animation:none!important;
+  transition:opacity .35s ease,--tgz .5s cubic-bezier(.2,.9,.3,1)}
+#loginGate.lg-exit .lg-tag-from{opacity:0;--tgz:12px}
+#loginGate.lg-exit .lg-tag-to{opacity:1;--tgz:138px}
+#loginGate.lg-exit .lg-to::before{animation:none!important;
+  transition:opacity .3s ease;opacity:1;transform:translateZ(.5px) scale(1)}
+#loginGate.lg-exit .lg-from::before{animation:none!important;
+  transition:opacity .35s ease;opacity:.14}
+#loginGate.lg-exit .lg-cube{animation:none!important;transition:opacity .25s ease;opacity:0}
+#loginGate.lg-exit .lg-card{animation:lgCardOut .45s cubic-bezier(.4,0,1,1) forwards}
+@keyframes lgCardOut{to{opacity:0;transform:translateY(-20px) scale(.97)}}
+#loginGate.lg-exit .lg-h,#loginGate.lg-exit .lg-lede,
+#loginGate.lg-exit .lg-count,#loginGate.lg-exit .lg-tag,#loginGate.lg-exit .lg-foot{
+  animation:lgFadeOut .3s ease forwards}
+@keyframes lgFadeOut{to{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  #loginGate.lg-exit,#loginGate.lg-exit *{animation:none!important;transition:none!important}}
 
 /* ── จอแคบ ────────────────────────────────────────────────────────────────── */
 @media (max-width:900px){
   #loginGate{padding:32px 22px}
-  #loginGate .lg-shell{grid-template-columns:minmax(0,1fr);gap:24px;max-width:470px}
+  #loginGate .lg-shell{grid-template-columns:minmax(0,1fr);gap:24px;max-width:470px;
+    grid-template-rows:auto}
+  #loginGate .lg-story,#loginGate .lg-card,#loginGate .lg-stage{grid-column:1;grid-row:auto}
   #loginGate .lg-h{font-size:25px;max-width:none}
   #loginGate .lg-lede{max-width:none}
   #loginGate .lg-stage{height:168px;margin-top:20px}
   #loginGate .lg-count{margin-top:18px;padding-top:15px}
   #loginGate .lg-days{font-size:36px}
   #loginGate .lg-foot{margin-top:26px}
+}
+/* จอโน้ตบุ๊กเตี้ย (1280x620) เนื้อหาเกินจอ 16px ต้องเลื่อนนิดหน่อยโดยไม่จำเป็น
+   ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
+/* ขยายจาก 740 เป็น 820 — จอ 1280x800 (โน้ตบุ๊กทั่วไป) แคบกว่าจึงเนื้อหาสูงกว่า
+   และล้นไป 30px ทั้งที่สูงกว่าเกณฑ์เดิม */
+@media (max-height:880px) and (min-width:901px){
+  #loginGate{padding:18px 32px 28px}
+  /* ฉากเป็นแถวของตัวเองแล้ว ความสูงจึงบวกเข้ากับแถวบนตรงๆ ไม่ได้ซ้อนในคอลัมน์
+     วัดแล้วจอ 1280x620 เกิน 29px · 1366x660 เกิน 10px ต้องรัดทั้งฉากและช่องว่างแถว */
+  #loginGate .lg-shell{row-gap:8px}
+  #loginGate .lg-stage{height:clamp(168px,17vw,200px);margin-top:2px}
+  /* บรรทัดชี้แนะกับพื้นที่คำตอบกินที่เพิ่ม ต้องรัดเข้ามาเมื่อจอเตี้ย */
+  #loginGate .lg-say{min-height:0}
+  /* จอเตี้ยไม่มีที่พอสำหรับคำบรรยายใต้แต่ละข้อ เหลือไว้แค่ชื่อสามข้อ */
+  #loginGate .lg-pillars span{display:none}
+  #loginGate .lg-pillars li{padding:6px 0}
+  #loginGate .lg-goalttl{margin-bottom:8px}
+  #loginGate .lg-roadhint{margin-top:6px}
+  #loginGate .lg-count{margin-top:12px;padding-top:12px}
+  #loginGate .lg-shell{padding-bottom:16px}
+  #loginGate .lg-foot{margin-top:10px}
+}
+/* เตี้ยมาก (1280x620) — ปลายทางสามข้อกินความสูงเพิ่ม วัดแล้วยังเกิน 14px
+   รัดหัวเรื่องกับฉากอีกชั้น โดยยังเก็บชื่อสามข้อกับชื่อเฟสไว้ครบ */
+@media (max-height:660px) and (min-width:901px){
+  #loginGate{padding:14px 32px 22px}
+  #loginGate .lg-h{font-size:clamp(22px,2.2vw,27px);margin-bottom:9px}
+  #loginGate .lg-goalttl{font-size:12px;margin-bottom:6px}
+  #loginGate .lg-pillars li{padding:5px 0}
+  #loginGate .lg-pillars svg{width:22px;height:22px}
+  #loginGate .lg-pillars b{font-size:14.5px}
+  #loginGate .lg-stage{height:clamp(156px,16vw,182px)}
+  #loginGate .lg-days{font-size:34px}
+  #loginGate .lg-count{margin-top:10px;padding-top:10px}
 }
 @media (max-width:560px){
   #loginGate .lg-stage,#loginGate .lg-lede{display:none}
@@ -993,7 +1541,12 @@ body.locked{overflow:hidden}
   #loginGate .lg-card{animation:none}
   #loginGate .lg-slab,#loginGate .lg-cube{animation:none!important}
   #loginGate .lg-to .lg-slab{opacity:1;transform:translateZ(calc(var(--i) * 16px))}
-  #loginGate .lg-cube{opacity:1;transform:translateZ(104px)}
+  /* กองเตี้ยลงเหลือ 16px ต่อชั้น ป้ายจึงต้องลงมาอยู่บนแผ่นบนสุดที่ 80px */
+  #loginGate .lg-tag{animation:none!important;--tgz:88px}
+  #loginGate .lg-ph s,#loginGate .lg-ph b{transition:none}
+  #loginGate .lg-cube{opacity:1;transform:translateZ(130px)}
+  #loginGate .lg-from::before,#loginGate .lg-to::before{
+    animation:none!important;opacity:1;transform:translateZ(.5px) scale(1)}
   #loginGate .lg-cube:nth-of-type(1){left:14%}
   #loginGate .lg-cube:nth-of-type(2){left:48%}
   #loginGate .lg-cube:nth-of-type(3){left:82%}
@@ -1002,44 +1555,35 @@ body.locked{overflow:hidden}
 <div id="loginGate">
   <div class="lg-shell">
     <section class="lg-story">
-      <h1 class="lg-h">กำลังย้ายระบบ ERP ของบริษัทจาก <b>SAP</b> ไป <b>Oracle NetSuite</b></h1>
-      <p class="lg-lede">ที่นี่รวมทุกงานของการเปลี่ยนระบบ ตั้งแต่เก็บความต้องการและ BRD
-        ไปจนถึงวันขึ้นระบบจริง พร้อมบอกว่าแต่ละงานค้างอยู่ฝั่งไหน</p>
-
-      <div class="lg-stage" aria-hidden="true">
-        <div class="lg-world">
-          <div class="lg-floor"></div>
-          <div class="lg-side lg-from">
-            <i class="lg-slab" style="--i:0"></i><i class="lg-slab" style="--i:1"></i>
-            <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
-            <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
-          </div>
-          <div class="lg-side lg-to">
-            <i class="lg-slab" style="--i:0"></i><i class="lg-slab" style="--i:1"></i>
-            <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
-            <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
-          </div>
-          <div class="lg-track">
-            <div class="lg-cube" style="--d:0s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="lg-cube" style="--d:3.7s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-            <div class="lg-cube" style="--d:7.4s"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          </div>
+      <h1 class="lg-h">ก้าวสู่ <i class="lg-erp">ERP</i> ยุคใหม่ของชาว CIVIL<span>จาก <b>SAP</b> ไปสู่ <b><i class="lg-orcl">Oracle</i> <i class="lg-ns">NetSuite</i></b> อย่างเป็นทางการ</span></h1>
+      <div class="lg-say">
+        <div class="lg-lede" id="lgLede">
+          <div class="lg-goalttl">ปลายทางที่เราจะไปถึงด้วยกัน</div>
+          <ul class="lg-pillars">
+            <li style="--pc:#3ec8e8">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 20h8M12 17v3"/><path d="M7 9.5h6M7 12.5h4"/></svg>
+              <div><b>ONE PLATFORM</b><span>ทุกระบบเชื่อมโยงเป็นหนึ่ง</span></div></li>
+            <li style="--pc:#4bd07d">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7.5" ry="3.1"/><path d="M4.5 5.6v6.4c0 1.7 3.4 3.1 7.5 3.1s7.5-1.4 7.5-3.1V5.6"/><path d="M4.5 12v6.4c0 1.7 3.4 3.1 7.5 3.1s7.5-1.4 7.5-3.1V12"/></svg>
+              <div><b>ONE DATA</b><span>ข้อมูลถูกต้อง ทันเวลา ชุดเดียวทั้งองค์กร</span></div></li>
+            <li style="--pc:#ff5244">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8" r="3.1"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M2.6 19c0-3.2 2.6-5.3 5.9-5.3s5.9 2.1 5.9 5.3"/><path d="M15.4 14.1c3 .2 5.2 2.2 5.2 4.9"/></svg>
+              <div><b>ONE CIVIL</b><span>องค์กรที่แข็งแกร่ง และพร้อมเติบโต</span></div></li>
+          </ul>
         </div>
-        <canvas class="lg-map"></canvas>
-        <span class="lg-tag lg-tag-from">SAP ECC<small>ระบบเดิม</small></span>
-        <span class="lg-tag lg-tag-to">ORACLE NETSUITE<small>ระบบใหม่</small></span>
+        <div class="lg-detail" id="lgDetail" hidden></div>
       </div>
 
       <div class="lg-count">
         <span class="lg-days" id="lgDays">—</span>
-        <p>วันก่อนขึ้นระบบจริง<br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
+        <p><span id="lgDaysLbl">วันก่อนขึ้นระบบจริง</span><br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
       </div>
     </section>
 
     <form id="loginForm" class="lg-card" autocomplete="on">
       <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
       <div class="lg-brand">
-        <img src="SMALL_CIVIL_LOGO.png" alt="Civil Engineering">
+        <img src="civil-fast-logo.png" alt="CIVIL FAST">
         <div>
           <div class="lg-ttl">Project Tracker</div>
           <div class="lg-sub">โครงการวางระบบ Oracle</div>
@@ -1056,6 +1600,57 @@ body.locked{overflow:hidden}
       <div id="loginErr" class="lg-err"></div>
       <div class="lg-note">ทั้งทีมใช้รหัสเดียวกัน ไม่ต้องกรอกชื่อผู้ใช้</div>
     </form>
+
+      <div class="lg-stage" aria-hidden="true">
+        <div class="lg-zoom" id="lgZoom">
+        <div class="lg-cam" id="lgCam">
+        <div class="lg-world">
+          <div class="lg-floor"></div>
+          <svg class="lg-wire" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <g class="lw-base">
+              <path d="M1,30 H19 V20 H44 V31 H67 V23 H99"/>
+              <path d="M1,74 H14 V86 H39 V72 H63 V82 H99"/>
+              <path d="M26,20 V9 H52"/>
+              <path d="M77,23 V12 H92"/>
+              <path d="M22,86 V95 H48"/>
+            </g>
+            <g class="lw-node">
+              <path d="M19,20h.01"/><path d="M44,31h.01"/><path d="M67,23h.01"/><path d="M52,9h.01"/>
+              <path d="M14,74h.01"/><path d="M39,72h.01"/><path d="M63,82h.01"/><path d="M48,95h.01"/>
+            </g>
+            <g class="lw-pulse">
+              <path d="M1,30 H19 V20 H44 V31 H67 V23 H99"/>
+              <path d="M1,74 H14 V86 H39 V72 H63 V82 H99"/>
+            </g>
+          </svg>
+          <div class="lg-side lg-from">
+            <i class="lg-slab" style="--i:0"></i><i class="lg-slab" style="--i:1"></i>
+            <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
+            <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
+            <span class="lg-tag lg-tag-from"><b>SAP<br>ECC</b><small>ระบบเดิม</small></span>
+          </div>
+          <div class="lg-side lg-to">
+            <i class="lg-slab" style="--i:0"></i><i class="lg-slab" style="--i:1"></i>
+            <i class="lg-slab" style="--i:2"></i><i class="lg-slab" style="--i:3"></i>
+            <i class="lg-slab" style="--i:4"></i><i class="lg-slab" style="--i:5"></i>
+            <span class="lg-tag lg-tag-to"><b>ORACLE<br>NETSUITE</b><small>ระบบใหม่</small></span>
+          </div>
+          <div class="lg-road" id="lgRoad"></div>
+          <div class="lg-track">
+            <div class="lg-cube" style="--d:0s;--cd:#1a73e8;--cb:#1257b5;--ct:#4d95f0"
+                 title="คลัง/สโตร์"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:2.7s;--cd:#f0a91c;--cb:#c07f08;--ct:#f7c250"
+                 title="จัดซื้อ"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:5.4s;--cd:#2fa35a;--cb:#1e7a41;--ct:#5cc183"
+                 title="บัญชี/การเงิน"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="lg-cube" style="--d:8.1s;--cd:#d8342a;--cb:#a8231b;--ct:#ef6355"
+                 title="หน้างาน/โครงการ"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+        <canvas class="lg-map"></canvas>
+        </div>
+        </div>
+      </div>
   </div>
   <div class="lg-foot">CIVIL ENGINEERING PUBLIC COMPANY LIMITED</div>
 </div>
@@ -1063,10 +1658,141 @@ body.locked{overflow:hidden}
 /* ══ นับถอยหลังถึงวันขึ้นระบบ ══
    ข้อมูลจริงชิ้นเดียวที่ใส่ได้ก่อนยืนยันตัวตน วันที่เป็นค่าคงที่ ไม่ต้องอ่านฐานข้อมูล */
 (function(){
-  var el=document.getElementById('lgDays');if(!el)return;
+  var el=document.getElementById('lgDays'),lb=document.getElementById('lgDaysLbl');
+  if(!el)return;
   var go=new Date(2027,6,1),t=new Date();t.setHours(0,0,0,0);
-  var d=Math.ceil((go-t)/86400000);
-  el.textContent=d>0?d.toLocaleString('en-US'):'0';
+  var d=Math.round((go-t)/86400000);
+  /* ของเดิมพอเลยวัน Go-Live จะค้างที่ "0 วันก่อนขึ้นระบบจริง" ตลอดไป
+     ซึ่งผิดตั้งแต่วันถัดจาก 01/07/2027 เป็นต้นไป ต้องพลิกเป็นนับขึ้นแทน */
+  if(d>0){el.textContent=d.toLocaleString('en-US');
+    if(lb)lb.textContent='วันก่อนขึ้นระบบจริง';}
+  else if(d===0){el.textContent='วันนี้';el.style.fontSize='34px';
+    if(lb)lb.textContent='คือวันขึ้นระบบจริง';}
+  else{el.textContent=(-d).toLocaleString('en-US');
+    if(lb)lb.textContent='วันตั้งแต่ขึ้นระบบจริง';}
+})();
+
+/* ══ เส้นทาง 7 เฟส ══
+   เนื้อหาถอดจากแผ่นข่าว CIVIL NEWSLETTER Q2/2026 หน้า 23 ตรงตามที่ประกาศในองค์กร
+   ไม่ได้อ่านจากฐานข้อมูล เพราะหน้านี้อยู่ก่อนยืนยันตัวตน และตัวเลขที่ประกาศไปแล้ว
+   ต้องตรงกับที่คนเห็นในแผ่น ไม่ใช่เปลี่ยนตามข้อมูลที่ทีมแก้รายวัน */
+(function(){
+  var road=document.getElementById('lgRoad');if(!road)return;
+  var lede=document.getElementById('lgLede'),det=document.getElementById('lgDetail');
+  var PH=[
+    {n:'01',t:'Planning & Kick-Off',    s:'Planning &\nKick-Off',      w:'พ.ค. 69',           d:'วางแผนและเริ่มโครงการ',      st:'done'},
+    {n:'02',t:'Solution Definition (BRD)',s:'Solution\nDefinition (BRD)',w:'มิ.ย. – ก.ย. 69', d:'เก็บความต้องการจากทุกแผนก', st:'now'},
+    {n:'03',t:'Solution Build',        s:'Solution\nBuild',           w:'ก.ย. 69 – ก.พ. 70', d:'ตั้งค่าและพัฒนาระบบ'},
+    {n:'04',t:'Training & Testing (UAT)',s:'Training &\nTesting (UAT)',w:'มี.ค. – พ.ค. 70',  d:'อบรมและทดสอบร่วมกัน'},
+    {n:'05',t:'Deployment & Go-Live',  s:'Deployment &\nGo-Live',     w:'มิ.ย. – ก.ค. 70',   d:'นำระบบขึ้นใช้งานจริง',goal:1},
+    {n:'06',t:'Hypercare',             s:'Hypercare',                 w:'ก.ค. – ต.ค. 70',    d:'ดูแลใกล้ชิดหลังเปิดใช้'},
+    {n:'07',t:'On-Going Support',      s:'On-Going\nSupport',         w:'ต่อเนื่อง 12 เดือน', d:'สนับสนุนการใช้งานต่อเนื่อง'}
+  ];
+  var esc=function(x){return String(x==null?'':x).replace(/</g,'&lt;');};
+  road.innerHTML=PH.map(function(o,i){
+    return '<button type="button" class="lg-ph'+(o.st?' '+o.st:'')+(o.goal?' goal':'')
+      +'" data-i="'+i+'"'
+      +' style="left:'+(i/(PH.length-1)*100).toFixed(2)+'%'
+      /* ไต่ขึ้นแบบเร่ง ไม่ใช่เชิงเส้น — เส้นจึงโค้งพุ่งขึ้นเหมือนกราฟในรูปอ้างอิง
+         ไม่ใช่ทางลาดตรง หลังเวทีหมุน 52 องศา Z กลายเป็นความสูงจริง */
+      +';--rise:'+(Math.pow(i/(PH.length-1),1.9)*62).toFixed(1)+'px"'
+      +' aria-label="'+esc(o.n+' '+o.t)+'"><em></em><s></s><b>'+esc(o.n)+'</b>'
+      +'<u>'+esc(o.s||o.t).replace(/\n/g,'<br>')+'</u></button>';}).join('');
+  var sel=-1,hint=null,say=lede.parentNode;
+  var stage=road.closest('.lg-stage'),zoom=document.getElementById('lgZoom');
+  /* ดันกล้องเข้าหาเฟสที่กด แล้วเลื่อนให้มันมาอยู่กลางเวที
+     อ่านตำแหน่งจริงบนจอ ไม่ใช่คำนวณจาก % เพราะเวทีหมุนอยู่ ตำแหน่งจริงไม่ตรงกับค่า left */
+  function focusOn(el){
+    if(!zoom||!stage)return;
+    var sr=stage.getBoundingClientRect(),r=el.getBoundingClientRect();
+    var dx=(sr.left+sr.width/2)-(r.left+r.width/2);
+    var dy=(sr.top+sr.height*.52)-(r.top+r.height/2);
+    /* ต้องหนีบระยะไว้ ไม่งั้นเฟสที่ปลายสองข้างจะเหวี่ยงฉากออกนอกเวที
+       วัดแล้วเฟส 01 ทะลุขวา 505px จนไปถึงคอลัมน์การ์ด ส่วนเฟส 07 ทะลุซ้าย 470px
+       จนเหลือที่ว่างโบ๋ครึ่งจอ — เลื่อนพอให้รู้ว่ากล้องขยับเข้าหา ไม่ใช่เลื่อนให้ถึงกลางจริง */
+    var cap=function(v,m){return Math.max(-m,Math.min(m,v));};
+    var zx=cap(dx*.5,72),zy=cap(dy*.42,34);
+    zoom.style.setProperty('--zx',zx.toFixed(1)+'px');
+    zoom.style.setProperty('--zy',zy.toFixed(1)+'px');
+    zoom.style.setProperty('--zz','152px');   /* ดึงเข้าลึกกว่าเดิม */
+    /* เลื่อนของใต้จุดลับสายตาที่อยู่นิ่ง ทำให้ฉากบิดเฉือนคนละแบบในแต่ละเฟส
+       วัดจากภาพแล้วเฟส 01 ถนนเรียงเกือบเป็นเส้นตรงพุ่งเข้าหาการ์ด
+       ให้จุดลับสายตาตามของไปด้วย มุมมองจะคงรูปเดิมไม่ว่าซูมไปที่เฟสไหน */
+    stage.style.setProperty('--fx',(-zx*.55).toFixed(1)+'px');
+    stage.style.setProperty('--fy',(-zy*.55).toFixed(1)+'px');
+    stage.classList.add('zoomed');}
+  function unfocus(){
+    if(!zoom)return;
+    zoom.style.setProperty('--zx','0px');zoom.style.setProperty('--zy','0px');
+    zoom.style.setProperty('--zz','0px');
+    if(stage){stage.style.setProperty('--fx','0px');stage.style.setProperty('--fy','0px');
+      stage.classList.remove('zoomed');}}
+  function show(i){
+    /* สั่งกล้องก่อนแตะ DOM อื่น — focusOn ต้องอ่าน getBoundingClientRect
+       ถ้าอ่านหลังเขียน innerHTML เบราว์เซอร์ต้องคำนวณ layout ใหม่ทั้งหน้าคาไว้ตรงนั้น
+       วัดแล้วกล้องนิ่งอยู่ 136ms ก่อนเริ่มขยับ แล้วค่อยพุ่ง จึงรู้สึกสะดุด
+       จุดกึ่งกลางหมุดไม่เปลี่ยนเพราะการเลือกแค่ขยายดวงจากจุดเดิม */
+    focusOn(road.children[i]);
+    sel=i;road.classList.add('picking');
+    [].forEach.call(road.children,function(el,k){el.classList.toggle('sel',k===i);});
+    var o=PH[i];
+    det.innerHTML='<h2><i>'+esc(o.n)+'</i>'+esc(o.t)+'</h2>'
+      +'<div class="lg-when">'+esc(o.w)+'</div>'
+      +'<p>'+esc(o.d)+'</p>'
+      +'<button type="button" class="lg-back">ย้อนกลับ</button>';
+    det.querySelector('.lg-back').onclick=clear;
+    det.hidden=false;say.classList.add('showdet');
+    if(hint)hint.style.visibility='hidden';}   /* ไม่ใช้ display เพราะที่ของมันจะหาย */
+  function clear(){
+    sel=-1;road.classList.remove('picking');
+    [].forEach.call(road.children,function(el){el.classList.remove('sel');});
+    det.hidden=true;det.innerHTML='';say.classList.remove('showdet');
+    if(hint)hint.style.visibility='';
+    unfocus();}
+  road.addEventListener('click',function(e){
+    var btn=e.target.closest?e.target.closest('.lg-ph'):null;if(!btn)return;
+    var i=+btn.dataset.i;if(i===sel)clear();else show(i);});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&sel>=0)clear();});
+  /* บอกให้รู้ว่ากดได้ ไม่งั้นไม่มีใครรู้ว่าฉากมีอะไรให้กด */
+  hint=document.createElement('div');
+  hint.className='lg-roadhint';hint.textContent='กดที่เฟสบนเส้นทางเพื่อดูรายละเอียด';
+  lede.parentNode.appendChild(hint);
+})();
+
+/* ══ กล้องกับไฟส่องตามเมาส์ ══
+   เขียนค่าเมาส์ลง transform ตรงๆ จะรู้สึกกระตุกและถูก ต้องหน่วงด้วย rAF
+   (cur += (target-cur) * 0.08) ถึงจะรู้สึกมีน้ำหนัก โค้ดชุดเดียวกัน คนละความรู้สึก
+   ลูปเดียวคุมทั้งกล้อง ไฟ และเส้นประที่ไหลบน canvas ไม่แยกหลายลูป */
+(function(){
+  var gate=document.getElementById('loginGate'),stage=gate&&gate.querySelector('.lg-stage');
+  if(!stage)return;
+  var fine=window.matchMedia&&window.matchMedia('(pointer:fine)').matches;
+  var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!fine||still)return;                 /* จอสัมผัสไม่มีตัวชี้ค้าง และเคารพการปิดการเคลื่อนไหว */
+  var tx=0,ty=0,cx=0,cy=0,lx=0,ly=0,tlx=0,tly=0,raf=0,on=false;
+  gate.addEventListener('pointermove',function(e){
+    var r=stage.getBoundingClientRect();
+    var nx=(e.clientX-(r.left+r.width/2))/(r.width/2);
+    var ny=(e.clientY-(r.top+r.height/2))/(r.height/2);
+    nx=Math.max(-1.6,Math.min(1.6,nx));ny=Math.max(-1.6,Math.min(1.6,ny));
+    tx=nx*4;ty=-ny*3;                      /* ±4 / ±3 องศา */
+    tlx=nx*120;tly=ny*90;                  /* ไฟส่องวิ่งกว้างกว่ากล้อง */
+    if(!on){on=true;stage.style.setProperty('--spot','1');}
+    if(!raf)raf=requestAnimationFrame(step);});
+  gate.addEventListener('pointerleave',function(){
+    tx=ty=tlx=tly=0;on=false;stage.style.setProperty('--spot','0');});
+  function step(){
+    cx+=(tx-cx)*.08;cy+=(ty-cy)*.08;lx+=(tlx-lx)*.1;ly+=(tly-ly)*.1;
+    stage.style.setProperty('--px',cx.toFixed(3)+'deg');
+    stage.style.setProperty('--py',cy.toFixed(3)+'deg');
+    stage.style.setProperty('--ox',(-cx*3).toFixed(1)+'px');
+    stage.style.setProperty('--oy',(cy*3).toFixed(1)+'px');
+    stage.style.setProperty('--lx',lx.toFixed(1)+'px');
+    stage.style.setProperty('--ly',ly.toFixed(1)+'px');
+    if(Math.abs(tx-cx)>.01||Math.abs(ty-cy)>.01||Math.abs(tlx-lx)>.3||Math.abs(tly-ly)>.3)
+      raf=requestAnimationFrame(step);
+    else raf=0;}
 })();
 
 /* ══ เส้นจับคู่ field ข้ามระบบ ══
@@ -1078,7 +1804,8 @@ body.locked{overflow:hidden}
 (function(){
   var cv=document.querySelector('#loginGate .lg-map');if(!cv||!cv.getContext)return;
   var gate=document.getElementById('loginGate'),stage=cv.parentNode;
-  var ctx=cv.getContext('2d'),W=0,H=0,A=[],B=[],links=[],raf=0,timer=0,last=0;
+  var ctx=cv.getContext('2d'),W=0,H=0,A=[],B=[],RD=[],RL=[],links=[],raf=0,timer=0,last=0;
+  var SPARK=[],DUST=[],sparkT=0,GOAL=-1,BEAT=0,WARP=[],selWas=-1;
   var still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   function anchors(sel){
@@ -1095,16 +1822,160 @@ body.locked{overflow:hidden}
     cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
     A=anchors('.lg-from');B=anchors('.lg-to');
+    /* อ่านตำแหน่งจริงของหมุดบนจอ ไม่คำนวณเอง เพราะเวทีหมุนอยู่และหมุดยกตาม --rise
+       เส้นที่ได้จึงผ่านหมุดเป๊ะทุกตัวไม่ว่าเวทีจะเอียงเท่าไหร่ */
+    RD=[].map.call(stage.querySelectorAll('.lg-ph'),function(p){
+      var b=p.getBoundingClientRect();
+      return {x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2};});
+    /* ตารางระยะสะสม ใช้สุ่มตำแหน่งบนเส้นทางด้วยพารามิเตอร์ 0..1 ที่เดินเร็วสม่ำเสมอ
+       ถ้าเดินด้วยดัชนีหมุดตรงๆ ประกายจะกระตุกช้าเร็วตามระยะห่างของหมุดที่ไม่เท่ากัน */
+    RL=[0];
+    for(var k=1;k<RD.length;k++){
+      var ddx=RD[k].x-RD[k-1].x,ddy=RD[k].y-RD[k-1].y;
+      RL.push(RL[k-1]+Math.sqrt(ddx*ddx+ddy*ddy));}
+    GOAL=-1;
+    [].forEach.call(stage.querySelectorAll('.lg-ph'),function(p,i){
+      if(p.classList.contains('goal'))GOAL=i;});
+    DUST=[];
+    for(var q=0;q<16;q++)DUST.push({x:Math.random()*W,y:H*(.35+Math.random()*.55),
+      vx:.10+Math.random()*.22,vy:-.02-Math.random()*.05,
+      r:.7+Math.random()*1.1,a:.10+Math.random()*.2});
     return A.length>0&&B.length>0;}
 
+  /* จุดบนเส้นทางที่ระยะ t (0=เฟส 01 · 1=เฟส 07) */
+  function roadAt(t){
+    if(RD.length<2)return null;
+    var tot=RL[RL.length-1];if(!tot)return RD[0];
+    var L=tot*Math.max(0,Math.min(1,t));
+    for(var i=1;i<RL.length;i++){
+      if(L<=RL[i]){
+        var f=(L-RL[i-1])/((RL[i]-RL[i-1])||1);
+        return {x:RD[i-1].x+(RD[i].x-RD[i-1].x)*f,
+                y:RD[i-1].y+(RD[i].y-RD[i-1].y)*f};}}
+    return RD[RD.length-1];}
+
+  /* ประกายวิ่งไปตามเส้นทาง พร้อมหางสั้นๆ บอกทิศ
+     บนพื้นสว่างประกายไม่ใช่ "แสงที่สว่างกว่าพื้น" แต่เป็นจุดสีเข้มอิ่มตัว
+     ที่มีรัศมีจาง — ตาอ่านเป็นของเปล่งแสงเหมือนกัน */
+  function sparks(dt){
+    if(RD.length<2)return;
+    var wasS=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
+    SPARK.forEach(function(s){s.t+=dt/1000*s.v;});
+    SPARK=SPARK.filter(function(s){return s.t<1.12;});
+    SPARK.forEach(function(s){
+      for(var k=7;k>=0;k--){
+        var pt=roadAt(s.t-k*0.026);if(!pt)continue;
+        var f=(1-k/8);
+        var head=Math.min(1,Math.max(0,(1-Math.abs(s.t-.5)*.55)));
+        ctx.beginPath();ctx.arc(pt.x,pt.y,(k===0?3.4:2.4*f),0,6.2832);
+        ctx.fillStyle=(k===0?'rgba(225,245,255,':'rgba(120,195,255,')
+          +(f*f*.95*head).toFixed(3)+')';ctx.fill();}
+      var h=roadAt(s.t);
+      if(h){ctx.beginPath();ctx.arc(h.x,h.y,11,0,6.2832);
+        ctx.fillStyle='rgba(90,175,255,.2)';ctx.fill();
+        ctx.beginPath();ctx.arc(h.x,h.y,5.6,0,6.2832);
+        ctx.fillStyle='rgba(150,210,255,.26)';ctx.fill();}});
+    ctx.globalCompositeOperation=wasS;}
+
+  /* แสงที่ปลายทาง: วันขึ้นระบบจริง เต้นช้ามากจนแทบไม่รู้ว่าเต้น
+     ให้รู้สึกว่าเป็นแหล่งกำเนิดแสง ไม่ใช่วงกลมสีที่แปะไว้เฉยๆ */
+  function goalGlow(){
+    if(GOAL<0||!RD[GOAL])return;
+    var g=RD[GOAL],k=.88+Math.sin(BEAT/1400)*.12;
+    /* หมุดลอยสูงกว่า canvas รัศมีจึงอยู่หลังตัวหมุดเสมอ เพิ่มความเข้มได้
+       โดยไม่กลบตัวหมุด — ที่ .4 วัดจากภาพแล้วแทบมองไม่เห็น */
+    var wasG=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
+    var rg=ctx.createRadialGradient(g.x,g.y,0,g.x,g.y,66*k);
+    rg.addColorStop(0,'rgba(255,192,86,.55)');
+    rg.addColorStop(.34,'rgba(255,170,60,.24)');
+    rg.addColorStop(.7,'rgba(255,180,80,.08)');
+    rg.addColorStop(1,'rgba(255,180,80,0)');
+    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(g.x,g.y,66*k,0,6.2832);ctx.fill();
+    ctx.globalCompositeOperation=wasG;}
+
+  /* วงคลื่นแผ่จากหมุดตอนกด อ่านเป็น "ทะลุเข้าไป" ไม่ใช่แค่ไฮไลท์
+     ต้องวาดบน canvas เพราะ pseudo-element ที่ใหญ่กว่าพ่อแม่หลายเท่าในโครง
+     preserve-3d ถูก rasterise แล้วตัดเป็นสี่เหลี่ยม (เคยเจอกับรัศมีของเฟส 05)
+     อ่านตำแหน่งสดตอนกด ไม่ใช้ค่าที่วัดไว้ เพราะหมุดที่เลือกยกตัวและโตขึ้น */
+  function warpWatch(){
+    var el=stage.querySelector('.lg-ph.sel');
+    var list=stage.querySelectorAll('.lg-ph');
+    var i=el?[].indexOf.call(list,el):-1;
+    if(i===selWas)return;
+    selWas=i;
+    if(i<0||!el)return;
+    var r=stage.getBoundingClientRect(),b=el.getBoundingClientRect();
+    WARP.push({x:b.left-r.left+b.width/2,y:b.top-r.top+b.height/2,t:0});}
+
+  function warps(dt){
+    if(!WARP.length)return;
+    var was=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
+    for(var i=WARP.length-1;i>=0;i--){
+      var w=WARP[i];w.t+=dt/1150;
+      if(w.t>=1){WARP.splice(i,1);continue;}
+      var e=1-Math.pow(1-w.t,2.6),fade=1-w.t;
+      [[0,2.4,.5],[14,1.3,.24],[30,.9,.12]].forEach(function(k){
+        var rr=12+e*(92+k[0]);
+        ctx.beginPath();ctx.arc(w.x,w.y,rr,0,6.2832);
+        ctx.strokeStyle='rgba(150,205,255,'+(fade*k[2]).toFixed(3)+')';
+        ctx.lineWidth=k[1];ctx.stroke();});}
+    ctx.globalCompositeOperation=was;}
+
+  /* ฝุ่นลอยในอากาศ ให้ฉากมีอนุภาคระหว่างของ ไม่ใช่สุญญากาศ */
+  function dust(dt){
+    DUST.forEach(function(d){
+      d.x+=d.vx*dt/16;d.y+=d.vy*dt/16;
+      if(d.x>W+4){d.x=-4;d.y=H*(.35+Math.random()*.55);}
+      if(d.y<H*.22)d.y=H*.9;
+      ctx.beginPath();ctx.arc(d.x,d.y,d.r,0,6.2832);
+      ctx.fillStyle='rgba(158,205,255,'+d.a.toFixed(3)+')';ctx.fill();});}
+
+  /* เส้นทาง 7 เฟสเป็นเส้นโค้งพุ่งขึ้น ไล่สีตามความคืบหน้าจริง
+     เขียว=ผ่านแล้ว แดง=เฟสปัจจุบัน จางลงเป็นน้ำเงินสำหรับเฟสที่ยังไม่ถึง
+     สามชั้นซ้อน ชั้นนอกกว้างและจาง ทำหน้าที่เป็นรัศมีนุ่ม */
+  function road(){
+    var n=RD.length;if(n<2)return;
+    var g=ctx.createLinearGradient(RD[0].x,RD[0].y,RD[n-1].x,RD[n-1].y);
+    /* ช่วง "ยังไม่ถึง" ยาวกว่าครึ่งเส้น ถ้าจางที่ .16–.3 รูปทรงที่พุ่งขึ้นก็หายไปด้วย
+       ยังให้จางกว่าช่วงที่ผ่านแล้วอยู่ แต่ต้องเห็นเป็นเส้นเดียวกันตลอดสาย */
+    g.addColorStop(0,'rgba(58,220,132,.95)');
+    g.addColorStop(.17,'rgba(255,92,70,1)');
+    g.addColorStop(.44,'rgba(104,172,240,.62)');
+    g.addColorStop(1,'rgba(104,172,240,.42)');
+    var wasR=ctx.globalCompositeOperation;ctx.globalCompositeOperation='lighter';
+    [[10,.12],[4.6,.24],[2.4,1]].forEach(function(p){
+      ctx.beginPath();ctx.moveTo(RD[0].x,RD[0].y);
+      for(var i=1;i<n-1;i++)
+        ctx.quadraticCurveTo(RD[i].x,RD[i].y,(RD[i].x+RD[i+1].x)/2,(RD[i].y+RD[i+1].y)/2);
+      ctx.lineTo(RD[n-1].x,RD[n-1].y);
+      ctx.globalAlpha=p[1];ctx.strokeStyle=g;ctx.lineWidth=p[0];
+      ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();});
+    ctx.globalAlpha=1;ctx.globalCompositeOperation=wasR;}
+
+  /* ของเดิมวาด "หมึก" แต่ทุกอย่างรอบๆ เปล่งแสง ไม่เข้าชุดกัน
+     วาดสามรอบซ้อนใต้ globalCompositeOperation='lighter' แสงจึงบวกกันและสว่างที่สุด
+     ตรงที่เส้นมารวมกัน — คือปลายทั้งสองข้าง ซึ่งเป็นจุดที่ไดอะแกรมอยากเน้นพอดี
+     ไม่ใช้ shadowBlur เพราะเป็นทางช้า */
+  var FLOW=0;
   function curve(L,upto,alpha){
     var mx=(L.a.x+L.b.x)/2,my=Math.min(L.a.y,L.b.y)-H*0.26;
-    ctx.beginPath();ctx.moveTo(L.a.x,L.a.y);
+    var pts=[[L.a.x,L.a.y]];
     for(var s=0.025;s<=upto;s+=0.025){
       var u=1-s;
-      ctx.lineTo(u*u*L.a.x+2*u*s*mx+s*s*L.b.x, u*u*L.a.y+2*u*s*my+s*s*L.b.y);}
-    ctx.strokeStyle='rgba(236,136,126,'+alpha.toFixed(3)+')';
-    ctx.lineWidth=1.6;ctx.stroke();}
+      pts.push([u*u*L.a.x+2*u*s*mx+s*s*L.b.x, u*u*L.a.y+2*u*s*my+s*s*L.b.y]);}
+    /* พื้นเข้มแล้ว กลับมาบวกแสงได้ — สามชั้นซ้อนกันทำให้สว่างที่สุดตรงที่เส้นมารวมกัน
+       คือปลายทั้งสองข้าง ซึ่งเป็นจุดที่ไดอะแกรมอยากเน้นพอดี ไม่ใช้ shadowBlur เพราะช้า */
+    var was=ctx.globalCompositeOperation;
+    ctx.globalCompositeOperation='lighter';
+    [[7,.07],[3,.14],[1.4,1]].forEach(function(p,k){
+      ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);
+      for(var i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);
+      /* เส้นชั้นบนสุดเป็นเส้นประที่ไหล บอกทิศ SAP → NetSuite */
+      if(k===2){ctx.setLineDash([5,13]);ctx.lineDashOffset=-FLOW;}
+      else ctx.setLineDash([]);
+      ctx.strokeStyle='rgba(255,118,92,'+(alpha*p[1]).toFixed(3)+')';
+      ctx.lineWidth=p[0];ctx.stroke();});
+    ctx.setLineDash([]);ctx.globalCompositeOperation=was;}
 
   function spawn(){
     if(!A.length||!B.length)return;
@@ -1114,16 +1985,33 @@ body.locked{overflow:hidden}
   function draw(now){
     raf=requestAnimationFrame(draw);
     var dt=Math.min((now-last)||16,50);last=now;
+    FLOW+=dt*0.045;
     ctx.clearRect(0,0,W,H);
+    BEAT+=dt;
+    warpWatch();
+    goalGlow();
+    road();
+    warps(dt);
+    dust(dt);
+    /* ปล่อยประกายเป็นจังหวะ ไม่ปล่อยรัวจนกลายเป็นเส้นทึบ */
+    sparkT-=dt;
+    if(sparkT<=0){sparkT=1250;
+      if(SPARK.length<4)SPARK.push({t:-0.04,v:0.3+Math.random()*0.07});}
+    sparks(dt);
     for(var i=links.length-1;i>=0;i--){
       var L=links[i];L.t+=dt/2200;
       if(L.t>=1){links.splice(i,1);continue;}
       /* 0→.55 เส้นงอกออกไป · .55→1 จางหาย */
       var grow=Math.min(L.t/.55,1),fade=L.t<.55?1:1-(L.t-.55)/.45;
-      curve(L,grow,0.75*fade);
+      /* ตอนกดดูเฟส เส้นย้ายข้อมูลไม่ใช่เรื่องที่กำลังดูอยู่ ต้องถอยให้เส้นทางเฟส
+         หรี่ด้วย CSS ไม่ได้เพราะสองเส้นอยู่บน canvas เดียวกัน จึงลดตอนวาดแทน */
+      /* ตอนนี้เส้นทางมีป้ายชื่อเฟสแล้ว เส้นย้ายข้อมูลจึงเป็นฉากหลัง ไม่ใช่ตัวเอก
+         ที่ .75 บนพื้นเข้มมันสว่างจนตัดผ่านป้ายและแย่งสายตา */
+      var back=stage.classList.contains('zoomed')?0.2:0.45;
+      curve(L,grow,0.75*fade*back);
       if(grow>=1){
         ctx.beginPath();ctx.arc(L.b.x,L.b.y,3.4,0,6.2832);
-        ctx.fillStyle='rgba(240,162,152,'+(0.82*fade).toFixed(3)+')';ctx.fill();}}}
+        ctx.fillStyle='rgba(255,140,110,'+(0.9*fade*back).toFixed(3)+')';ctx.fill();}}}
 
   function stop(){if(raf)cancelAnimationFrame(raf);raf=0;
     if(timer)clearInterval(timer);timer=0;}
@@ -1133,8 +2021,10 @@ body.locked{overflow:hidden}
     if(!size())return;
     if(still){                      /* ไม่เคลื่อนไหว: วาดค้างไว้สามเส้นแล้วจบ */
       ctx.clearRect(0,0,W,H);
+      goalGlow();
+      road();
       [[0,3],[2,1],[3,2]].forEach(function(p){
-        curve({a:A[p[0]],b:B[p[1]]},1,0.45);});
+        curve({a:A[p[0]],b:B[p[1]]},1,0.5);});
       return;}
     spawn();
     timer=setInterval(spawn,1500);
@@ -1149,10 +2039,29 @@ body.locked{overflow:hidden}
   else window.addEventListener('resize',start);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);
   else start();
-  /* เข้าระบบผ่านแล้ว auth.js ซ่อน #loginGate — ต้องหยุดวาดด้วย ไม่งั้น rAF วิ่งต่อ
-     ทั้งที่ไม่มีใครเห็น กินแบตและ CPU ของทุกคนที่เปิดแอปค้างไว้ */
+  /* ══ เข้าระบบผ่านแล้ว: เล่นจังหวะออกก่อนค่อยซ่อน ══
+     auth.js สั่ง display:none ทันทีที่ผ่าน เราดักตรงนั้นแล้วดึงกลับมา 850ms
+     เพื่อเล่นจังหวะออก — ทำแบบนี้เพราะ auth.js ไม่ควรต้องรู้เรื่องอนิเมชัน
+     และเราไม่อยากแตะไฟล์นั้นเลย
+
+     ต้องหยุดวาด canvas ตอนจบด้วย ไม่งั้น rAF วิ่งต่อทั้งที่ไม่มีใครเห็น
+     กินแบตและ CPU ของทุกคนที่เปิดแอปค้างไว้ */
+  var exiting=false,played=false;
   if(window.MutationObserver&&gate)new MutationObserver(function(){
-    if(gate.style.display==='none')stop();
+    if(exiting)return;
+    if(gate.style.display!=='none'){played=false;return;}  /* ถูกแสดงกลับ (ออกจากระบบ) = พร้อมเล่นใหม่ */
+    /* played กันวนไม่จบ: ตอนจบจังหวะเราสั่ง display:none เอง ซึ่ง trigger observer
+       ตัวนี้ซ้ำ ถ้าไม่มีธงนี้มันจะดึงหน้ากลับมาเล่นใหม่ไปเรื่อยๆ ไม่มีวันจบ */
+    if(played||still){stop();return;}
+    exiting=true;played=true;
+    gate.style.display='';             /* ดึงกลับมาเล่นจังหวะออก */
+    gate.classList.add('lg-exit');
+    setTimeout(function(){
+      gate.classList.remove('lg-exit');
+      /* ถ้าระหว่างนั้นถูกล็อกกลับ (กดออกจากระบบทันที) อย่าไปซ่อนทับคำสั่งเขา */
+      if(!document.body.classList.contains('locked'))gate.style.display='none';
+      exiting=false;stop();
+    },850);
   }).observe(gate,{attributes:true,attributeFilter:['style']});
   /* เปิดให้ตรวจได้จากข้างนอกว่าลูปยังวิ่งอยู่ไหม — ถ้าไม่มีตัวนี้ การทดสอบว่า
      "หยุดแล้วจริง" จะเช็คไม่ได้ แล้วก็ผ่านแบบปลอมได้ง่ายๆ */
