@@ -911,6 +911,40 @@ body.locked{overflow:hidden}
   color:var(--g-ink);letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
 #loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:var(--g-ink2);max-width:26ch}
 #loginGate .lg-count time{color:var(--g-ink);font-weight:600;white-space:nowrap}
+/* ตัวเลข 275 บอกว่าเหลือเท่าไร แต่ไม่ได้บอกว่าเรามาไกลแค่ไหนแล้ว ซึ่งเป็น
+   คำถามที่คนในองค์กรถามจริง แถบนี้คือเส้นทางเดียวกับที่อยู่ในฉาก ย่อลงมาเป็น
+   เส้นเดียว ปลายซ้ายคือ SAP ปลายขวาคือ Oracle NetSuite ใช้สีเดียวกับกองสองฝั่ง
+   ไม่ได้ตั้งสีใหม่ ส่วนที่ผ่านมาแล้วสว่าง ที่เหลือหรี่ หัวเรืองแสงคือวันนี้ */
+/* กว้างเต็มคอลัมน์ (854px) แถบบางๆ จะยืดจนป้ายสองข้างลอยห่างกันคนละมุม
+   คุมไว้ให้สัมพันธ์กับบล็อกตัวเลขและปลายทางสามข้อด้านบน (44ch) */
+#loginGate .lg-prog{margin-top:13px;max-width:clamp(320px,34vw,470px)}
+/* พื้นแถบคือเส้นทางทั้งเส้น SAP → NetSuite จึงไล่สีเต็มความยาวไว้ตั้งแต่แรก
+   แล้วหรี่ลง ส่วนที่เดินมาแล้วคือ "เปิดไฟ" ให้เห็นสีจริงของช่วงนั้น */
+#loginGate .lg-pgr{position:relative;height:4px;border-radius:99px;
+  background:linear-gradient(90deg,rgba(63,154,232,.26),rgba(138,127,200,.22) 58%,
+    rgba(255,82,68,.26))}
+/* ไล่สีต้องกางเต็มรางเสมอ ไม่ใช่กางตามความยาวที่เดินมา ไม่งั้นพอเดินได้ 33%
+   ปลายของช่วงนั้นจะกลายเป็นแดงของ NetSuite ทั้งที่ยังอยู่แค่ต้นทาง
+   จึงวางไล่สีเต็มรางแล้วใช้ clip-path เปิดทีละส่วน สีตรงหัวจึงบอกตำแหน่งจริง */
+#loginGate .lg-pgr i{position:absolute;inset:0;border-radius:99px;
+  background:linear-gradient(90deg,#3f9ae8,#8a7fc8 58%,#ff5244);
+  box-shadow:0 0 13px rgba(110,170,240,.4);
+  clip-path:inset(0 calc(100% - var(--p,0%)) 0 0 round 99px);
+  transition:clip-path 1.15s cubic-bezier(.22,.78,.3,1) .4s}
+/* หัวคือ "วันนี้" เต้นช้าๆ แบบเดียวกับดวงไฟที่วิ่งบนเส้นทางในฉาก
+   เป็นจุดเดียวของบล็อกนี้ที่ขยับตลอด ตาจึงรู้ว่าตัวเลขนี้เป็นของสด */
+#loginGate .lg-pgr u{position:absolute;top:50%;left:var(--p,0%);
+  width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;
+  background:#e2effd;text-decoration:none;
+  transition:left 1.15s cubic-bezier(.22,.78,.3,1) .4s;
+  animation:lgPgrBeat 2.8s ease-in-out 1.7s infinite}
+@keyframes lgPgrBeat{
+  0%,100%{box-shadow:0 0 0 2px rgba(9,24,44,.92),0 0 14px rgba(150,205,255,.75)}
+  50%    {box-shadow:0 0 0 2px rgba(9,24,44,.92),0 0 24px rgba(165,215,255,1)}}
+#loginGate .lg-pgtx{display:flex;justify-content:space-between;gap:12px;margin:8px 0 0;
+  font-size:11.5px;line-height:1.4;color:var(--g-ink2);max-width:none}
+#loginGate .lg-pgtx b{font-family:var(--g-tech);font-weight:600;color:var(--g-ink);
+  font-variant-numeric:tabular-nums}
 
 /* ── ฉากสามมิติ ───────────────────────────────────────────────────────────
    .lg-world หมุนทั้งก้อนครั้งเดียว ของข้างในวางด้วย translateZ ซึ่งกลายเป็น
@@ -1451,13 +1485,29 @@ body.locked{overflow:hidden}
 
    ลำดับ: กอง Oracle ประกอบจนครบ → กริดพุ่งเข้าหาคนดู → การ์ดยกตัวแล้วสลาย
    ระหว่าง 850ms นี้แอปกำลังบูตอยู่ข้างหลังพอดี จังหวะออกจึงกลบเวลารอไปด้วย */
-#loginGate.lg-exit{animation:lgGateOut .85s cubic-bezier(.55,0,.85,0) forwards;pointer-events:none}
-@keyframes lgGateOut{0%,55%{opacity:1}100%{opacity:0}}
-/* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป */
-#loginGate.lg-exit .lg-world{animation:lgWorldOut .85s cubic-bezier(.45,0,.75,.2) forwards}
+#loginGate.lg-exit{animation:lgGateOut .95s cubic-bezier(.55,0,.85,0) forwards;
+  pointer-events:none;
+  /* ฉากหลุดกรอบเวทีได้แล้ว จึงต้องกันแถบเลื่อนที่ชั้นนี้แทน */
+  overflow:hidden}
+@keyframes lgGateOut{0%,52%{opacity:1}100%{opacity:0}}
+/* เวทีเลิกตัดและเลิก mask ตอนพุ่งออก — ไม่งั้นฉากที่ควรทะลุผ่านคนดู
+   ถูกขังอยู่ในกล่อง 1000×318 กลางหน้า เห็นเป็นการซูมในกรอบ ไม่ใช่การพุ่งผ่าน
+   (พื้นมีการจางของตัวเองอยู่แล้ว ขอบจึงไม่กระโดดตอนถอด mask) */
+#loginGate.lg-exit .lg-stage{overflow:visible;
+  -webkit-mask-image:none;mask-image:none}
+/* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป
+   ของเดิมใช้โค้งเดียว cubic-bezier(.45,0,.75,.2) ซึ่งจุดคุมทั้งสองอยู่ต่ำ
+   วัดจริงแล้วผ่านไปครึ่งเวลาเดินทางได้แค่ 5% ของระยะ ที่เหลือ 70% อัดอยู่ใน
+   ช่วงท้าย 9% — ตาอ่านว่านิ่งค้างแล้วกระตุกหายไป ไม่ใช่พุ่ง
+   คราวนี้แยกเป็นสองช่วง: กล้องเงยขึ้นจากโต๊ะก่อนแบบออกตัวทันที
+   แล้วค่อยเร่งพุ่งทะลุ ระยะทางจึงไหลตลอดเส้น ไม่มีช่วงไหนค้าง */
+#loginGate.lg-exit .lg-world{animation:lgWorldOut .95s linear forwards}
 @keyframes lgWorldOut{
-  from{transform:rotateX(52deg) rotateZ(-7deg) translateY(4%)}
-  to  {transform:rotateX(14deg) rotateZ(0deg) translateY(-8%) translateZ(620px)}}
+  0%  {transform:rotateX(52deg) rotateZ(-7deg) translateY(4%) translateZ(0);
+       animation-timing-function:cubic-bezier(.19,.64,.35,.98)}
+  40% {transform:rotateX(33deg) rotateZ(-3.4deg) translateY(-1%) translateZ(135px);
+       animation-timing-function:cubic-bezier(.52,0,.8,.46)}
+  100%{transform:rotateX(9deg) rotateZ(0deg) translateY(-10%) translateZ(730px)}}
 /* กอง Oracle ประกอบจนครบ ใช้ transition เพื่อให้ไหลจากตำแหน่งที่ค้างอยู่ ไม่ใช่กระโดด */
 #loginGate.lg-exit .lg-to .lg-slab{animation:none!important;
   transition:opacity .3s ease,transform .5s cubic-bezier(.2,.9,.3,1);
@@ -1475,10 +1525,17 @@ body.locked{overflow:hidden}
 #loginGate.lg-exit .lg-from::before{animation:none!important;
   transition:opacity .35s ease;opacity:.14}
 #loginGate.lg-exit .lg-cube{animation:none!important;transition:opacity .25s ease;opacity:0}
-#loginGate.lg-exit .lg-card{animation:lgCardOut .45s cubic-bezier(.4,0,1,1) forwards}
+/* เส้นทางกับเส้นโค้งย้ายระบบวาดอยู่บน canvas ซึ่งเป็นภาพสองมิติ มันจึงไม่ไปกับ
+   .lg-world ที่กำลังพุ่ง — ค้างอยู่กับที่ให้เห็นว่าหลุดจากกัน
+   ดันมันเข้าหาคนดูด้วย translateZ พร้อมจางไป ทั้งฉากจึงออกไปเป็นก้อนเดียวกัน */
+#loginGate.lg-exit .lg-map{
+  transition:opacity .4s ease,transform .62s cubic-bezier(.5,0,.8,.46);
+  opacity:0;transform:translateZ(320px)}
+#loginGate.lg-exit .lg-card{animation:lgCardOut .5s cubic-bezier(.4,0,1,1) forwards}
 @keyframes lgCardOut{to{opacity:0;transform:translateY(-20px) scale(.97)}}
 #loginGate.lg-exit .lg-h,#loginGate.lg-exit .lg-lede,
-#loginGate.lg-exit .lg-count,#loginGate.lg-exit .lg-tag,#loginGate.lg-exit .lg-foot{
+#loginGate.lg-exit .lg-count,#loginGate.lg-exit .lg-prog,
+#loginGate.lg-exit .lg-tag,#loginGate.lg-exit .lg-foot{
   animation:lgFadeOut .3s ease forwards}
 @keyframes lgFadeOut{to{opacity:0}}
 @media (prefers-reduced-motion:reduce){
@@ -1501,6 +1558,16 @@ body.locked{overflow:hidden}
    ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
 /* ขยายจาก 740 เป็น 820 — จอ 1280x800 (โน้ตบุ๊กทั่วไป) แคบกว่าจึงเนื้อหาสูงกว่า
    และล้นไป 30px ทั้งที่สูงกว่าเกณฑ์เดิม */
+/* จอสูง 900 ไม่เข้าเงื่อนไข 880 จึงใช้ผังเต็ม ซึ่งพอเพิ่มแถบเส้นทางแล้วเกินจอ 19px
+   ชั้นนี้บีบเฉพาะระยะรอบบล็อกนับถอยหลัง ไม่ไปแตะขนาดฉากหรือตัวหนังสือ
+   ต้องอยู่ก่อนชั้น 880 ไม่งั้นจะไปทับค่าของชั้นนั้นด้วย (specificity เท่ากัน อันหลังชนะ) */
+@media (max-height:940px) and (min-width:901px){
+  #loginGate .lg-count{margin-top:12px;padding-top:12px}
+  #loginGate .lg-prog{margin-top:8px}
+  #loginGate .lg-pgtx{margin-top:5px}
+  /* ยังเกินอีก 9px หลังบีบระยะแล้ว เตี้ยฉากลงเล็กน้อยแบบเดียวกับชั้นจอเตี้ยอื่น */
+  #loginGate .lg-stage{height:clamp(240px,22vw,298px)}
+}
 @media (max-height:880px) and (min-width:901px){
   #loginGate{padding:18px 32px 28px}
   /* ฉากเป็นแถวของตัวเองแล้ว ความสูงจึงบวกเข้ากับแถวบนตรงๆ ไม่ได้ซ้อนในคอลัมน์
@@ -1577,6 +1644,10 @@ body.locked{overflow:hidden}
       <div class="lg-count">
         <span class="lg-days" id="lgDays">—</span>
         <p><span id="lgDaysLbl">วันก่อนขึ้นระบบจริง</span><br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
+      </div>
+      <div class="lg-prog" id="lgProg">
+        <div class="lg-pgr" aria-hidden="true"><i></i><u></u></div>
+        <p class="lg-pgtx"><span id="lgPgGone">เดินทางมาแล้ว</span><span id="lgPgPct"></span></p>
       </div>
     </section>
 
@@ -1664,12 +1735,42 @@ body.locked{overflow:hidden}
   var d=Math.round((go-t)/86400000);
   /* ของเดิมพอเลยวัน Go-Live จะค้างที่ "0 วันก่อนขึ้นระบบจริง" ตลอดไป
      ซึ่งผิดตั้งแต่วันถัดจาก 01/07/2027 เป็นต้นไป ต้องพลิกเป็นนับขึ้นแทน */
-  if(d>0){el.textContent=d.toLocaleString('en-US');
+  var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* ตัวเลขนี้คือของสดชิ้นเดียวบนหน้านี้ ให้มันนับขึ้นหาค่าจริงครั้งเดียวตอนเปิด
+     ตาจะได้ไปหยุดที่มันก่อนอย่างอื่น — tabular-nums กันความกว้างกระพริบระหว่างนับ */
+  function roll(node,to,dur){
+    if(calm||to<=0){node.textContent=to.toLocaleString('en-US');return;}
+    var t0=0;
+    requestAnimationFrame(function step(ts){
+      if(!t0)t0=ts;
+      var k=Math.min(1,(ts-t0)/dur),e=1-Math.pow(1-k,3);
+      node.textContent=Math.round(to*e).toLocaleString('en-US');
+      if(k<1)requestAnimationFrame(step);});}
+
+  if(d>0){roll(el,d,1150);
     if(lb)lb.textContent='วันก่อนขึ้นระบบจริง';}
   else if(d===0){el.textContent='วันนี้';el.style.fontSize='34px';
     if(lb)lb.textContent='คือวันขึ้นระบบจริง';}
-  else{el.textContent=(-d).toLocaleString('en-US');
+  else{roll(el,-d,1150);
     if(lb)lb.textContent='วันตั้งแต่ขึ้นระบบจริง';}
+
+  /* แถบเส้นทาง — วันคิกออฟจริงตามแผ่นข่าว Q2/2026 คือ 18 พ.ค. 69
+     ทั้งสองปลายเป็นค่าคงที่ที่ประกาศไปแล้ว ไม่ได้อ่านจากฐานข้อมูล
+     เหมือนเนื้อหาอื่นบนหน้านี้ที่อยู่ก่อนยืนยันตัวตน */
+  var kick=new Date(2026,4,18);
+  var bar=document.querySelector('#lgProg .lg-pgr');
+  var total=Math.round((go-kick)/86400000);
+  var gone=Math.max(0,Math.min(total,Math.round((t-kick)/86400000)));
+  var pct=total>0?gone/total*100:100;
+  var gn=document.getElementById('lgPgGone'),pc=document.getElementById('lgPgPct');
+  if(gn)gn.innerHTML='เดินทางมาแล้ว <b>'+gone.toLocaleString('en-US')
+    +'</b> จาก '+total.toLocaleString('en-US')+' วัน';
+  if(pc)pc.innerHTML='<b>'+Math.round(pct)+'%</b> ของเส้นทาง';
+  if(bar){
+    var set=function(){bar.style.setProperty('--p',pct.toFixed(1)+'%');};
+    /* ต้องให้เบราว์เซอร์เห็นค่า 0% ก่อนหนึ่งเฟรม ไม่งั้น transition ไม่ทำงาน
+       มันจะกระโดดไปค่าปลายทางทันทีตั้งแต่เฟรมแรก */
+    if(calm)set(); else requestAnimationFrame(function(){requestAnimationFrame(set);});}
 })();
 
 /* ══ เส้นทาง 7 เฟส ══
