@@ -874,6 +874,17 @@ body.locked{overflow:hidden}
 /* ERP ใช้ฟ้าเดียวกับ SAP ด้านล่าง หัวเรื่องกับบรรทัดต้นทางจึงพูดด้วยเสียงเดียวกัน */
 #loginGate .lg-h .lg-erp{font-style:normal;color:#3f9ae8;
   text-shadow:0 0 24px rgba(63,154,232,.4)}
+/* เส้นใต้คำว่า CIVIL ขีดตัวเองตอนเปิดหน้า — pathLength="1" ทำให้สั่งระยะประได้
+   เป็นสัดส่วน ไม่ต้องรู้ความยาวจริงของเส้นซึ่งเปลี่ยนไปตามขนาดตัวอักษร
+   non-scaling-stroke กันเส้นหนาบิดเบี้ยวเพราะ viewBox ถูกยืดไม่เท่ากันสองแกน */
+#loginGate .lg-h .lg-civ{font-style:normal;position:relative;display:inline-block}
+#loginGate .lg-h .lg-civ svg{position:absolute;left:-3%;width:106%;bottom:-.17em;
+  height:.3em;overflow:visible;fill:none;stroke:#3f9ae8;stroke-width:2.1;
+  stroke-linecap:round;vector-effect:non-scaling-stroke;
+  filter:drop-shadow(0 0 7px rgba(63,154,232,.7))}
+#loginGate .lg-h .lg-civ path{stroke-dasharray:1;stroke-dashoffset:1;
+  animation:lgDraw 1s cubic-bezier(.32,.68,.3,1) .55s forwards}
+@keyframes lgDraw{to{stroke-dashoffset:0}}
 /* บรรทัด "จาก … ไป …" เป็นข้อมูลรอง ไม่ใช่พาดหัว จึงเล็กลงและขึ้นบรรทัดใหม่เสมอ */
 #loginGate .lg-h span{display:block;margin-top:7px;font-size:.62em;font-weight:600;
   letter-spacing:0;color:var(--g-ink2)}
@@ -911,6 +922,12 @@ body.locked{overflow:hidden}
   color:var(--g-ink);letter-spacing:-.005em;font-variant-numeric:tabular-nums;flex:none}
 #loginGate .lg-count p{margin:0;font-size:13px;line-height:1.55;color:var(--g-ink2);max-width:26ch}
 #loginGate .lg-count time{color:var(--g-ink);font-weight:600;white-space:nowrap}
+/* เศษของวันที่ยังไม่ครบ เดินจริงทุกวินาที เป็นของสดชิ้นที่สองบนหน้านี้
+   กำกับหน่วยไว้ครั้งเดียว ไม่งั้น 07:41:18 อ่านได้หลายแบบ */
+#loginGate .lg-tick{display:block;margin-top:4px;font-family:var(--g-tech);
+  font-size:12px;letter-spacing:.055em;color:#7e9ab6;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+#loginGate .lg-tick b{color:#cfe2f5;font-weight:600;margin-right:6px}
 /* ตัวเลข 275 บอกว่าเหลือเท่าไร แต่ไม่ได้บอกว่าเรามาไกลแค่ไหนแล้ว ซึ่งเป็น
    คำถามที่คนในองค์กรถามจริง แถบนี้คือเส้นทางเดียวกับที่อยู่ในฉาก ย่อลงมาเป็น
    เส้นเดียว ปลายซ้ายคือ SAP ปลายขวาคือ Oracle NetSuite ใช้สีเดียวกับกองสองฝั่ง
@@ -1223,7 +1240,16 @@ body.locked{overflow:hidden}
   /* ยกพ้นพื้นนิดเดียว ไม่งั้น z เท่ากันแล้วเบราว์เซอร์เลือกพื้นเป็นตัวรับคลิก
      --rise คือความสูงของเฟสนั้นบนเส้นทาง เส้นถนนบนพื้นยังอยู่ ทำหน้าที่เป็น
      เงาของเส้นทางที่ลอยอยู่ — รูปอ้างอิงก็มีเส้นคู่ขนานจางๆ ใต้เส้นหลักแบบเดียวกัน */
-  transform:translateZ(calc(2px + var(--rise,0px)))}
+  transform:translateZ(calc(2px + var(--rise,0px)));
+  /* หมุดทยอยผุดขึ้นจากพื้นไล่จาก SAP ไป NetSuite ตอนเปิดหน้า แทนที่จะโผล่พร้อมกัน
+     ทั้งเจ็ด ไล่ไปทางเดียวกับการย้ายระบบ สายตาจึงถูกพาไปตามเส้นทางตั้งแต่วินาทีแรก
+     fill-mode เป็น backwards ไม่ใช่ both — ถ้าใช้ both ค่า opacity ปลายทางจะถูก
+     ล็อกไว้ด้วยอนิเมชัน แล้วการหรี่หมุดอื่นตอนกดเลือกเฟสจะไม่ทำงาน */
+  animation:lgPhIn .62s cubic-bezier(.2,.78,.3,1) backwards;
+  animation-delay:calc(.3s + var(--k,0) * .085s)}
+@keyframes lgPhIn{
+  from{opacity:0;transform:translateZ(calc(2px + var(--rise,0px) - 32px)) scale(.45)}
+  to  {opacity:1;transform:translateZ(calc(2px + var(--rise,0px)))}}
 /* แผ่นบนพื้น */
 /* วงกลมแทนสี่เหลี่ยม — อ่านเป็นโหนดบนเส้นทางแบบไดอะแกรมในรูปอ้างอิง
    ความหมายของสียังเหมือนเดิมทุกอย่าง เปลี่ยนแค่รูปทรง */
@@ -1384,9 +1410,21 @@ body.locked{overflow:hidden}
 #loginGate .lg-detail .lg-back{margin-top:7px;border:0;background:none;padding:0;
   font-family:inherit;font-size:13px;font-weight:600;color:#7cc4ff;cursor:pointer}
 #loginGate .lg-detail .lg-back:hover{text-decoration:underline}
-#loginGate .lg-roadhint{margin-top:9px;font-size:13px;color:#7b93ab}
+/* ข้อความนี้เป็นสิ่งเดียวที่บอกว่าฉากกดได้ แต่มันนิ่งจนคนมองข้าม
+   ใส่หัวลูกศรที่ขยับลงเบาๆ ชี้ไปทางฉาก ตาจึงถูกพาไปต่อ */
+#loginGate .lg-roadhint{margin-top:9px;font-size:13px;color:#7b93ab;
+  display:flex;align-items:center;gap:8px;width:max-content}
+#loginGate .lg-roadhint i{display:block;width:8px;height:8px;margin-top:-4px;
+  border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
+  animation:lgHintFloat 2.2s ease-in-out infinite}
+@keyframes lgHintFloat{
+  0%,100%{transform:rotate(45deg) translate(0,0);opacity:.45}
+  50%    {transform:rotate(45deg) translate(3px,3px);opacity:1}}
 @media (prefers-reduced-motion:reduce){
   #loginGate .lg-ph.now em{animation:none}
+  #loginGate .lg-ph{animation:none}
+  #loginGate .lg-roadhint i{animation:none;opacity:.7}
+  #loginGate .lg-h .lg-civ path{animation:none;stroke-dashoffset:0}
   #loginGate .lg-floor::before{animation:none;background-position:50% 0}
   #loginGate .lg-wire .lw-pulse{display:none}
   #loginGate .lg-ph.now em::before{animation:none}
@@ -1487,14 +1525,25 @@ body.locked{overflow:hidden}
    ระหว่าง 850ms นี้แอปกำลังบูตอยู่ข้างหลังพอดี จังหวะออกจึงกลบเวลารอไปด้วย */
 #loginGate.lg-exit{animation:lgGateOut .95s cubic-bezier(.55,0,.85,0) forwards;
   pointer-events:none;
-  /* ฉากหลุดกรอบเวทีได้แล้ว จึงต้องกันแถบเลื่อนที่ชั้นนี้แทน */
-  overflow:hidden}
+  /* ฉากหลุดกรอบเวทีได้แล้ว จึงต้องกันแถบเลื่อนที่ชั้นนี้แทน
+     ใช้ clip ไม่ใช่ hidden เพราะ hidden ยังเลื่อนด้วยสคริปต์ได้ (วัดได้ 122px)
+     clip ตัดจริงและไม่สร้างกล่องเลื่อนเลย */
+  overflow:clip;
+  /* กรอบคลี่ออกเต็มจอพร้อมกับที่ฉากพุ่ง ไม่งั้นฉากจะถูกมุมโค้งตัดตอนทะลุ
+     และยังได้จังหวะ "กรอบเปิดออก" มาเสริมความรู้สึกว่ากำลังเข้าไปข้างใน */
+  inset:0;border-radius:0;
+  transition:inset .5s cubic-bezier(.4,0,.2,1),border-radius .5s ease}
 @keyframes lgGateOut{0%,52%{opacity:1}100%{opacity:0}}
 /* เวทีเลิกตัดและเลิก mask ตอนพุ่งออก — ไม่งั้นฉากที่ควรทะลุผ่านคนดู
    ถูกขังอยู่ในกล่อง 1000×318 กลางหน้า เห็นเป็นการซูมในกรอบ ไม่ใช่การพุ่งผ่าน
    (พื้นมีการจางของตัวเองอยู่แล้ว ขอบจึงไม่กระโดดตอนถอด mask) */
 #loginGate.lg-exit .lg-stage{overflow:visible;
   -webkit-mask-image:none;mask-image:none}
+/* ฉากอยู่ในกล่องพื้นหลังที่ overflow:hidden แล้ว ตอนพุ่งออกต้องเปิดให้ทะลุด้วย
+   ไม่งั้นกลับไปถูกขังเหมือนเดิม — แต่คนละชั้นกับคราวก่อน */
+#loginGate.lg-exit .lg-bg{overflow:visible}
+/* ฉากหรี่จางไปพร้อมกัน ฉากจึงสว่างเต็มตอนพุ่งผ่านคนดู */
+#loginGate.lg-exit .lg-scrim{transition:opacity .45s ease;opacity:0}
 /* โลกทั้งใบเงยขึ้นแล้วพุ่งผ่านคนดูไป
    ของเดิมใช้โค้งเดียว cubic-bezier(.45,0,.75,.2) ซึ่งจุดคุมทั้งสองอยู่ต่ำ
    วัดจริงแล้วผ่านไปครึ่งเวลาเดินทางได้แค่ 5% ของระยะ ที่เหลือ 70% อัดอยู่ใน
@@ -1541,68 +1590,162 @@ body.locked{overflow:hidden}
 @media (prefers-reduced-motion:reduce){
   #loginGate.lg-exit,#loginGate.lg-exit *{animation:none!important;transition:none!important}}
 
-/* ── จอแคบ ────────────────────────────────────────────────────────────────── */
+
+/* ══════════════ ผังรุ่นสอง: คอลัมน์กลาง ฉากเป็นพื้นหลัง ══════════════
+   เดิมเป็นสองคอลัมน์ (เล่าเรื่องซ้าย การ์ดขวา) แล้วฉากเป็นแถวล่าง ซึ่งแปลว่า
+   ฉากกินความสูงของผังจริงๆ และต้องบีบ media query หลายชั้นไม่ให้ล้นจอ
+   ผังใหม่ยกฉากออกจากสายผัง ให้เป็นพื้นหลังเต็มจอ เนื้อหาจึงเรียงกลางได้สบาย
+   และได้หน้าตาแบบรูปอ้างอิง (เนื้อหากลาง ฉากคลุมเต็มจอหลังฉากหรี่) */
+/* กรอบมนแบบ fastwork — ของเขาเว้นข้าง 67–82px มุมโค้ง 32px overflow:clip
+   ทำที่ตัว #loginGate เองโดยไม่เพิ่ม markup: ร่นขอบเข้ามาแล้วใช้ box-shadow
+   แผ่กว้าง 100vmax ทาสีพื้นรอบนอกให้ทึบ — ถ้าปล่อยโปร่ง แดชบอร์ดข้างหลัง
+   จะโผล่ออกมาให้เห็นตั้งแต่ยังไม่ login ซึ่งรับไม่ได้
+   ความสูงที่เหลือของจอเตี้ยมีแค่ 7–37px กรอบจึงต้องหดตามจอ ไม่ใช่ค่าคงที่ */
+#loginGate{justify-content:flex-start;
+  --fr-y:clamp(8px,1.6vh,18px);--fr-x:clamp(12px,3vw,52px);
+  inset:var(--fr-y) var(--fr-x);border-radius:26px;
+  /* สีนี้เป็นตัวสำรองที่การันตีว่าทึบแน่ๆ ส่วนไล่สีจริงอยู่ที่ .lg-surround
+     ถ้าชั้นนั้นถูกตัดด้วยเหตุใด สีนี้ยังบังแดชบอร์ดข้างหลังไว้ */
+  box-shadow:0 0 0 100vmax #16222f;
+  padding:clamp(20px,3.8vh,46px) 32px 40px}
+/* พื้นรอบกรอบ — เหล็กเย็นอมน้ำเงิน สว่างกว่าแผงข้างใน แผงจึงอ่านเป็นจอที่ติดไฟ
+   อยู่ในกรอบโลหะ ไม่ใช่กล่องดำวางบนพื้นดำซึ่งแยกไม่ออกว่าตรงไหนคือขอบ
+   ต้องเป็น position:fixed ถึงจะพ้นกรอบที่ถูกร่นขอบเข้ามา และ z-index ติดลบ
+   เพื่อให้ไปอยู่ใต้ .lg-bg ที่ทาสีแผงทับอีกที พื้นนี้จึงโผล่เฉพาะนอกกรอบ */
+#loginGate .lg-surround{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1500px 620px at 50% -12% in oklab,rgba(126,176,228,.13),transparent 68%),
+    linear-gradient(168deg in oklab,#1f3245 0%,#172637 48%,#111d2a 100%)}
+/* ไล่สีของแผงย้ายมาอยู่ที่ชั้นนี้ เพราะพื้นรอบกรอบปูทับพื้นหลังของ #loginGate ไปแล้ว
+   และเพิ่มเงาทิ้งกับเส้นขอบผมบางๆ ให้แผงดูจมลงไปในกรอบจริงๆ */
+#loginGate .lg-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;
+  border-radius:inherit;
+  background:
+    radial-gradient(1250px 720px at 26% 24% in oklab,#12395f 0%,transparent 62%),
+    linear-gradient(168deg in oklab,#06203a 0%,#04142a 56%,#020b18 100%);
+  box-shadow:0 30px 78px rgba(0,0,0,.5),inset 0 0 0 1px rgba(142,186,236,.14)}
+/* ฉากยึดขอบล่าง ถนนจึงไปอยู่ช่วงล่างของจอซึ่งไม่มีเนื้อหาทับ กดเฟสได้ตามเดิม
+   perspective ต้องโตตามกล่อง ไม่งั้นมุมมองจะบิดแรงขึ้นเมื่อฉากกว้างขึ้น */
+/* ถนนอยู่ที่ 52% ของเวที ซึ่งตกลงมาชนบรรทัดชวนกดพอดี — กดเวทีลงไปอีกหน่อย
+   ถนนเลื่อนลง ส่วนที่จมหายข้างล่างเป็นพื้นว่างของฉาก ไม่ใช่ตัวกอง (วัดแล้ว) */
+#loginGate .lg-bg .lg-stage{position:absolute;left:50%;bottom:-46px;transform:translateX(-50%);
+  width:min(1720px,118vw);max-width:none;height:clamp(300px,40vw,560px);margin:0;
+  perspective:clamp(1250px,112vw,2050px);pointer-events:auto}
+/* ฉากหรี่ลงด้านบนให้ตัวหนังสืออ่านออก และใสลงด้านล่างให้ถนนโชว์เต็ม */
+#loginGate .lg-scrim{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(5,20,38,.95) 0%,rgba(5,20,38,.9) 26%,rgba(5,20,38,.66) 46%,
+    rgba(5,20,38,.26) 64%,rgba(5,20,38,0) 82%)}
+/* เนื้อหาปล่อยคลิกทะลุไปถึงฉาก เปิดรับเฉพาะตัวที่กดได้จริง */
+#loginGate .lg-shell{display:flex;flex-direction:column;align-items:center;
+  width:100%;max-width:980px;gap:clamp(12px,1.9vh,22px);text-align:center;
+  padding-bottom:0;border-bottom:0;pointer-events:none}
+#loginGate .lg-shell form,#loginGate .lg-shell input,
+#loginGate .lg-shell button,#loginGate .lg-shell a{pointer-events:auto}
+
+#loginGate .lg-brand{justify-content:center;gap:12px;margin:0}
+#loginGate .lg-brand img{height:clamp(28px,2.4vw,36px)}
+#loginGate .lg-brand>div{text-align:left}
+#loginGate .lg-ttl{font-size:17px}
+#loginGate .lg-sub{font-size:12px;margin-top:1px}
+
+#loginGate .lg-h{font-size:clamp(28px,3.9vw,56px);line-height:1.14;letter-spacing:-.025em;
+  margin:0;white-space:normal;text-wrap:balance}
+#loginGate .lg-h span{font-size:.42em;margin-top:12px}
+
+/* สามข้อเรียงแนวนอน เหลือแค่ชื่อ — ในผังกลางจอ รายการแนวตั้งกินที่เกินไป */
+/* ช่องนี้สลับระหว่างสามข้อ (19px) กับแผงรายละเอียดเฟส (วัดได้ 103px เท่ากันทั้งเจ็ด)
+   ผังเดิมสามข้อสูงกว่าแผง ช่องจึงไม่ยุบ แต่ผังใหม่สามข้อเหลือแถวเดียว
+   ถ้าไม่ตรึงความสูง ทุกอย่างใต้ช่องนี้จะกระโดดลง 84px ตอนกดเฟส */
+#loginGate .lg-say{width:100%;justify-items:center;min-height:105px;align-content:center}
+#loginGate .lg-pillars{display:flex;justify-content:center;flex-wrap:wrap;
+  gap:clamp(16px,2.4vw,34px);max-width:none}
+#loginGate .lg-pillars li{display:flex;align-items:center;gap:9px;padding:0;border-top:0}
+#loginGate .lg-pillars svg{width:19px;height:19px;margin:0}
+#loginGate .lg-pillars b{font-size:13px;letter-spacing:.07em}
+#loginGate .lg-detail{text-align:center}
+
+/* ไทล์นับถอยหลัง — สัดส่วนตามรูปอ้างอิง 115×115 มุมโค้ง 24 ห่าง 8
+   พื้นโปร่งกว่าของต้นแบบเล็กน้อยเพราะข้างหลังเป็นฉากที่เคลื่อนไหว ไม่ใช่รูปนิ่ง
+   ไทล์ทึบสนิทจะตัดฉากขาดเป็นสี่เหลี่ยม */
+#loginGate .lg-count{display:flex;justify-content:center;gap:8px;margin:0;padding:0;border-top:0}
+#loginGate .lg-unit{width:clamp(78px,8.2vw,115px);aspect-ratio:1;border-radius:24px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  background:rgba(14,32,56,.66);border:1px solid rgba(122,175,235,.18);
+  -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);
+  box-shadow:inset 0 1px 0 rgba(170,212,255,.1)}
+#loginGate .lg-unit b{font-family:var(--g-tech);font-size:clamp(24px,2.9vw,40px);
+  font-weight:600;line-height:1;color:var(--g-ink);font-variant-numeric:tabular-nums}
+#loginGate .lg-unit span{font-size:clamp(11px,1vw,14px);color:rgba(233,242,252,.62)}
+
+/* แถบเส้นทางกว้างเท่าแถวไทล์พอดี (115×4 + 8×3 = 484) สองอย่างจึงอ่านเป็นก้อนเดียว */
+#loginGate .lg-prog{width:100%;max-width:484px;margin:0}
+#loginGate .lg-pgtx{justify-content:space-between;gap:10px;margin-top:9px;font-size:11.5px}
+#loginGate .lg-pgtx span:nth-child(2){color:var(--g-ink)}
+
+/* ล็อกอินเหลือแถวเดียว ไม่มีกรอบการ์ด — ในผังกลางจอ การ์ดทึบจะไปบังฉาก
+   และแย่งน้ำหนักกับไทล์นับถอยหลังซึ่งควรเป็นของเด่นรองจากหัวเรื่อง */
+#loginGate .lg-card{background:none;border:0;box-shadow:none;padding:0;border-radius:0;
+  -webkit-backdrop-filter:none;backdrop-filter:none;width:auto;overflow:visible}
+#loginGate .lg-card::before{display:none}
+#loginGate .lg-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+#loginGate .lg-field{position:relative;margin:0;width:clamp(210px,23vw,286px)}
+#loginGate .lg-field input{height:46px;border-radius:999px;padding:0 46px 0 20px;text-align:left}
+#loginGate .lg-btn{width:auto;height:46px;margin:0;padding:0 30px;border-radius:999px;
+  font-size:15px;flex:none}
+#loginGate .lg-err{margin-top:12px}
+#loginGate .lg-note{margin-top:10px;text-align:center}
+/* บรรทัดนี้ไปตกอยู่บนฉากช่วงที่สว่าง (ราว 68% ของจอ) อ่านไม่ออก
+   ให้มันมีพื้นของตัวเองบางๆ แทนการหรี่ฉากทั้งแถบซึ่งจะกลบถนนไปด้วย */
+#loginGate .lg-roadhint{margin:auto auto 0;justify-content:center;position:relative;z-index:2;
+  padding:6px 15px;border-radius:999px;background:rgba(5,20,38,.58);
+  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);
+  border:1px solid rgba(122,175,235,.12)}
+
+#loginGate .lg-foot{margin-top:0;padding-top:14px}
+
+/* ── จอเตี้ย ────────────────────────────────────────────────────────────────
+   ผังกลางจอสูงราว 620px ที่จอเต็ม ส่วนใหญ่จึงพอ ชั้นพวกนี้ไว้สำหรับจอที่เตี้ยจริง */
+@media (max-height:800px){
+  /* วัดแล้วที่ 1366x768 เหลือที่ว่างแค่ 26px กรอบจึงต้องคงที่บางๆ ไม่ใช่ตาม vh */
+  #loginGate{--fr-y:8px}
+}
+@media (max-height:680px){
+  /* 1280x620 เหลือ 7px และ 1366x660 เหลือ ~0px — ไม่มีที่ให้กรอบ คืนเป็นเต็มจอ */
+  #loginGate{--fr-y:0px;--fr-x:0px;border-radius:0}
+  /* คืนที่ให้อีก 12px เพราะช่องสลับเนื้อหาถูกตรึงไว้ 105px (กันฟอร์มกระโดด) */
+  #loginGate .lg-foot{padding-top:14px}
+}
+@media (max-height:760px) and (min-width:901px){
+  #loginGate{padding-top:clamp(14px,2.4vh,28px)}
+  #loginGate .lg-shell{gap:clamp(9px,1.4vh,15px)}
+  #loginGate .lg-brand img{height:28px}
+  #loginGate .lg-h span{margin-top:8px}
+  #loginGate .lg-bg .lg-stage{height:clamp(260px,34vw,440px)}
+}
+@media (max-height:620px) and (min-width:901px){
+  #loginGate .lg-brand{display:none}
+  #loginGate .lg-pillars{gap:16px}
+  #loginGate .lg-pillars b{font-size:12px}
+  #loginGate .lg-unit{width:clamp(70px,7vw,92px);border-radius:20px}
+  #loginGate .lg-bg .lg-stage{height:clamp(220px,28vw,340px)}
+}
+/* ── จอแคบ ─────────────────────────────────────────────────────────────── */
 @media (max-width:900px){
-  #loginGate{padding:32px 22px}
-  #loginGate .lg-shell{grid-template-columns:minmax(0,1fr);gap:24px;max-width:470px;
-    grid-template-rows:auto}
-  #loginGate .lg-story,#loginGate .lg-card,#loginGate .lg-stage{grid-column:1;grid-row:auto}
-  #loginGate .lg-h{font-size:25px;max-width:none}
-  #loginGate .lg-lede{max-width:none}
-  #loginGate .lg-stage{height:168px;margin-top:20px}
-  #loginGate .lg-count{margin-top:18px;padding-top:15px}
-  #loginGate .lg-days{font-size:36px}
-  #loginGate .lg-foot{margin-top:26px}
-}
-/* จอโน้ตบุ๊กเตี้ย (1280x620) เนื้อหาเกินจอ 16px ต้องเลื่อนนิดหน่อยโดยไม่จำเป็น
-   ลดระยะขอบและช่องว่างรอบฉากเมื่อจอสั้น ให้พอดีในหน้าเดียว */
-/* ขยายจาก 740 เป็น 820 — จอ 1280x800 (โน้ตบุ๊กทั่วไป) แคบกว่าจึงเนื้อหาสูงกว่า
-   และล้นไป 30px ทั้งที่สูงกว่าเกณฑ์เดิม */
-/* จอสูง 900 ไม่เข้าเงื่อนไข 880 จึงใช้ผังเต็ม ซึ่งพอเพิ่มแถบเส้นทางแล้วเกินจอ 19px
-   ชั้นนี้บีบเฉพาะระยะรอบบล็อกนับถอยหลัง ไม่ไปแตะขนาดฉากหรือตัวหนังสือ
-   ต้องอยู่ก่อนชั้น 880 ไม่งั้นจะไปทับค่าของชั้นนั้นด้วย (specificity เท่ากัน อันหลังชนะ) */
-@media (max-height:940px) and (min-width:901px){
-  #loginGate .lg-count{margin-top:12px;padding-top:12px}
-  #loginGate .lg-prog{margin-top:8px}
-  #loginGate .lg-pgtx{margin-top:5px}
-  /* ยังเกินอีก 9px หลังบีบระยะแล้ว เตี้ยฉากลงเล็กน้อยแบบเดียวกับชั้นจอเตี้ยอื่น */
-  #loginGate .lg-stage{height:clamp(240px,22vw,298px)}
-}
-@media (max-height:880px) and (min-width:901px){
-  #loginGate{padding:18px 32px 28px}
-  /* ฉากเป็นแถวของตัวเองแล้ว ความสูงจึงบวกเข้ากับแถวบนตรงๆ ไม่ได้ซ้อนในคอลัมน์
-     วัดแล้วจอ 1280x620 เกิน 29px · 1366x660 เกิน 10px ต้องรัดทั้งฉากและช่องว่างแถว */
-  #loginGate .lg-shell{row-gap:8px}
-  #loginGate .lg-stage{height:clamp(168px,17vw,200px);margin-top:2px}
-  /* บรรทัดชี้แนะกับพื้นที่คำตอบกินที่เพิ่ม ต้องรัดเข้ามาเมื่อจอเตี้ย */
-  #loginGate .lg-say{min-height:0}
-  /* จอเตี้ยไม่มีที่พอสำหรับคำบรรยายใต้แต่ละข้อ เหลือไว้แค่ชื่อสามข้อ */
-  #loginGate .lg-pillars span{display:none}
-  #loginGate .lg-pillars li{padding:6px 0}
-  #loginGate .lg-goalttl{margin-bottom:8px}
-  #loginGate .lg-roadhint{margin-top:6px}
-  #loginGate .lg-count{margin-top:12px;padding-top:12px}
-  #loginGate .lg-shell{padding-bottom:16px}
-  #loginGate .lg-foot{margin-top:10px}
-}
-/* เตี้ยมาก (1280x620) — ปลายทางสามข้อกินความสูงเพิ่ม วัดแล้วยังเกิน 14px
-   รัดหัวเรื่องกับฉากอีกชั้น โดยยังเก็บชื่อสามข้อกับชื่อเฟสไว้ครบ */
-@media (max-height:660px) and (min-width:901px){
-  #loginGate{padding:14px 32px 22px}
-  #loginGate .lg-h{font-size:clamp(22px,2.2vw,27px);margin-bottom:9px}
-  #loginGate .lg-goalttl{font-size:12px;margin-bottom:6px}
-  #loginGate .lg-pillars li{padding:5px 0}
-  #loginGate .lg-pillars svg{width:22px;height:22px}
-  #loginGate .lg-pillars b{font-size:14.5px}
-  #loginGate .lg-stage{height:clamp(156px,16vw,182px)}
-  #loginGate .lg-days{font-size:34px}
-  #loginGate .lg-count{margin-top:10px;padding-top:10px}
+  #loginGate{padding:26px 20px 36px}
+  #loginGate .lg-shell{max-width:520px}
+  #loginGate .lg-h{font-size:clamp(24px,6.4vw,34px)}
+  #loginGate .lg-pillars{gap:14px}
+  #loginGate .lg-pillars b{font-size:12px}
+  #loginGate .lg-bg .lg-stage{width:160vw;height:clamp(230px,46vw,330px)}
 }
 @media (max-width:560px){
-  #loginGate .lg-stage,#loginGate .lg-lede{display:none}
-  #loginGate .lg-card{padding:26px 22px 20px}
-  #loginGate .lg-h{font-size:22px;margin-bottom:0}
-  #loginGate .lg-count{margin-top:16px}
+  #loginGate .lg-brand{display:none}
+  #loginGate .lg-h{font-size:22px}
+  #loginGate .lg-pillars{display:none}
+  #loginGate .lg-unit{width:clamp(64px,19vw,80px);border-radius:18px}
+  #loginGate .lg-row{flex-direction:column;gap:8px}
+  #loginGate .lg-field,#loginGate .lg-btn{width:100%;max-width:300px}
 }
 @media (prefers-reduced-motion:reduce){
   #loginGate .lg-card{animation:none}
@@ -1620,58 +1763,10 @@ body.locked{overflow:hidden}
 }
 </style>
 <div id="loginGate">
-  <div class="lg-shell">
-    <section class="lg-story">
-      <h1 class="lg-h">ก้าวสู่ <i class="lg-erp">ERP</i> ยุคใหม่ของชาว CIVIL<span>จาก <b>SAP</b> ไปสู่ <b><i class="lg-orcl">Oracle</i> <i class="lg-ns">NetSuite</i></b> อย่างเป็นทางการ</span></h1>
-      <div class="lg-say">
-        <div class="lg-lede" id="lgLede">
-          <div class="lg-goalttl">ปลายทางที่เราจะไปถึงด้วยกัน</div>
-          <ul class="lg-pillars">
-            <li style="--pc:#3ec8e8">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 20h8M12 17v3"/><path d="M7 9.5h6M7 12.5h4"/></svg>
-              <div><b>ONE PLATFORM</b><span>ทุกระบบเชื่อมโยงเป็นหนึ่ง</span></div></li>
-            <li style="--pc:#4bd07d">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7.5" ry="3.1"/><path d="M4.5 5.6v6.4c0 1.7 3.4 3.1 7.5 3.1s7.5-1.4 7.5-3.1V5.6"/><path d="M4.5 12v6.4c0 1.7 3.4 3.1 7.5 3.1s7.5-1.4 7.5-3.1V12"/></svg>
-              <div><b>ONE DATA</b><span>ข้อมูลถูกต้อง ทันเวลา ชุดเดียวทั้งองค์กร</span></div></li>
-            <li style="--pc:#ff5244">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8" r="3.1"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M2.6 19c0-3.2 2.6-5.3 5.9-5.3s5.9 2.1 5.9 5.3"/><path d="M15.4 14.1c3 .2 5.2 2.2 5.2 4.9"/></svg>
-              <div><b>ONE CIVIL</b><span>องค์กรที่แข็งแกร่ง และพร้อมเติบโต</span></div></li>
-          </ul>
-        </div>
-        <div class="lg-detail" id="lgDetail" hidden></div>
-      </div>
-
-      <div class="lg-count">
-        <span class="lg-days" id="lgDays">—</span>
-        <p><span id="lgDaysLbl">วันก่อนขึ้นระบบจริง</span><br><time datetime="2027-07-01">1 กรกฎาคม 2027</time></p>
-      </div>
-      <div class="lg-prog" id="lgProg">
-        <div class="lg-pgr" aria-hidden="true"><i></i><u></u></div>
-        <p class="lg-pgtx"><span id="lgPgGone">เดินทางมาแล้ว</span><span id="lgPgPct"></span></p>
-      </div>
-    </section>
-
-    <form id="loginForm" class="lg-card" autocomplete="on">
-      <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-      <div class="lg-brand">
-        <img src="civil-fast-logo.png" alt="CIVIL FAST">
-        <div>
-          <div class="lg-ttl">Project Tracker</div>
-          <div class="lg-sub">โครงการวางระบบ Oracle</div>
-        </div>
-      </div>
-      <div class="lg-field">
-        <label for="loginPass">รหัสผ่านทีม</label>
-        <div style="position:relative">
-          <input id="loginPass" type="password" name="password" autocomplete="current-password" placeholder="กรอกรหัสผ่าน" autofocus style="padding-right:46px">
-          <button type="button" class="lg-eye" aria-label="แสดง/ซ่อนรหัสผ่าน" onclick="var i=document.getElementById('loginPass');var s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);"><svg class="eye-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
-        </div>
-      </div>
-      <button id="loginBtn" class="lg-btn" type="submit">เข้าสู่ระบบ</button>
-      <div id="loginErr" class="lg-err"></div>
-      <div class="lg-note">ทั้งทีมใช้รหัสเดียวกัน ไม่ต้องกรอกชื่อผู้ใช้</div>
-    </form>
-
+  <!-- ฉากเป็นพื้นหลังเต็มจอ เนื้อหาลอยทับอยู่ข้างบน แบบเดียวกับรูปอ้างอิง
+       ข้อดีคือฉากไม่กินความสูงของผัง เนื้อหาจึงเรียงกลางจอได้โดยไม่ล้น -->
+  <div class="lg-surround" aria-hidden="true"></div>
+  <div class="lg-bg">
       <div class="lg-stage" aria-hidden="true">
         <div class="lg-zoom" id="lgZoom">
         <div class="lg-cam" id="lgCam">
@@ -1721,7 +1816,59 @@ body.locked{overflow:hidden}
         <canvas class="lg-map"></canvas>
         </div>
         </div>
+      </div>    <div class="lg-scrim" aria-hidden="true"></div>
+  </div>
+  <div class="lg-shell">
+      <div class="lg-brand">
+        <img src="civil-fast-logo.png" alt="CIVIL FAST">
+        <div>
+          <div class="lg-ttl">Project Tracker</div>
+          <div class="lg-sub">โครงการวางระบบ Oracle</div>
+        </div>
       </div>
+      <h1 class="lg-h">ก้าวสู่ <i class="lg-erp">ERP</i> ยุคใหม่ของชาว <i class="lg-civ">CIVIL<svg viewBox="0 0 120 10" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2,6.4 C20,3.1 44,8.4 66,5.2 C86,2.3 104,6.2 118,3.4"/></svg></i><span>จาก <b>SAP</b> ไปสู่ <b><i class="lg-orcl">Oracle</i> <i class="lg-ns">NetSuite</i></b> อย่างเป็นทางการ</span></h1>
+      <div class="lg-say">
+        <div class="lg-lede" id="lgLede">
+          <ul class="lg-pillars">
+            <li style="--pc:#3ec8e8">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 20h8M12 17v3"/><path d="M7 9.5h6M7 12.5h4"/></svg>
+              <b>ONE PLATFORM</b></li>
+            <li style="--pc:#4bd07d">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5.6" rx="7.5" ry="3.1"/><path d="M4.5 5.6v6.4c0 1.7 3.4 3.1 7.5 3.1s7.5-1.4 7.5-3.1V5.6"/><path d="M4.5 12v6.4c0 1.7 3.4 3.1 7.5 3.1s7.5-1.4 7.5-3.1V12"/></svg>
+              <b>ONE DATA</b></li>
+            <li style="--pc:#ff5244">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8" r="3.1"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M2.6 19c0-3.2 2.6-5.3 5.9-5.3s5.9 2.1 5.9 5.3"/><path d="M15.4 14.1c3 .2 5.2 2.2 5.2 4.9"/></svg>
+              <b>ONE CIVIL</b></li>
+          </ul>
+        </div>
+        <div class="lg-detail" id="lgDetail" hidden></div>
+      </div>
+
+      <div class="lg-count">
+        <div class="lg-unit"><b id="lgDays">—</b><span id="lgDaysLbl">วัน</span></div>
+        <div class="lg-unit"><b id="lgHrs">—</b><span>ชั่วโมง</span></div>
+        <div class="lg-unit"><b id="lgMin">—</b><span>นาที</span></div>
+        <div class="lg-unit"><b id="lgSec">—</b><span>วินาที</span></div>
+      </div>
+      <div class="lg-prog" id="lgProg">
+        <div class="lg-pgr" aria-hidden="true"><i></i><u></u></div>
+        <p class="lg-pgtx"><span>เริ่ม 18 พ.ค. 69</span><span id="lgPgPct"></span><span><time datetime="2027-07-01">Go-Live 1 ก.ค. 70</time></span></p>
+      </div>
+
+    <form id="loginForm" class="lg-card" autocomplete="on">
+      <input type="text" name="username" autocomplete="username" value="team" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+      <div class="lg-row">
+        <div class="lg-field">
+          <input id="loginPass" type="password" name="password" autocomplete="current-password" placeholder="รหัสผ่านทีม" autofocus style="padding-right:46px">
+          <button type="button" class="lg-eye" aria-label="แสดง/ซ่อนรหัสผ่าน" onclick="var i=document.getElementById('loginPass');var s=i.type==='password';i.type=s?'text':'password';this.classList.toggle('on',s);"><svg class="eye-on" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg></button>
+        </div>
+        <button id="loginBtn" class="lg-btn" type="submit">เข้าสู่ระบบ</button>
+      </div>
+      <div id="loginErr" class="lg-err"></div>
+      <div class="lg-note">ทั้งทีมใช้รหัสเดียวกัน ไม่ต้องกรอกชื่อผู้ใช้</div>
+    </form>
+
+
   </div>
   <div class="lg-foot">CIVIL ENGINEERING PUBLIC COMPANY LIMITED</div>
 </div>
@@ -1732,7 +1879,11 @@ body.locked{overflow:hidden}
   var el=document.getElementById('lgDays'),lb=document.getElementById('lgDaysLbl');
   if(!el)return;
   var go=new Date(2027,6,1),t=new Date();t.setHours(0,0,0,0);
-  var d=Math.round((go-t)/86400000);
+  /* เดิมปัดจากเที่ยงคืนของวันนี้ ซึ่งใช้ร่วมกับนาฬิกาที่เดินเศษของวันอยู่ข้างล่างไม่ได้
+     ต้องนับจากเวลาจริงแล้วปัดลง เลขวันกับนาฬิกาจึงเป็นชุดเดียวกัน
+     พอนาฬิกาเดินถึง 00:00:00 เลขวันลดลงหนึ่งพอดี ไม่ใช่ลดก่อนหรือหลัง
+     ผลข้างเคียง: ระหว่างวันเลขจะน้อยกว่าแบบเดิมหนึ่ง เพราะไม่ปัดเศษวันขึ้น */
+  var d=Math.floor((go-new Date())/86400000);
   /* ของเดิมพอเลยวัน Go-Live จะค้างที่ "0 วันก่อนขึ้นระบบจริง" ตลอดไป
      ซึ่งผิดตั้งแต่วันถัดจาก 01/07/2027 เป็นต้นไป ต้องพลิกเป็นนับขึ้นแทน */
   var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
@@ -1747,12 +1898,9 @@ body.locked{overflow:hidden}
       node.textContent=Math.round(to*e).toLocaleString('en-US');
       if(k<1)requestAnimationFrame(step);});}
 
-  if(d>0){roll(el,d,1150);
-    if(lb)lb.textContent='วันก่อนขึ้นระบบจริง';}
-  else if(d===0){el.textContent='วันนี้';el.style.fontSize='34px';
-    if(lb)lb.textContent='คือวันขึ้นระบบจริง';}
-  else{roll(el,-d,1150);
-    if(lb)lb.textContent='วันตั้งแต่ขึ้นระบบจริง';}
+  /* ป้ายหน่วยอยู่ในไทล์แล้ว เหลือคำเดียว ไม่ใช่ประโยคเหมือนผังเดิม */
+  if(d>=0){roll(el,d,1150);if(lb)lb.textContent='วัน';}
+  else{roll(el,-d,1150);if(lb)lb.textContent='วันตั้งแต่ขึ้นระบบ';}
 
   /* แถบเส้นทาง — วันคิกออฟจริงตามแผ่นข่าว Q2/2026 คือ 18 พ.ค. 69
      ทั้งสองปลายเป็นค่าคงที่ที่ประกาศไปแล้ว ไม่ได้อ่านจากฐานข้อมูล
@@ -1765,12 +1913,34 @@ body.locked{overflow:hidden}
   var gn=document.getElementById('lgPgGone'),pc=document.getElementById('lgPgPct');
   if(gn)gn.innerHTML='เดินทางมาแล้ว <b>'+gone.toLocaleString('en-US')
     +'</b> จาก '+total.toLocaleString('en-US')+' วัน';
-  if(pc)pc.innerHTML='<b>'+Math.round(pct)+'%</b> ของเส้นทาง';
+  if(pc)pc.innerHTML='มาแล้ว <b>'+Math.round(pct)+'%</b>';
   if(bar){
     var set=function(){bar.style.setProperty('--p',pct.toFixed(1)+'%');};
     /* ต้องให้เบราว์เซอร์เห็นค่า 0% ก่อนหนึ่งเฟรม ไม่งั้น transition ไม่ทำงาน
        มันจะกระโดดไปค่าปลายทางทันทีตั้งแต่เฟรมแรก */
     if(calm)set(); else requestAnimationFrame(function(){requestAnimationFrame(set);});}
+
+  /* นาฬิกาเดินเศษของวันที่ยังไม่ครบ — ของสดชิ้นที่สองบนหน้านี้
+     หยุดตัวเองเมื่อออกจากหน้า ไม่ปล่อยให้ตั้งเวลาค้างไว้หลังเข้าระบบแล้ว */
+  var hh=document.getElementById('lgHrs'),mm=document.getElementById('lgMin'),
+      ss=document.getElementById('lgSec');
+  if(hh&&mm&&ss){
+    var pad=function(n){return (n<10?'0':'')+n;};
+    var beat=function(){
+      var gate=document.getElementById('loginGate');
+      if(!gate||gate.classList.contains('lg-exit')){clearInterval(iv);return;}
+      var ms=go-new Date();
+      if(ms<=0){clearInterval(iv);return;}
+      var r=ms%86400000;
+      hh.textContent=pad(Math.floor(r/3600000));
+      mm.textContent=pad(Math.floor(r%3600000/60000));
+      ss.textContent=pad(Math.floor(r%60000/1000));
+      /* ข้ามเที่ยงคืนแล้วเลขวันต้องลดตาม ไม่ใช่ค้างจนกว่าจะรีเฟรชหน้า */
+      var nd=Math.floor(ms/86400000);
+      if(nd!==d&&nd>0){d=nd;el.textContent=nd.toLocaleString('en-US');}};
+    var iv=setInterval(beat,1000);
+    beat();   /* เติมค่าแรกทันที ไม่งั้นไทล์ค้างเป็นขีดอยู่หนึ่งวินาที */
+  }
 })();
 
 /* ══ เส้นทาง 7 เฟส ══
@@ -1796,7 +1966,8 @@ body.locked{overflow:hidden}
       +' style="left:'+(i/(PH.length-1)*100).toFixed(2)+'%'
       /* ไต่ขึ้นแบบเร่ง ไม่ใช่เชิงเส้น — เส้นจึงโค้งพุ่งขึ้นเหมือนกราฟในรูปอ้างอิง
          ไม่ใช่ทางลาดตรง หลังเวทีหมุน 52 องศา Z กลายเป็นความสูงจริง */
-      +';--rise:'+(Math.pow(i/(PH.length-1),1.9)*62).toFixed(1)+'px"'
+      +';--rise:'+(Math.pow(i/(PH.length-1),1.9)*62).toFixed(1)+'px'
+      +';--k:'+i+'"'
       +' aria-label="'+esc(o.n+' '+o.t)+'"><em></em><s></s><b>'+esc(o.n)+'</b>'
       +'<u>'+esc(o.s||o.t).replace(/\n/g,'<br>')+'</u></button>';}).join('');
   var sel=-1,hint=null,say=lede.parentNode;
@@ -1857,8 +2028,12 @@ body.locked{overflow:hidden}
     if(e.key==='Escape'&&sel>=0)clear();});
   /* บอกให้รู้ว่ากดได้ ไม่งั้นไม่มีใครรู้ว่าฉากมีอะไรให้กด */
   hint=document.createElement('div');
-  hint.className='lg-roadhint';hint.textContent='กดที่เฟสบนเส้นทางเพื่อดูรายละเอียด';
-  lede.parentNode.appendChild(hint);
+  hint.className='lg-roadhint';
+  hint.innerHTML='กดที่เฟสบนเส้นทางเพื่อดูรายละเอียด<i></i>';
+  /* วางไว้ใต้สุดก่อนชื่อบริษัท ไม่ใช่ท้ายคอลัมน์เนื้อหา — ท้ายคอลัมน์ตกลงมา
+     อยู่ในแถบเดียวกับหมุดกลางถนน (04/05) ซึ่งอยู่แนวกลางเหมือนกัน วัดแล้วทับกันทุกจอ */
+  var gateEl=document.getElementById('loginGate'),footEl=gateEl&&gateEl.querySelector('.lg-foot');
+  if(footEl)gateEl.insertBefore(hint,footEl); else lede.parentNode.appendChild(hint);
 })();
 
 /* ══ กล้องกับไฟส่องตามเมาส์ ══
