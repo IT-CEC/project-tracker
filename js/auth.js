@@ -18,6 +18,46 @@ const ADMIN_EMAIL = CFG.ADMIN_EMAIL || "";
 let appStarted = false;
 let wasSignedIn = false;
 
+// ── อายุเซสชันสูงสุด 24 ชม. ──────────────────────────────────────────────────
+// อายุ ID token ของ Firebase ตรึงไว้ที่ 1 ชม. และ SDK ต่อให้เองเงียบๆ ด้วย
+// refresh token ซึ่งไม่หมดอายุ — เปลี่ยนเลขนั้นไม่ได้ ที่คุมได้คือ auth_time
+// (เวลาที่ "กรอกรหัสจริง") ซึ่งไม่ขยับตอนต่อโทเคน จึงใช้วัดอายุเซสชันได้ตรง
+// อ่านจาก window ตอนเรียกใช้ ไม่ใช่ตอนโหลดโมดูล เพื่อให้เทสต์ตั้งค่าสั้นๆ ได้
+function maxSessionMs() {
+  const h = Number(window.ERP_MAX_SESSION_H);
+  return (isFinite(h) && h > 0 ? h : 24) * 3600000;
+}
+let expiryTimer = null;
+let expiring = false;   // อยู่ระหว่างเตะออกเพราะหมดอายุ แล้วกำลังจะรีโหลด
+
+function expireNow() {
+  if (expiring) return;
+  expiring = true;
+  wasSignedIn = false;                       // กัน toast "เซสชันหมดอายุ" ซ้ำซ้อน
+  try { sessionStorage.setItem("erpExpired", "1"); } catch (e) {}
+  try { window.DB && window.DB.logEvent && window.DB.logEvent("session_expired"); } catch (e) {}
+  setTimeout(() => signOut(auth).then(() => location.reload()), 200);
+}
+
+// คืน true ถ้าเซสชันหมดอายุแล้ว (ผู้เรียกต้องหยุด ไม่ต้องปลดล็อกแอป)
+async function sessionExpired(user) {
+  let authTime = 0;
+  try {
+    const t = await user.getIdTokenResult();
+    authTime = new Date(t.authTime).getTime();
+  } catch (e) {
+    return false;   // เน็ตสะดุด/อ่านไม่ได้ → ปล่อยผ่าน ดีกว่าเตะคนออกเพราะอ่านพลาด
+  }
+  if (!authTime) return false;
+  const ends = authTime + maxSessionMs();
+  window.ERP_SESSION_ENDS = ends;            // ให้หน้าตั้งค่าหรือเทสต์อ่านได้
+  if (ends - Date.now() <= 0) { expireNow(); return true; }
+  // ตั้งเวลาเตะออกตอนครบด้วย เผื่อเปิดแท็บค้างข้ามวันโดยไม่เคยรีโหลด
+  clearTimeout(expiryTimer);
+  expiryTimer = setTimeout(expireNow, ends - Date.now());
+  return false;
+}
+
 function $(id) { return document.getElementById(id); }
 
 function showErr(msg) {
@@ -91,8 +131,10 @@ function wire() {
   if (btn && !form) btn.addEventListener("click", doLogin);
 
   // สถานะ auth: ถ้ามี session อยู่แล้ว → เข้าเลย ; ไม่งั้นแสดงหน้า login
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
     if (user) {
+      // เช็กอายุก่อนปลดล็อก ไม่งั้นแอปจะโผล่ให้เห็นแวบหนึ่งก่อนถูกเตะออก
+      if (await sessionExpired(user)) return;
       // บอกแอปว่าล็อกอินด้วยบัญชีไหน — ฝั่งหน้าเว็บใช้ซ่อนปุ่มแก้ไขเท่านั้น
       // ตัวบังคับจริงคือ firestore.rules ต่อให้แก้ค่านี้ใน DevTools ก็เขียนไม่ผ่าน
       window.ERP_ROLE  = (ADMIN_EMAIL && user.email === ADMIN_EMAIL) ? "admin" : "viewer";
@@ -106,8 +148,20 @@ function wire() {
       wasSignedIn = true;
     }
     else {
+      clearTimeout(expiryTimer);
+      // signOut ทำให้ callback นี้ยิงก่อนหน้าจะรีโหลด ถ้าปล่อยให้ทำงานต่อ
+      // มันจะกินธง erpExpired ไปแสดงผลในหน้าที่กำลังจะถูกทิ้ง พอหน้าใหม่ขึ้นมา
+      // ธงหายแล้วจึงไม่มีข้อความบอกเหตุผล — รอให้หน้าใหม่เป็นคนอ่านธงแทน
+      if (expiring) { setBusy(false); lock(); return; }
       if (wasSignedIn) { if (window.toast) window.toast('เซสชันหมดอายุ — กรุณาเข้าสู่ระบบใหม่'); }
       setBusy(false); lock();
+      // มาจากการหมดอายุ (รีโหลดแล้ว) → บอกเหตุผลที่หน้า login ไม่ใช่ปล่อยให้งง
+      try {
+        if (sessionStorage.getItem("erpExpired")) {
+          sessionStorage.removeItem("erpExpired");
+          showErr("ครบ " + Math.round(maxSessionMs() / 3600000) + " ชั่วโมงแล้ว กรุณาเข้าสู่ระบบใหม่");
+        }
+      } catch (e) {}
     }
   });
 }
@@ -115,6 +169,7 @@ function wire() {
 // ล็อกเอาต์ (ปุ่มใน Settings หรือ console) — เคลียร์ wasSignedIn ก่อน signOut กันโชว์ toast "เซสชันหมดอายุ" ตอนตั้งใจออก
 window.erpLogout = () => {
   wasSignedIn = false;
+  clearTimeout(expiryTimer);
   // ยิง log ก่อน แล้วหน่วงสั้นๆ ให้มีโอกาสส่งออกก่อนหน้าจะรีโหลด
   try { window.DB && window.DB.logEvent && window.DB.logEvent("logout"); } catch (e) {}
   setTimeout(() => signOut(auth).then(() => location.reload()), 200);
