@@ -520,6 +520,9 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .g-deprow .g-inl-inp{width:150px;padding:3px 8px;font-size:12px}
 .g-phdt{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--ink3)}
 .g-phdt .g-dtin{width:96px;text-align:center}
+/* ช่องเหตุผลโผล่ต่อท้ายเมื่อวันจบถูกแก้ ต้องกว้างกว่าช่องวันที่เพราะเป็นประโยค
+   และเว้นซ้ายให้เห็นว่าเป็นคนละเรื่องกับคู่วันที่ */
+.g-phdt .g-whyin{width:210px;margin-left:10px;text-align:left;font-weight:500}
 .g-inl-inp::placeholder{color:var(--ink3);font-weight:500}
 .g-bar.pi-sum{border:1px dashed var(--ink3);cursor:default}
 #piGantt .g-bar.pi-slim{height:9px;top:14px;border:0;border-radius:5px;box-shadow:none;padding:0;min-width:6px;gap:0}
@@ -5517,8 +5520,25 @@ function piMovePhase(key,dir){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};v
 function piAddPhase(nm){if(erpDenyEdit())return;nm=(nm||'').trim();if(!nm)return;var m=PH_STORE[GCTX]=PH_STORE[GCTX]||defaultPhaseDocs(GCTX);var key=piNextPhKey();var maxo=0;Object.keys(m).forEach(function(k){if(m[k].order>maxo)maxo=m[k].order;});var doc={key:key,name:nm,color:PH_PALETTE[Object.keys(m).length%PH_PALETTE.length],order:maxo+1};m[key]=doc;piPhSave(GCTX,doc);applyPhaseMap(GCTX);renderPI();if(window.toast)toast(GCTX==='ap'?'เพิ่มกลุ่มแล้ว':'เพิ่มเฟสแล้ว');}
 function piAddPhaseInline(el){if(erpDenyEdit())return;var wrap=el.parentNode;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.placeholder=(GCTX==='ap'?'ชื่อกลุ่มใหม่…':'ชื่อเฟสใหม่…');wrap.innerHTML='';wrap.appendChild(inp);inp.focus();var done=false;var fin=function(ok){if(done)return;done=true;var v=ok?inp.value.trim():'';if(v)piAddPhase(v);else renderPI();};inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
 function piRenamePhase(key,nm){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;nm=(nm||'').trim();if(!nm||nm===cur.name){renderPI();return;}cur.name=nm;piPhSave(GCTX,cur);applyPhaseMap(GCTX);renderPI();if(window.renderProjRibbon)renderProjRibbon();}
-function piSetPhaseDates(key,sv,ev){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;sv=(sv||'').trim();ev=(ev||'').trim();var msg;if(!sv&&!ev){delete cur.s;delete cur.e;msg='กลับไปคำนวณจากงาน';}else if(!sv||!ev){if(window.toast)toast('ต้องกรอกทั้งวันเริ่มและวันจบ');renderPI();return;}else{var a=piDate(sv),b=piDate(ev);if(!a||!b){if(window.toast)toast('รูปแบบวันที่ต้องเป็น dd/mm/yyyy');renderPI();return;}if(b<a){var t=sv;sv=ev;ev=t;msg='ตั้งวันที่เฟสแล้ว (สลับวันเริ่ม-จบให้)';}else{msg='ตั้งวันที่เฟสแล้ว';}cur.s=sv;cur.e=ev;}piPhSave(GCTX,cur);renderPI();if(window.toast)toast(msg);}
-function piPhDatesInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var d=(PH_STORE[GCTX]||{})[key]||{};var wrap=document.createElement('span');wrap.className='g-phdt';var mk=function(v,ph2){var i2=document.createElement('input');i2.className='g-inl-inp g-dtin';i2.type='text';i2.value=v||'';i2.placeholder=ph2;return i2;};var a=mk(d.s,'dd/mm/yyyy'),b=mk(d.e,'dd/mm/yyyy');wrap.appendChild(a);wrap.appendChild(document.createTextNode(' → '));wrap.appendChild(b);nameEl.textContent='';nameEl.appendChild(wrap);a.focus();a.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piSetPhaseDates(key,a.value,b.value);else renderPI();};[a,b].forEach(function(el){el.onmousedown=function(e){e.stopPropagation();};el.onclick=function(e){e.stopPropagation();};el.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};el.onblur=function(){setTimeout(function(){if(document.activeElement!==a&&document.activeElement!==b)fin(true);},0);};});}
+function piSetPhaseDates(key,sv,ev,why){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;sv=(sv||'').trim();ev=(ev||'').trim();var msg;var _oldE=cur.e;if(!sv&&!ev){delete cur.s;delete cur.e;msg='กลับไปคำนวณจากงาน';}else if(!sv||!ev){if(window.toast)toast('ต้องกรอกทั้งวันเริ่มและวันจบ');renderPI();return;}else{var a=piDate(sv),b=piDate(ev);if(!a||!b){if(window.toast)toast('รูปแบบวันที่ต้องเป็น dd/mm/yyyy');renderPI();return;}if(b<a){var t=sv;sv=ev;ev=t;msg='ตั้งวันที่เฟสแล้ว (สลับวันเริ่ม-จบให้)';}else{msg='ตั้งวันที่เฟสแล้ว';}cur.s=sv;cur.e=ev;
+    /* วันจบเปลี่ยนจากของเดิมที่เคยตั้งไว้ = การเลื่อนกำหนด ต้องเก็บไว้
+       ไม่ใช่เขียนทับเงียบๆ · ครั้งแรกที่ตั้งวัน (ยังไม่เคยมี e) ไม่นับเป็นการเลื่อน */
+    if(_oldE&&ev!==_oldE){
+      if(!Array.isArray(cur.dueLog))cur.dueLog=[];
+      cur.dueLog.push({from:_oldE,to:ev,at:piLogStamp(),why:(why||'').trim()});
+      var _dd=Math.round((piDate(ev)-piDate(_oldE))/86400000);
+      msg=(_dd>0?'เลื่อนวันจบเฟสไป '+_dd+' วัน':'ร่นวันจบเฟสเข้ามา '+(-_dd)+' วัน')+' (บันทึกแล้ว)';
+    }}piPhSave(GCTX,cur);renderPI();if(window.toast)toast(msg);}
+function piPhDatesInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var d=(PH_STORE[GCTX]||{})[key]||{};var wrap=document.createElement('span');wrap.className='g-phdt';var mk=function(v,ph2){var i2=document.createElement('input');i2.className='g-inl-inp g-dtin';i2.type='text';i2.value=v||'';i2.placeholder=ph2;return i2;};var a=mk(d.s,'dd/mm/yyyy'),b=mk(d.e,'dd/mm/yyyy');wrap.appendChild(a);wrap.appendChild(document.createTextNode(' → '));wrap.appendChild(b);
+  /* ช่องเหตุผลโผล่เองเฉพาะตอนที่วันจบถูกแก้จากของเดิม — ถ้าโผล่ตลอดจะกวนตอนแก้วันเริ่ม
+     ไม่บังคับกรอก (ให้เหมือนระดับงาน) แต่ตัวตรวจ drift จะฟ้องถ้าเลี่ยงไปแก้ทางอื่น */
+  var why=mk('','เหตุผลที่เลื่อน…');why.className='g-inl-inp g-whyin';why.style.display='none';
+  wrap.appendChild(why);
+  var syncWhy=function(){var ch=!!(d.e&&(b.value||'').trim()&&(b.value||'').trim()!==d.e);
+    why.style.display=ch?'':'none';};
+  b.oninput=syncWhy;
+  nameEl.textContent='';nameEl.appendChild(wrap);a.focus();a.select();
+  var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piSetPhaseDates(key,a.value,b.value,why.value);else renderPI();};[a,b,why].forEach(function(el){el.onmousedown=function(e){e.stopPropagation();};el.onclick=function(e){e.stopPropagation();};el.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};el.onblur=function(){setTimeout(function(){if(document.activeElement!==a&&document.activeElement!==b&&document.activeElement!==why)fin(true);},0);};});}
 function piRenameInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var cur=(PH_STORE[GCTX]&&PH_STORE[GCTX][key])?PH_STORE[GCTX][key].name:nameEl.textContent;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.value=cur;nameEl.textContent='';nameEl.appendChild(inp);inp.focus();inp.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piRenamePhase(key,inp.value);else renderPI();};inp.onmousedown=function(e){e.stopPropagation();};inp.onclick=function(e){e.stopPropagation();};inp.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
 function piDeletePhase(key){if(erpDenyEdit())return;if(PIMPL.some(function(d){return d.ph===key;})){if(window.toast)toast(GCTX==='ap'?'ลบไม่ได้ — กลุ่มยังมีงาน':'ลบไม่ได้ — เฟสยังมีงาน');return;}var m=PH_STORE[GCTX]||{};if(!m[key])return;delete m[key];if(window.DB)window.DB.deleteItem(COL_PH[GCTX],key).catch(dbErr('phase del'));applyPhaseMap(GCTX);renderPI();if(window.toast)toast('ลบแล้ว');}
 function buildAP(){var d0=new Date(2026,6,1);var base=(DATA.bridge||[]).map(function(b){return {ph:(b.module||"อื่นๆ"),name:b.name||"(ไม่มีชื่อ)",asg:(b.owner?[b.owner]:[""]),s:"",e:"",prog:0,st:(b.status||"Not Started"),pr:(b.cplx==="High"?"High":"Low"),dep:[]};});var seq={};base.forEach(function(d,i){d._pi=i;d._key="b"+i;var dp=d.ph;var k=(seq[dp]=(seq[dp]||0));seq[dp]++;var st=new Date(d0.getTime()+k*14*86400000);var seg=10,p=st.getTime();var r0=new Date(p),r1=new Date(p+seg*864e5),v0=new Date(p+(seg+1)*864e5),v1=new Date(p+(2*seg+1)*864e5),u0=new Date(p+(2*seg+2)*864e5),u1=new Date(p+(3*seg+2)*864e5);d.stages=[{k:'req',s:fmtDMY(r0),e:fmtDMY(r1),st:'Not Started'},{k:'dev',s:fmtDMY(v0),e:fmtDMY(v1),st:'Not Started'},{k:'uat',s:fmtDMY(u0),e:fmtDMY(u1),st:'Not Started'}];d.gld=fmtDMY(new Date(u1.getTime()+3*864e5));d.s=fmtDMY(st);d.e=fmtDMY(u1);});AP_BASE=base;var depts=[...new Set((DATA.bridge||[]).map(function(b){return b.module||"อื่นๆ";}))];AP_GROUPS={};AP_PHC={};depts.forEach(function(dp){AP_GROUPS[dp]=dp;AP_PHC[dp]=deptColor(dp);});}
@@ -5601,6 +5621,18 @@ function piDueInfo(d){
   return {n:L.length,base:L[0].from,days:Math.round((c-b)/86400000),
           drift:(last&&last.getTime()!==c.getTime())?{from:L[L.length-1].to,to:d.e}:null};}
 function piDueDays(n){return (n>0?'+':'')+n+' วัน';}
+/* ══════════ การเลื่อนกำหนดระดับเฟส (2026-10-06) ══════════
+   เฟสเคยมีแค่ {s,e} ซึ่งเขียนทับได้เงียบๆ ไม่เหลือร่องรอยว่าเคยเลื่อน
+   ส่วนป้าย "ช้ากว่าแผนเดิม" ที่เคยแสดง คำนวณจาก dueLog ของงานข้างใน
+   ไม่ใช่ของเฟสเอง เฟสจึงไม่เคยรู้ว่าตัวเองถูกเลื่อน
+   ใช้โครงเดียวกับงานเป๊ะ (dueLog + base + drift) จะได้ไม่ต้องสอนแนวคิดใหม่
+   piPhSave บันทึกทั้งอ็อบเจกต์ ฟิลด์นี้จึงลง Firestore เองโดยไม่ต้องแก้ชั้น persistence */
+function piPhDueInfo(p){
+  var L=(p&&Array.isArray(p.dueLog))?p.dueLog:[];if(!L.length)return null;
+  var b=piDate(L[0].from),c=piDate(p.e);if(!b||!c)return null;
+  var last=piDate(L[L.length-1].to);
+  return {n:L.length,base:L[0].from,days:Math.round((c-b)/86400000),
+          drift:(last&&last.getTime()!==c.getTime())?{from:L[L.length-1].to,to:p.e}:null};}
 function piTbdNote(d){
   if(!piDate(d.e))return '<div class="tbdnote">ยังไม่กำหนดวัน Sign Off — บาร์ในผังใช้ขอบเขตของงานย่อยแทน</div>';
   var mx=null;piChildren(d).forEach(function(c){var e=piDate(piSpan(c).e);if(e&&(!mx||e>mx))mx=e;});
@@ -5951,6 +5983,15 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
   var byp={};rows.forEach(d=>{(byp[d.ph]=byp[d.ph]||[]).push(d);});
   var _phFA=(vm(GP+'Phase').length||vm(GP+'Status').length||vm(GP+'Asg').length||(v(GP+'Search')||'').trim());
   var _phK=(_phFA?Object.keys(byp):Object.keys(PI_PHASES));_phK.sort(function(a,b){var oa=(PI_PORDER[a]!=null?PI_PORDER[a]:9999),ob=(PI_PORDER[b]!=null?PI_PORDER[b]:9999);return oa-ob||(a<b?-1:a>b?1:0);});
+  /* วันเริ่มของทุกเฟส คำนวณล่วงหน้าไว้ เพราะตอนวาดเฟสหนึ่งต้องรู้ว่าเฟสถัดไปเริ่มวันไหน
+     ถึงจะบอกได้ว่าชนกันหรือยัง — ตกลงกันไว้ว่าไม่เลื่อนให้อัตโนมัติ แค่เตือน */
+  var _phStart={};
+  _phK.forEach(function(k2){
+    var L2=byp[k2]||[],pd2=(PH_STORE[GCTX]||{})[k2]||{};
+    var fx2=piDate(pd2.s),fy2=piDate(pd2.e);
+    if(fx2&&fy2){_phStart[k2]=fx2;return;}
+    var ta2=null;L2.forEach(function(z){var a2=piDate(piSpan(z).s);if(a2&&(!ta2||a2<ta2))ta2=a2;});
+    _phStart[k2]=ta2;});
   var body=_phK.map(ph=>{var list=byp[ph]||[];var col=piCollapsed[ph];var _phd=(PH_STORE[GCTX]||{})[ph]||{};var _ta=null,_tb=null;list.forEach(function(z){var _z=piSpan(z),_a=piDate(_z.s),_b=piDate(_z.e);if(_a&&(!_ta||_a<_ta))_ta=_a;if(_b&&(!_tb||_b>_tb))_tb=_b;});var _fx=piDate(_phd.s),_fy=piDate(_phd.e),_man=!!(_fx&&_fy);var _pa=_man?_fx:_ta,_pb=_man?_fy:_tb;var _sl=!!(_man&&_ta&&_ta<_pa),_sr=!!(_man&&_tb&&_tb>_pb);/* ══ ความช้าระดับเฟส ══
        จุดจบเดิม = วันจบที่ช้าที่สุด "ถ้าไม่มีงานไหนถูกเลื่อนเลย"
        จุดจบปัจจุบัน = วันจบที่ช้าที่สุดตอนนี้
@@ -5967,7 +6008,23 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       if(!n||!b0||!c0)return null;
       return {n:n,was:b0,now:c0,d:Math.round((c0-b0)/86400000)};})();
     var _pslip='',_pmark='';
-    if(_ps){
+    /* เฟสมีประวัติการเลื่อนของตัวเองแล้ว ให้ใช้ค่าจริงของเฟส ไม่ใช่ค่าที่เดาจากงานข้างใน
+       (ของเดิมยังใช้ได้อยู่สำหรับเฟสที่ไม่เคยถูกเลื่อนเอง จึงเก็บไว้เป็นทางถอย) */
+    var _pdue=piPhDueInfo(_phd);
+    if(_pdue){
+      var _qd=_pdue.days;
+      var _qtxt=_qd>0?('เลื่อนแล้ว '+_pdue.n+' ครั้ง · ช้ากว่าเดิม '+_qd+' วัน')
+              :(_qd<0?('เลื่อนแล้ว '+_pdue.n+' ครั้ง · เร็วกว่าเดิม '+(-_qd)+' วัน')
+                     :('เลื่อนแล้ว '+_pdue.n+' ครั้ง · วันจบเท่าเดิม'));
+      var _qlog=(_phd.dueLog||[]).map(function(x){
+        return '· '+x.from+' → '+x.to+(x.why?(' — '+x.why):' — (ไม่ได้ระบุเหตุผล)')+'  ['+x.at+']';}).join('\n');
+      var _qtip='วันจบเดิม '+_pdue.base+' → ปัจจุบัน '+(_phd.e||'-')+'\n'+_qlog
+        +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' → '+_pdue.drift.to+')'):'');
+      _pslip=`<span class="g-phslip${_qd>0?'':' ok'}" title="${attr(_qtip)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_qtxt}</span>`;
+      var _qb=piDate(_pdue.base),_qx=_qb?dayOf(_qb):-1;
+      if(_qx>=0&&_qx<totalDays)_pmark=`<span class="g-phmark" style="left:${250+(_qx+1)*dw}px" title="${attr('วันจบเดิมของเฟส '+_pdue.base)}"></span>`;
+    }
+    else if(_ps){
       var _pd=_ps.d,_txt=_pd>0?('ช้ากว่าแผนเดิม '+_pd+' วัน')
              :('เลื่อน '+_ps.n+' งาน · ไม่กระทบวันจบเฟส');
       var _ptip='เลื่อนกำหนด '+_ps.n+' งาน · จุดจบเดิม '+fmtDMY(_ps.was)+' → ปัจจุบัน '+fmtDMY(_ps.now);
@@ -5975,7 +6032,12 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       if(_pd>0){var _mx=dayOf(_ps.was);
         if(_mx>=0&&_mx<totalDays)_pmark=`<span class="g-phmark" style="left:${250+(_mx+1)*dw}px" title="${attr('จุดจบเดิมของเฟส '+fmtDMY(_ps.was))}"></span>`;}
     }
-    var _phbar='';if(_pa&&_pb){var _x=dayOf(_pa),_y=dayOf(_pb);if(_y<_x){var _t=_x;_x=_y;_y=_t;}var _rs=piPhRoll(list,ph),_rc=STATUS_COLORS[_rs]||'#8e8e93';var _pw=Math.max((_y-_x+1)*dw,6),_pl=`left:${250+_x*dw}px;width:${_pw}px`;var _wd=[];if(_sl)_wd.push('เริ่มก่อน '+Math.round((_pa-_ta)/DAY)+' วัน');if(_sr)_wd.push('เกิน '+Math.round((_tb-_pb)/DAY)+' วัน');var _wl=_wd.length?`<span class="g-phwarn">${_wd.join(' · ')}</span>`:'';if(_sl)_pl+=';border-left-color:var(--red);border-left-style:dashed';if(_sr)_pl+=';border-right-color:var(--red);border-right-style:dashed';if(col){_phbar=`<div class="g-phbar phfull" style="${_pl};background:color-mix(in srgb,${_rc} 14%,var(--surface));border-color:color-mix(in srgb,${_rc} 40%,transparent)"><span class="g-bdot" style="background:${_rc}"></span><span class="g-phlab">${esc(PI_PHASES[ph]||ph)}${_wl}</span><span class="g-pill" style="background:${_rc}1f;color:${_rc}"><span class="g-pdot" style="background:${_rc}"></span>${_rs}</span>${_pslip}</div>`;}else{_phbar=`<div class="g-phbar" style="${_pl}"><span class="g-phlab">${esc(PI_PHASES[ph]||ph)}${_wl}${_pslip}</span></div>`;}}
+    var _phbar='';if(_pa&&_pb){var _x=dayOf(_pa),_y=dayOf(_pb);if(_y<_x){var _t=_x;_x=_y;_y=_t;}var _rs=piPhRoll(list,ph),_rc=STATUS_COLORS[_rs]||'#8e8e93';var _pw=Math.max((_y-_x+1)*dw,6),_pl=`left:${250+_x*dw}px;width:${_pw}px`;var _wd=[];if(_sl)_wd.push('เริ่มก่อน '+Math.round((_pa-_ta)/DAY)+' วัน');if(_sr)_wd.push('เกิน '+Math.round((_tb-_pb)/DAY)+' วัน');
+      /* จบหลังเฟสถัดไปเริ่ม = สองเฟสซ้อนกัน ซึ่งเกิดขึ้นจริงได้ ไม่ใช่ความผิดพลาดเสมอไป
+         จึงบอกให้เห็นแล้วให้คนตัดสินใจเอง ไม่ไปขยับวันของเฟสอื่นให้ */
+      var _nk=_phK[_phK.indexOf(ph)+1],_ns=_nk?_phStart[_nk]:null;
+      if(_pb&&_ns&&_pb>=_ns){var _ov=Math.round((_pb-_ns)/DAY)+1;
+        _wd.push('ชน'+(GCTX==='ap'?'กลุ่ม':'เฟส')+' '+esc(PI_PHASES[_nk]||_nk)+' '+_ov+' วัน');}var _wl=_wd.length?`<span class="g-phwarn">${_wd.join(' · ')}</span>`:'';if(_sl)_pl+=';border-left-color:var(--red);border-left-style:dashed';if(_sr)_pl+=';border-right-color:var(--red);border-right-style:dashed';if(col){_phbar=`<div class="g-phbar phfull" style="${_pl};background:color-mix(in srgb,${_rc} 14%,var(--surface));border-color:color-mix(in srgb,${_rc} 40%,transparent)"><span class="g-bdot" style="background:${_rc}"></span><span class="g-phlab">${esc(PI_PHASES[ph]||ph)}${_wl}</span><span class="g-pill" style="background:${_rc}1f;color:${_rc}"><span class="g-pdot" style="background:${_rc}"></span>${_rs}</span>${_pslip}</div>`;}else{_phbar=`<div class="g-phbar" style="${_pl}"><span class="g-phlab">${esc(PI_PHASES[ph]||ph)}${_wl}${_pslip}</span></div>`;}}
     var hdr=`<div class="g-deprow" onclick="piTogglePhase('${ph}')" style="cursor:pointer;--pc:${_rc}">${_pmark}${_phbar}<div class="g-dept">${col?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>':'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'} <span class="g-phname">${esc(PI_PHASES[ph]||ph)}</span> <span class="g-dn">${list.length}</span><span class="g-phacts"><button class="g-phedit" onclick="event.stopPropagation();piMovePhase('${ph}',-1)" title="เลื่อนขึ้น"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button><button class="g-phedit" onclick="event.stopPropagation();piMovePhase('${ph}',1)" title="เลื่อนลง"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button><button class="g-phedit" onclick="event.stopPropagation();piRenameInline(this,'${ph}')" title="เปลี่ยนชื่อ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button><button class="g-phedit" onclick="event.stopPropagation();piPhDatesInline(this,'${ph}')" title="กำหนดวันที่ของเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></button>${list.length===0?`<button class="g-phdel" onclick="event.stopPropagation();piDeletePhase('${ph}')" title="ลบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>`:''}<button class="g-add" onclick="event.stopPropagation();piAddTask('${ph}')" title="เพิ่มงานในเฟสนี้">+</button></span></div></div>`;if(col||!list.length)return hdr;
     return hdr+piTreeOrder(list).map(function(o){var d=o.d,_dep=o.depth;var _sum=piIsSummary(d),_col=piTaskCol[d._key];var _sp=piSpan(d);var _est=piEffSt(d);var sc=STATUS_COLORS[_est];
       /* ยังไม่กำหนดวันจบเอง — บาร์ยืมขอบเขตจากงานย่อยมาวาด แต่ต้องดูต่างจากบาร์ที่มีกำหนดจริง
