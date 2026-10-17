@@ -476,15 +476,28 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 /* เครื่องหมายงานย่อย — เล็กและจางกว่าชื่องาน เป็นบริบท ไม่ใช่เนื้อหา */
 .submk{color:var(--ink3);font-weight:400;margin-right:2px}
 .sumcell{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--ink3);white-space:nowrap}
+.namecell{display:flex;align-items:center;gap:5px;min-width:0}
+.stepcell{display:flex;align-items:center;gap:6px;min-width:0}
+.stepcell .truncate{min-width:0;flex:0 1 auto}
+.rowtog{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;flex:none;border-radius:5px;color:var(--ink3);cursor:pointer;transition:background .15s,color .15s}
+.rowtog:hover{background:var(--chip);color:var(--ink)}
+.rowtog svg{width:12px;height:12px;transition:transform .18s}
+.rowtog.on svg{transform:rotate(90deg)}
+.rowtog.sp{cursor:inherit}
+.dt tbody tr.steprow{background:color-mix(in srgb,var(--ink3) 5%,transparent)}
+.dt tbody tr.steprow:hover{background:var(--hover)}
 .subpar{font-size:11px;color:var(--ink3);margin-top:1px;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap;max-width:260px}
 /* คอลัมน์งานหลัก — ชื่อ BRD ที่งานนี้สังกัด ทำให้ชื่อขั้นตอนที่ซ้ำกัน 40 จาก 78 งาน
    แยกออกจากกันได้ และเรียง/กรองตามรายการ BRD ได้
    แถวที่เป็นตัว BRD เอง (25 จาก 78) ช่อง "ขั้นตอน" เว้นเป็น — ไม่ใช่ซ้ำชื่อเดิม
    เพราะแถวนั้น "คือ" งานหลัก ไม่ได้เป็นขั้นตอนย่อยของอะไร */
-.parcell{display:block;font-size:12px;color:var(--ink2);font-weight:600;overflow:hidden;
+.parcell{min-width:0;display:block;font-size:12px;color:var(--ink2);font-weight:600;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap;max-width:210px}
 /* ตารางที่ไม่มีงานย่อยเลย ซ่อนคอลัมน์ "ขั้นตอน" (คอลัมน์ที่ 3) ทั้งหัวและเนื้อ */
+/* ชื่อขั้นตอนต่างกันที่ท้ายชื่อ (V.1 / V.2) ถ้าคอลัมน์แคบไปสองสิบ px
+   ส่วนที่โดนตัดคือส่วนที่แยกแถวออกจากกัน กำหนดขั้นต่ำไว้เท่าชื่อที่ยาวสุดบวกส่วนเผื่อ */
+.dt thead th:nth-child(3),.dt tbody td:nth-child(3){min-width:240px}
 .dt.nostep thead th:nth-child(3),.dt.nostep tbody td:nth-child(3){display:none}
 /* ชิปบอกว่าใครถืองานอยู่ตอนนี้ — ผูกกับ d.st ดิบเหมือนผัง จึงไม่หายตอนเลยกำหนด
    สีกลางๆ ไม่แย่งกับชิปสถานะที่อยู่ติดกัน */
@@ -5370,16 +5383,32 @@ function piRvwClear(){piRvwF=null;renderPI();}
 function filteredPI(opts){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
   var noR=!!(opts&&opts.noRvw);
   return PIMPL.filter(d=>(!phs.length||phs.includes(d.ph))&&(!sts.length||sts.includes(d.st))&&(!ags.length||ags.some(a=>d.asg.includes(a)))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q))&&(noR||piRvwHit(d)));}
-/* ช่อง "ขั้นตอน" มีสามสถานะที่ต่างกันจริง ใช้ขีดเดียวแทนสองอันไม่ได้:
-   มีแม่ = เป็นขั้นตอนย่อย · มีลูก = แถวสรุป ที่รวมผลจากขั้นตอนที่อยู่ในตารางเดียวกัน
-   (จุดนี้เองที่ทำให้เห็นงานหลักชื่อเดียวกันสองแถว) · ไม่มีทั้งคู่ = งานเดี่ยว ไม่มีขั้นตอนให้แสดง
-   การแยกอยู่บนหลักเดียวกันกับ Timeline — ที่นั่นแถวสรุปมีลูกศรพับกับเลขจำนวนลูกกำกับ */
+/* ตารางนี้แสดง "หนึ่งแถวต่อหนึ่งงานหลัก" ไม่ใช่หนึ่งแถวต่อหนึ่งงาน เพราะวันที่และ
+   การเลื่อนกำหนดที่ใช้ตัดสินใจจริงอยู่ที่ระดับงานหลัก (เช่น +43 วัน) ส่วน task ย่อย
+   ถือแค่วันของตัวเอง เดิมแถวแม่กับแถวลูกวางเรียงกันเฉยๆ จึงอ่านเหมือนข้อมูลซ้ำ
+   ทั้งที่เป็นคนละชุดตัวเลข — ยุบเหลือแถวเดียวแล้วกางขั้นตอนเมื่อกดลูกศรแทน */
+var piTblExp={};
+function piToggleRow(pid,ev){if(ev)ev.stopPropagation();
+  var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;
+  piTblExp[d._key]=!piTblExp[d._key];renderPITbl();}
+/* ขั้นตอนที่ยังค้างอยู่ของงานหลัก — ตัวแรกที่ยังไม่ Completed เรียงตามวันเริ่ม
+   คืน null เมื่อเสร็จครบ เพื่อให้ช่องขั้นตอนบอกว่าจบแล้วแทนที่จะชี้ไปขั้นตอนเก่า */
+function piActiveStep(d){var ch=piChildren(d);if(!ch.length)return null;
+  var open=ch.filter(function(c){return c.st!=='Completed';});if(!open.length)return null;
+  return open.slice().sort(function(a,z){return (piDate(a.s)||0)-(piDate(z.s)||0);})[0];}
+/* ช่อง "ขั้นตอน" มีสามสถานะที่ต่างกันจริง ใช้ขีดเดียวแทนทั้งหมดไม่ได้: เป็นแถวขั้นตอน
+   ที่กางออกมา · เป็นงานหลักที่ค้างอยู่ที่ขั้นตอนไหน (พร้อมนับว่าเสร็จกี่จากกี่) ·
+   เป็นงานเดี่ยวที่ไม่ได้แตกเป็นขั้นตอน */
+function piStepNm(t,tail){return '<div class="stepcell"><span class="truncate" title="'+attr(t.name)+'" style="color:var(--ink);font-weight:600;max-width:none">'
+  +(t.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg> ':'')+'<span class="submk">\u21b3</span> '+esc(t.name)+'</span>'+(tail||'')+'</div>';}
 function piStepCell(d){
-  if(d.parent)return `<div class="truncate" style="color:var(--ink);font-weight:600;max-width:none">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg> ':''}<span class="submk">↳</span> ${esc(d.name)}</div>`;
-  var n=piChildren(d).length;
-  if(!n)return '<span class="muted" title="งานเดี่ยว ไม่ได้แตกเป็นขั้นตอนย่อย">—</span>';
-  return '<span class="sumcell" title="'+attr('แถวสรุป — รวมผลจาก '+n+' ขั้นตอนที่แสดงอยู่ในตารางนี้ด้วย')
-    +'">ภาพรวม<span class="g-cn">'+n+'</span></span>';}
+  if(d.parent)return piStepNm(d);
+  var ch=piChildren(d),n=ch.length;
+  if(!n)return '<span class="muted" title="งานเดี่ยว ไม่ได้แตกเป็นขั้นตอนย่อย">\u2014</span>';
+  var done=ch.filter(function(c){return c.st==='Completed';}).length,act=piActiveStep(d);
+  if(!act)return '<span class="sumcell" title="'+attr('ขั้นตอนทั้ง '+n+' เสร็จครบแล้ว')
+    +'">ครบทุกขั้นตอน<span class="g-cn">'+n+'</span></span>';
+  return piStepNm(act,'<span class="g-cn" title="'+attr('เสร็จแล้ว '+done+' จาก '+n+' ขั้นตอน')+'">'+done+'/'+n+'</span>');}
 let piSortK='',piSortD=1;
 function renderPITbl(){var rows=filteredPI();
   var _rootName=function(d){var r=d,g=0;
@@ -5389,12 +5418,17 @@ function renderPITbl(){var rows=filteredPI();
     /* "งานหลัก" ไม่ใช่ฟิลด์บนงาน ต้องไล่ขึ้นไปหาต้นสายก่อนถึงเทียบได้ */
     if(piSortK==='_root')return _rootName(a).localeCompare(_rootName(b),'th')*piSortD;
     if(piSortK==='s'||piSortK==='e')return ((piDate(a[piSortK])||0)-(piDate(b[piSortK])||0))*piSortD;if(piSortK==='prog')return (a.prog-b.prog)*piSortD;if(piSortK==='wbs')return (a._pi-b._pi)*piSortD;return String(a[piSortK]||'').localeCompare(String(b[piSortK]||''),'th')*piSortD;});
-  /* บริบทไหนไม่มีงานย่อยเลย (Automation สร้างงานแบบแบน ไม่มีแม่-ลูก) คอลัมน์
-     "ขั้นตอน" จะเป็น — ทั้งตาราง ซึ่งเป็นปัญหาเดียวกับที่เพิ่งแก้ไปในฝั่งโครงการ
-     ซ่อนทั้งคอลัมน์ไปเลยดีกว่าปล่อยให้กินที่โดยไม่บอกอะไร */
+  /* ตัวกรองทำงานที่ระดับงานหลักตามที่ตกลงไว้ — เลือกเฉพาะแถวที่ไม่มีแม่ แล้วค่อยแทรก
+     ขั้นตอนของงานที่กางอยู่ลงไปใต้แถวนั้น ขั้นตอนที่กางออกมาไม่ผ่านตัวกรอง เพราะ
+     ตัวกรองตอบคำถามว่า "งานหลักตัวไหน" ไม่ใช่ "ขั้นตอนไหน" */
+  var _top=rows.filter(function(z){return !z.parent;}),_seq=[];
+  _top.forEach(function(t){_seq.push([t,0]);
+    if(piTblExp[t._key])piChildren(t).forEach(function(c){_seq.push([c,1]);});});
+  /* บริบทไหนไม่มีขั้นตอนย่อยเลย (Automation สร้างงานแบบแบน) คอลัมน์นี้จะว่างทั้งตาราง
+     ซ่อนไปเลยดีกว่าปล่อยให้กินที่โดยไม่บอกอะไร */
   var _tblEl=document.getElementById(GP+'Tbl');
-  if(_tblEl)_tblEl.classList.toggle('nostep',!rows.some(function(z){return !!z.parent;}));
-  var tb=document.querySelector('#'+GP+'Tbl tbody');if(tb)tb.innerHTML=rows.map(function(d){
+  if(_tblEl)_tblEl.classList.toggle('nostep',!_top.some(function(z){return piChildren(z).length;}));
+  var tb=document.querySelector('#'+GP+'Tbl tbody');if(tb)tb.innerHTML=_seq.map(function(_o){var d=_o[0],_sub=_o[1];
     /* ยึดจาก Timeline เป็นหลัก — ป้ายสถานะบนผังบอกสามอย่างในที่เดียว:
        สถานะจริง · เลยกำหนดกี่วัน · และใครถืองานอยู่ (rvw)
        ตารางเดิมบอกแค่สถานะเปล่าๆ คนจึงไปอ่าน "ทีม" (asg = แผนกที่เกี่ยวข้อง)
@@ -5409,8 +5443,11 @@ function renderPITbl(){var rows=filteredPI();
        ไล่ขึ้นไปหาต้นสายแล้วทำเป็นคอลัมน์ของตัวเอง เรียงและกรองตามได้ */
     var _root=d,_g=0;
     while(_root.parent&&_g++<10){var _up=PIMPL.find(function(z){return z._key===_root.parent;});if(!_up)break;_root=_up;}
-    var _par=d.parent?PIMPL.find(function(z){return z._key===d.parent;}):null;
-    return `<tr onclick="openPI(${d._pi})" style="cursor:pointer"><td><span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(PI_PHASES[d.ph]||d.ph||'')}</span></td><td><span class="parcell" title="${attr(_root.name)}">${esc(_root.name)}</span></td><td>${piStepCell(d)}</td><td><span class="chip" style="background:${STATUS_COLORS[_est]}1f;color:${STATUS_COLORS[_est]}">${esc(_stxt)}</span>${d.st==='In Review'?`<span class="chip rvwchip" title="${attr(L('กำลังตรวจโดย ','reviewing: ')+(d.rvw||'Civil'))}">${esc(d.rvw||'Civil')}</span>`:''}</td><td>${piAsg(d.asg)}</td><td class="muted">${esc(d.s||'')}</td><td class="muted">${esc(d.e||'')}${piSlipChip(d)}</td><td>${piProg(piCalcProg(d),STATUS_COLORS[_est])}</td><td><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span></td></tr>`;}).join('')||'<tr><td colspan="9" style="text-align:center;padding:40px" class="muted">ไม่พบงาน</td></tr>';}
+    /* ลูกศรกางต้องแยกขาดจากการกดแถว — กดแถวยังเปิดหน้าต่างงานเหมือนเดิมทุกประการ
+       ตัวเว้นกว้างเท่ากันบนแถวที่ไม่มีขั้นตอน ทำให้ชื่องานทุกแถวยังตรงแนวกัน */
+    var _nk=_sub?0:piChildren(d).length,_op=!!piTblExp[d._key];
+    var _chev=_nk?`<span class="rowtog${_op?' on':''}" onclick="piToggleRow(${d._pi},event)" title="${attr(_op?'ย่อขั้นตอน':'กางขั้นตอน')}"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>`:'<span class="rowtog sp"></span>';
+    return `<tr class="${_sub?'steprow':''}" onclick="openPI(${d._pi})" style="cursor:pointer"><td>${_sub?'':`<span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(PI_PHASES[d.ph]||d.ph||'')}</span>`}</td><td>${_sub?'':`<div class="namecell">${_chev}<span class="parcell" title="${attr(_root.name)}">${esc(_root.name)}</span></div>`}</td><td>${piStepCell(d)}</td><td><span class="chip" style="background:${STATUS_COLORS[_est]}1f;color:${STATUS_COLORS[_est]}">${esc(_stxt)}</span>${d.st==='In Review'?`<span class="chip rvwchip" title="${attr(L('กำลังตรวจโดย ','reviewing: ')+(d.rvw||'Civil'))}">${esc(d.rvw||'Civil')}</span>`:''}</td><td>${piAsg(d.asg)}</td><td class="muted">${esc(d.s||'')}</td><td class="muted">${esc(d.e||'')}${piSlipChip(d)}</td><td>${piProg(piCalcProg(d),STATUS_COLORS[_est])}</td><td><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span></td></tr>`;}).join('')||'<tr><td colspan="9" style="text-align:center;padding:40px" class="muted">ไม่พบงาน</td></tr>';}
 function piStIcon(st){var c=STATUS_COLORS[st]||'#888';return st==='Completed'?`<span style="color:${c};font-weight:700"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`:`<span class="dotc" style="background:${c};margin-right:0"></span>`;}
 function piRing(p,c,noPct){p=p||0;var cf=(2*Math.PI*9).toFixed(1),off=(cf*(1-p/100)).toFixed(1);return `<span style="display:inline-flex;align-items:center;gap:6px"><svg width="22" height="22" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--chip)" stroke-width="3"/><circle cx="12" cy="12" r="9" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="${cf}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 12 12)"/></svg>${noPct?'':`<span style="font-size:11px;color:var(--ink3)">${p}%</span>`}</span>`;}
 /* การ์ดเดิมสูง 104px จาก 3 ชั้น (ชื่อ / ชิป / วงกลม+ช่วงวัน)
@@ -5659,7 +5696,7 @@ function openAP(id){var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _b=brByKey(
       _mb2.querySelectorAll('.apstg-x,.apstg-add,.btn-pri').forEach(function(el){el.style.display='none';});
       _mb2.classList.add('mb-ro');}}
   document.getElementById('modal').classList.add('open');}
-function setGanttCtx(which){GCTX=which;if(which==="ap"){PIBASE=AP_BASE;PIEKEY="erp_ap_edits_v1";PIADDKEY="erp_ap_add_v1";PIDELKEY="erp_ap_del_v1";PIGID="apGantt";ZOOMID="apZoom";GP="ap";}else{PIBASE=PI_BASE0;PIEKEY="erp_pi_edits_v1";PIADDKEY="erp_pi_add_v1";PIDELKEY="erp_pi_del_v1";PIGID="piGantt";ZOOMID="piZoom";GP="pi";}applyPhaseMap(which);piTaskCol={};piCollapsed={};PIMPL=PI_STORE[which]||[];fillPIFilters();}
+function setGanttCtx(which){GCTX=which;if(which==="ap"){PIBASE=AP_BASE;PIEKEY="erp_ap_edits_v1";PIADDKEY="erp_ap_add_v1";PIDELKEY="erp_ap_del_v1";PIGID="apGantt";ZOOMID="apZoom";GP="ap";}else{PIBASE=PI_BASE0;PIEKEY="erp_pi_edits_v1";PIADDKEY="erp_pi_add_v1";PIDELKEY="erp_pi_del_v1";PIGID="piGantt";ZOOMID="piZoom";GP="pi";}applyPhaseMap(which);piTaskCol={};piCollapsed={};piTblExp={};PIMPL=PI_STORE[which]||[];fillPIFilters();}
 function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);
   /* ══ ฝั่งที่ตรวจไหลขึ้นหางานแม่ เหมือนที่สถานะทำอยู่แล้ว ══
      ของเดิม rvw ของงานแม่ตั้งด้วยมือครั้งเดียวแล้วไม่เคยตามลูก พองานย้ายฝั่ง
