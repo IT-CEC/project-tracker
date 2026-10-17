@@ -475,6 +475,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .slipchip.ok{background:var(--chip);color:var(--ink3)}
 /* เครื่องหมายงานย่อย — เล็กและจางกว่าชื่องาน เป็นบริบท ไม่ใช่เนื้อหา */
 .submk{color:var(--ink3);font-weight:400;margin-right:2px}
+.sumcell{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--ink3);white-space:nowrap}
 .subpar{font-size:11px;color:var(--ink3);margin-top:1px;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap;max-width:260px}
 /* คอลัมน์งานหลัก — ชื่อ BRD ที่งานนี้สังกัด ทำให้ชื่อขั้นตอนที่ซ้ำกัน 40 จาก 78 งาน
@@ -5369,6 +5370,16 @@ function piRvwClear(){piRvwF=null;renderPI();}
 function filteredPI(opts){var phs=vm(GP+'Phase'),sts=vm(GP+'Status'),ags=vm(GP+'Asg'),q=v(GP+'Search').toLowerCase().trim();
   var noR=!!(opts&&opts.noRvw);
   return PIMPL.filter(d=>(!phs.length||phs.includes(d.ph))&&(!sts.length||sts.includes(d.st))&&(!ags.length||ags.some(a=>d.asg.includes(a)))&&(!q||(d.name+d.asg.join(' ')).toLowerCase().includes(q))&&(noR||piRvwHit(d)));}
+/* ช่อง "ขั้นตอน" มีสามสถานะที่ต่างกันจริง ใช้ขีดเดียวแทนสองอันไม่ได้:
+   มีแม่ = เป็นขั้นตอนย่อย · มีลูก = แถวสรุป ที่รวมผลจากขั้นตอนที่อยู่ในตารางเดียวกัน
+   (จุดนี้เองที่ทำให้เห็นงานหลักชื่อเดียวกันสองแถว) · ไม่มีทั้งคู่ = งานเดี่ยว ไม่มีขั้นตอนให้แสดง
+   การแยกอยู่บนหลักเดียวกันกับ Timeline — ที่นั่นแถวสรุปมีลูกศรพับกับเลขจำนวนลูกกำกับ */
+function piStepCell(d){
+  if(d.parent)return `<div class="truncate" style="color:var(--ink);font-weight:600;max-width:none">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg> ':''}<span class="submk">↳</span> ${esc(d.name)}</div>`;
+  var n=piChildren(d).length;
+  if(!n)return '<span class="muted" title="งานเดี่ยว ไม่ได้แตกเป็นขั้นตอนย่อย">—</span>';
+  return '<span class="sumcell" title="'+attr('แถวสรุป — รวมผลจาก '+n+' ขั้นตอนที่แสดงอยู่ในตารางนี้ด้วย')
+    +'">ภาพรวม<span class="g-cn">'+n+'</span></span>';}
 let piSortK='',piSortD=1;
 function renderPITbl(){var rows=filteredPI();
   var _rootName=function(d){var r=d,g=0;
@@ -5399,7 +5410,7 @@ function renderPITbl(){var rows=filteredPI();
     var _root=d,_g=0;
     while(_root.parent&&_g++<10){var _up=PIMPL.find(function(z){return z._key===_root.parent;});if(!_up)break;_root=_up;}
     var _par=d.parent?PIMPL.find(function(z){return z._key===d.parent;}):null;
-    return `<tr onclick="openPI(${d._pi})" style="cursor:pointer"><td><span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(PI_PHASES[d.ph]||d.ph||'')}</span></td><td><span class="parcell" title="${attr(_root.name)}">${esc(_root.name)}</span></td><td>${_par?`<div class="truncate" style="color:var(--ink);font-weight:600;max-width:none">${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg> ':''}<span class="submk">↳</span> ${esc(d.name)}</div>`:'<span class="muted">—</span>'}</td><td><span class="chip" style="background:${STATUS_COLORS[_est]}1f;color:${STATUS_COLORS[_est]}">${esc(_stxt)}</span>${d.st==='In Review'?`<span class="chip rvwchip" title="${attr(L('กำลังตรวจโดย ','reviewing: ')+(d.rvw||'Civil'))}">${esc(d.rvw||'Civil')}</span>`:''}</td><td>${piAsg(d.asg)}</td><td class="muted">${esc(d.s||'')}</td><td class="muted">${esc(d.e||'')}${piSlipChip(d)}</td><td>${piProg(piCalcProg(d),STATUS_COLORS[_est])}</td><td><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span></td></tr>`;}).join('')||'<tr><td colspan="9" style="text-align:center;padding:40px" class="muted">ไม่พบงาน</td></tr>';}
+    return `<tr onclick="openPI(${d._pi})" style="cursor:pointer"><td><span class="chip" style="background:var(--bg);color:var(--ink2)">${esc(PI_PHASES[d.ph]||d.ph||'')}</span></td><td><span class="parcell" title="${attr(_root.name)}">${esc(_root.name)}</span></td><td>${piStepCell(d)}</td><td><span class="chip" style="background:${STATUS_COLORS[_est]}1f;color:${STATUS_COLORS[_est]}">${esc(_stxt)}</span>${d.st==='In Review'?`<span class="chip rvwchip" title="${attr(L('กำลังตรวจโดย ','reviewing: ')+(d.rvw||'Civil'))}">${esc(d.rvw||'Civil')}</span>`:''}</td><td>${piAsg(d.asg)}</td><td class="muted">${esc(d.s||'')}</td><td class="muted">${esc(d.e||'')}${piSlipChip(d)}</td><td>${piProg(piCalcProg(d),STATUS_COLORS[_est])}</td><td><span class="chip" style="background:${PI_PRC[d.pr]}1f;color:${PI_PRC[d.pr]}">${d.pr}</span></td></tr>`;}).join('')||'<tr><td colspan="9" style="text-align:center;padding:40px" class="muted">ไม่พบงาน</td></tr>';}
 function piStIcon(st){var c=STATUS_COLORS[st]||'#888';return st==='Completed'?`<span style="color:${c};font-weight:700"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>`:`<span class="dotc" style="background:${c};margin-right:0"></span>`;}
 function piRing(p,c,noPct){p=p||0;var cf=(2*Math.PI*9).toFixed(1),off=(cf*(1-p/100)).toFixed(1);return `<span style="display:inline-flex;align-items:center;gap:6px"><svg width="22" height="22" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--chip)" stroke-width="3"/><circle cx="12" cy="12" r="9" fill="none" stroke="${c}" stroke-width="3" stroke-dasharray="${cf}" stroke-dashoffset="${off}" stroke-linecap="round" transform="rotate(-90 12 12)"/></svg>${noPct?'':`<span style="font-size:11px;color:var(--ink3)">${p}%</span>`}</span>`;}
 /* การ์ดเดิมสูง 104px จาก 3 ชั้น (ชื่อ / ชิป / วงกลม+ช่วงวัน)
