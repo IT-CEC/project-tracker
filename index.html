@@ -13,12 +13,12 @@
 
 
 :root{--topbar-h:64px;
- --bg:#f5f5f7;--surface:#ffffff;--surface2:#fafafa;--ink:#1d1d1f;--ink2:#76767a;--ink3:#a1a1a6;
+ --bg:#f5f5f7;--surface:#ffffff;--surface2:#fafafa;--ink:#1d1d1f;--ink2:#5f5f64;--ink3:#6e6e73;
  --line:rgba(0,0,0,.10);--line2:rgba(0,0,0,.06);--side:#ffffff;--side-ink:#3c3c43;--hover:rgba(0,0,0,.04);
  --accent:#0071e3;--accent-d:#0066cc;--red:#ff3b30;--green:#28cd41;--orange:#ff9500;--purple:#af52de;--cyan:#32ade6;--mint:rgba(0,113,227,.08);--track:#e8e8ed;--chip:#e8e8ed;--shadow:0 1px 2px rgba(0,0,0,.06),0 18px 50px rgba(0,0,0,.14);--cardsh:0 2px 10px rgba(16,24,40,.05);--font-ui:'Noto Sans Thai',sans-serif;--font-sans:'Noto Sans Thai',sans-serif;--font-mono:'Noto Sans Thai',sans-serif;--serif:'Noto Sans Thai',sans-serif;--wall:linear-gradient(160deg,#dfe3ea 0%,#cdd3dd 45%,#bcc3d0 100%);
 }
 [data-theme="dark"]{
- --bg:#232325;--surface:#2c2c2e;--surface2:#28282a;--ink:#f5f5f7;--ink2:#aeaeb2;--ink3:#8e8e93;
+ --bg:#232325;--surface:#2c2c2e;--surface2:#28282a;--ink:#f5f5f7;--ink2:#aeaeb2;--ink3:#9a9aa0;
  --line:rgba(255,255,255,.11);--line2:rgba(255,255,255,.06);--side:#1c1c1e;--side-ink:#c7c7cc;--hover:rgba(255,255,255,.06);
  --accent:#0a84ff;--accent-d:#409cff;--red:#ff3b30;--green:#28cd41;--orange:#ff9500;--purple:#af52de;--cyan:#32ade6;--mint:rgba(10,132,255,.22);--track:#39393b;--chip:#3a3a3c;--shadow:0 1px 2px rgba(0,0,0,.4),0 22px 60px rgba(0,0,0,.55);--cardsh:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.5);--wall:linear-gradient(160deg,#33363d 0%,#222428 55%,#15161a 100%);
 }
@@ -747,7 +747,8 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 /* tooltip when labels are hidden */
 .nav[data-mode="collapsed"] .nav-item:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%);background:var(--ink);color:var(--surface);padding:5px 10px;border-radius:8px;font-size:12px;white-space:nowrap;box-shadow:var(--shadow);z-index:6;pointer-events:none}
 /* mobile: force thin rail */
-@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:64px}.nav .nav-lbl,.nav .nav-badge,.nav .sb-txt{opacity:0}.content{padding-left:64px!important}.nav-pop{left:6px}.brand{width:64px}}
+@media(max-width:760px){.nav,.nav[data-mode="expanded"],.nav[data-mode="hover"]:hover{width:64px}.nav .nav-lbl,.nav .nav-badge,.nav .sb-txt{opacity:0}.nav-pop{left:6px}.brand{width:64px}}
+
 .nav-pop{position:absolute;left:10px;bottom:52px;min-width:186px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:6px;display:none;z-index:20}
 .nav-pop.open{display:block}
 .nav-pop-h{font-size:11px;font-weight:600;color:var(--ink3);padding:6px 10px 8px;border-bottom:1px solid var(--line2);margin-bottom:4px}
@@ -2926,20 +2927,65 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
 </div>
 
 <style id="resetConfirmCss">
-#resetConfirm{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
-#resetConfirm.open{opacity:1;pointer-events:auto}
-#resetConfirm .rcm-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:min(440px,94vw);padding:26px 26px 20px;transform:scale(.96);transition:transform .2s}
-#resetConfirm.open .rcm-card{transform:none}
-#resetConfirm .rcm-ic{width:46px;height:46px;border-radius:50%;background:rgba(255,59,48,.12);color:#ff3b30;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
-#resetConfirm h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
-#resetConfirm p{font-size:13px;line-height:1.6;color:var(--ink2);margin-bottom:12px}
-#resetConfirm .rcm-hint{font-size:13px;color:var(--ink2);margin-bottom:8px}
-#resetConfirm .rcm-hint b{color:#ff3b30}
-#resetConfirm #rcmInput{width:100%;font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);margin-bottom:16px;font-family:inherit}
-#resetConfirm #rcmInput:focus{outline:none;border-color:#ff3b30;box-shadow:0 0 0 3px rgba(255,59,48,.15)}
-#resetConfirm .rcm-act{display:flex;gap:10px;justify-content:flex-end}
+#resetConfirm,#importConfirm{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+#resetConfirm.open,#importConfirm.open{opacity:1;pointer-events:auto}
+#resetConfirm .rcm-card,#importConfirm .rcm-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:min(440px,94vw);padding:26px 26px 20px;transform:scale(.96);transition:transform .2s}
+#resetConfirm.open .rcm-card,#importConfirm.open .rcm-card{transform:none}
+#resetConfirm .rcm-ic,#importConfirm .rcm-ic{width:46px;height:46px;border-radius:50%;background:rgba(255,59,48,.12);color:#ff3b30;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+#resetConfirm h3,#importConfirm h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
+#resetConfirm p,#importConfirm p{font-size:13px;line-height:1.6;color:var(--ink2);margin-bottom:12px}
+#resetConfirm .rcm-hint,#importConfirm .rcm-hint{font-size:13px;color:var(--ink2);margin-bottom:8px}
+#resetConfirm .rcm-hint b,#importConfirm .rcm-hint b{color:#ff3b30}
+#resetConfirm #rcmInput,#importConfirm #impInput{width:100%;font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);margin-bottom:16px;font-family:inherit}
+#resetConfirm #rcmInput:focus,#importConfirm #impInput:focus{outline:none;border-color:#ff3b30;box-shadow:0 0 0 3px rgba(255,59,48,.15)}
+#resetConfirm .rcm-act,#importConfirm .rcm-act{display:flex;gap:10px;justify-content:flex-end}
+#importConfirm .impopt{display:flex;gap:10px;align-items:flex-start;padding:12px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,background .15s}
+#importConfirm .impopt:hover{background:var(--hover)}
+#importConfirm .impopt.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
+#importConfirm .impopt.on.danger{border-color:#ff3b30;background:rgba(255,59,48,.06)}
+#importConfirm .impopt input{margin:2px 0 0;flex:none;accent-color:var(--accent)}
+#importConfirm .impopt b{display:block;font-size:13px;color:var(--ink);margin-bottom:2px}
+#importConfirm .impopt span{font-size:12px;line-height:1.5;color:var(--ink2)}
+#importConfirm .impwrap{display:none}
+#importConfirm .impwrap.on{display:block}
 #resetConfirm #rcmGo{background:#ff3b30;color:#fff}
 #resetConfirm #rcmGo:disabled{opacity:.4;cursor:not-allowed}
+#impGo{background:var(--accent);color:#fff}
+#impGo.danger{background:#ff3b30}
+#impGo:disabled{opacity:.4;cursor:not-allowed}
+/* ───────── มือถือ: แก้เฉพาะในนี้ จอ desktop ไม่ถูกแตะเลย ─────────
+   แถบ nav ด้านซ้ายถูกถอดออกจากหน้าไปแล้ว (ไม่มี .nav ใน DOM) แต่กฎเดิมยังกันที่
+   ไว้ให้ 64px ซึ่งบนจอ 390px คือเสียพื้นที่ไปหนึ่งในหกโดยไม่มีอะไรมาอยู่
+   (บน desktop ค่านี้เป็น 0 อยู่แล้ว การถอดออกจึงไม่เปลี่ยนอะไรฝั่งนั้น) */
+@media(max-width:760px){
+  /* iOS Safari ซูมหน้าเข้าเองทุกครั้งที่แตะช่องที่ตัวอักษรเล็กกว่า 16px แล้วไม่ซูมกลับ */
+  input,select,textarea{font-size:16px}
+  /* นิ้วต้องการเป้ากดอย่างน้อย 44px สองปุ่มนี้เป็นทางเข้าเมนูและทางออกจากระบบ */
+  .tb-ham{box-sizing:border-box;width:44px;height:44px;padding:9px 8px}
+  .tb-out{box-sizing:border-box;min-width:44px;min-height:44px;padding:9px 13px}
+  /* สามตัวนี้คือต้นเหตุที่ทำให้ทั้งหน้าเลื่อนแนวนอน ไม่ใช่ตัวตาราง
+     (ตารางมี .tscroll ที่เลื่อนในกรอบตัวเองอยู่แล้ว) */
+  .barright{margin-left:0;width:100%;flex-wrap:wrap}
+  .ststrip,.fgrow2 .ststrip{flex:1 1 auto;min-width:0;overflow-x:auto}
+  .kgroup{flex-wrap:nowrap;overflow-x:auto;max-width:100%}
+  .tscroll,.tablecard{max-width:100%;min-width:0}
+  .bar,.toprow,.reqtoprow{min-width:0}
+  /* แถวบนของหน้า Requirements เป็น flex แถวเดียว โดนัทจองไว้ตายตัว 320px
+     พอจอแคบกว่านั้น ฝั่งขวาจึงยุบเหลือ 0px แต่เนื้อหาข้างในยังยาวเท่าเดิม
+     ดันทั้งหน้าให้เลื่อนแนวนอน วางซ้อนกันแนวตั้งแทนตั้งแต่จอนี้ลงไป */
+  .reqtoprow,.toprow,.cockpit{flex-direction:column}
+  .donutpanel{flex:1 1 auto;width:100%;min-width:0}
+  .reqright,.reqkpis{width:100%;min-width:0}
+  .reqkpis{grid-template-columns:1fr}
+  /* โลโก้ตั้ง flex:none ไว้ จึงไม่ยอมหด แล้วล้นกรอบซ้ายไปทับปุ่มฝั่งขวา
+     (การขยายปุ่มเป็น 44px ข้างบนยิ่งดันให้ทับหนักขึ้น) ย่อลงและให้หดได้ */
+  .tb-logo{height:22px;flex:0 1 auto;min-width:0;max-width:132px;object-fit:contain;object-position:left}
+  .tb-left{flex:0 1 auto;overflow:hidden}
+  /* ป้ายตัวกรองกับช่องของมันเป็นพี่น้องกันเฉยๆ พอขึ้นบรรทัดใหม่ป้ายจึงไปอยู่
+     ติดช่องของตัวถัดไป อ่านแล้วจับคู่ผิด บังคับให้ป้ายขึ้นบรรทัดของตัวเองเสมอ
+     ช่องที่ตามมาจึงเป็นของป้ายนั้นแน่นอน */
+  .bar .lbl{flex:0 0 100%;margin:4px 0 -4px}
+}
 </style>
 <div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
   <div class="rcm-card" role="dialog" aria-modal="true">
@@ -2951,6 +2997,29 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
     <div class="rcm-act">
       <button class="btn btn-sec" onclick="closeResetConfirm()">ยกเลิก</button>
       <button class="btn" id="rcmGo" disabled onclick="closeResetConfirm();resetConfirmed()">รีเซ็ตข้อมูล</button>
+    </div>
+  </div>
+</div>
+<div id="importConfirm" onclick="if(event.target===this)closeImportConfirm()">
+  <div class="rcm-card" role="dialog" aria-modal="true">
+    <div class="rcm-ic">!</div>
+    <h3>นำเข้า Requirements</h3>
+    <p id="impSum"></p>
+    <label class="impopt on" id="impOptAdd" onclick="impPick('add')">
+      <input type="radio" name="impmode" value="add" checked>
+      <span><b>เพิ่มต่อท้ายของเดิม</b><span id="impAddTxt"></span></span>
+    </label>
+    <label class="impopt danger" id="impOptRep" onclick="impPick('rep')">
+      <input type="radio" name="impmode" value="rep">
+      <span><b>แทนที่ทั้งหมด</b><span id="impRepTxt"></span></span>
+    </label>
+    <div class="impwrap" id="impWrap">
+      <div class="rcm-hint">พิมพ์ <b>แทนที่</b> (หรือ <b>REPLACE</b>) เพื่อยืนยัน</div>
+      <input id="impInput" type="text" autocomplete="off" spellcheck="false" placeholder="แทนที่" oninput="impSync()">
+    </div>
+    <div class="rcm-act">
+      <button class="btn btn-sec" onclick="closeImportConfirm()">ยกเลิก</button>
+      <button class="btn" id="impGo" onclick="impConfirmed()">นำเข้า</button>
     </div>
   </div>
 </div>
@@ -4927,6 +4996,48 @@ function subscribeSettings(){if(!window.DB)return;window.DB.subscribe(COL_SET,fu
 function resetData(){openResetConfirm();}
 function openResetConfirm(){var m=document.getElementById('resetConfirm');if(!m)return;var i=document.getElementById('rcmInput'),g=document.getElementById('rcmGo');if(i)i.value='';if(g)g.disabled=true;m.classList.add('open');setTimeout(function(){if(i)i.focus();},60);}
 function closeResetConfirm(){var m=document.getElementById('resetConfirm');if(m)m.classList.remove('open');}
+/* นำเข้าไฟล์เป็นงานที่ย้อนไม่ได้และกระทบข้อมูลของทั้งทีม confirm() เดิมไม่มีทางถอย
+   เพราะกด Cancel แล้วตกไปเข้า else ซึ่งเขียนต่อท้ายอยู่ดี กล่องนี้จึงแยกสามทางให้ชัด
+   ยกเลิก = ไม่เขียนอะไรเลย และทางที่ลบของเดิมต้องพิมพ์ยืนยันก่อน */
+var _impRows=null,_impMode='add';
+function openImportConfirm(got){
+  _impRows=got;_impMode='add';
+  var m=document.getElementById('importConfirm');if(!m){reqImportApply('add');return;}
+  var cur=REQS.length;
+  document.getElementById('impSum').innerHTML='ไฟล์มี <b style="color:var(--ink)">'+got.length
+    +'</b> แถว · ตอนนี้ในระบบมี <b style="color:var(--ink)">'+cur+'</b> รายการ';
+  document.getElementById('impAddTxt').textContent='ของเดิม '+cur+' รายการอยู่ครบ รวมเป็น '+(cur+got.length)+' รายการ';
+  document.getElementById('impRepTxt').textContent='ลบ '+cur+' รายการเดิมบน Firebase แล้วใส่ของใหม่แทน ทุกคนเห็นผลทันทีและกู้คืนไม่ได้ (สถานะเดิมที่จับคู่ชื่อได้จะถูกคงไว้)';
+  document.getElementById('impInput').value='';
+  impPick('add');
+  m.classList.add('open');}
+function closeImportConfirm(){var m=document.getElementById('importConfirm');if(m)m.classList.remove('open');_impRows=null;}
+function impPick(mode){
+  _impMode=mode;
+  var a=document.getElementById('impOptAdd'),r=document.getElementById('impOptRep'),w=document.getElementById('impWrap');
+  if(a)a.classList.toggle('on',mode==='add');
+  if(r)r.classList.toggle('on',mode==='rep');
+  if(w)w.classList.toggle('on',mode==='rep');
+  var ri=document.querySelector('#importConfirm input[value="'+mode+'"]');if(ri)ri.checked=true;
+  var g=document.getElementById('impGo');
+  if(g){g.classList.toggle('danger',mode==='rep');
+        g.textContent=(mode==='rep')?'แทนที่ทั้งหมด':'เพิ่มต่อท้าย';}
+  impSync();}
+function impSync(){
+  var g=document.getElementById('impGo');if(!g)return;
+  if(_impMode!=='rep'){g.disabled=false;return;}
+  var v=(document.getElementById('impInput')||{}).value||'';v=v.trim();
+  g.disabled=!(v==='แทนที่'||v.toUpperCase()==='REPLACE');}
+function impConfirmed(){var m=_impMode,g=_impRows;closeImportConfirm();if(g)reqImportApply(m,g);}
+/* ขั้นตอนเขียนจริง แยกออกมาเพื่อให้มีทางเข้าเดียว ไม่ว่าจะมาจากปุ่มไหน */
+function reqImportApply(mode,got){
+  if(!got||!got.length)return;
+  REQS=(mode==='rep')?got:REQS.concat(got);
+  REQS.forEach(function(r){r.gap=normGap(r.gap);});
+  reqReplaceAll();fillFilters();renderAll();
+  if(window.renderProjRibbon)renderProjRibbon();
+  if(window.renderCockpit)renderCockpit();
+  toast(T('imported').replace('{n}',got.length));}
 async function resetConfirmed(){await resetReqs();fillFilters();renderAll();toast("คืนค่าต้นฉบับแล้ว");}
 function normGap(g){g=(g==null?"":String(g)).trim();if(GAP_OPTS.indexOf(g)>0)return g;const m=g.match(/^([1-5])/);if(m)return GAP_OPTS[+m[1]];return "";}
 function gapAssessed(r){return GAP_OPTS.indexOf(r.gap)>0;}
@@ -4940,7 +5051,25 @@ function attr(s){return (s||'').replace(/"/g,'&quot;');}
 
 const CRUMB={overview:'ภาพรวม',project:'โปรเจค',reqs:'Requirements',bridge:'Project Automation 2026',implement:'Project Implementation',settings:'ตั้งค่า',oracle:'กระบวนการของ Oracle'};
 var FTE_COST=600000;
-function setFteCost(val){FTE_COST=parseFloat(val)||0;renderCockpit();if(window.DB)window.DB.saveItem(COL_SET,'global',{fteCost:FTE_COST}).catch(dbErr('fte save'));}
+/* ค่านี้เป็นสมมติฐานต้นทุนที่ใช้คำนวณผลตอบแทนให้ทั้งบริษัท ไม่ใช่ค่าส่วนตัว
+   เดิมพิมพ์เสร็จเขียน Firestore ทันทีโดยไม่เช็กสิทธิ์และไม่ถาม ใครเปิดหน้านี้ก็
+   เปลี่ยนตัวเลขที่ทุกคนเห็นได้ ตอนนี้เช็กสิทธิ์ก่อน ตรวจช่วงค่า แล้วค่อยถามยืนยัน
+   ทุกทางที่ไม่ยืนยันจะคืนค่าเดิมกลับเข้าช่อง ไม่ให้หน้าจอค้างเลขที่ไม่ได้บันทึก */
+function setFteCost(val){
+  var el=document.getElementById('fteCost');
+  var back=function(){if(el)el.value=FTE_COST;};
+  if(erpDenyEdit()){back();return;}
+  var n=parseFloat(String(val).replace(/,/g,''));
+  if(!isFinite(n)||n<=0){toast('ต้นทุนต่อ FTE ต้องเป็นตัวเลขมากกว่า 0');back();return;}
+  if(n<50000||n>5000000){toast('ต้นทุนต่อ FTE ควรอยู่ระหว่าง 50,000 ถึง 5,000,000 บาทต่อปี');back();return;}
+  if(n===FTE_COST)return;
+  var old=FTE_COST;
+  var _msg='เปลี่ยนต้นทุนต่อ FTE จาก '+old.toLocaleString('en-US')+' เป็น '+n.toLocaleString('en-US')+' บาทต่อปี'+'\n\nค่านี้ใช้คำนวณผลตอบแทนที่ทุกคนในทีมเห็น และจะเปลี่ยนให้ทุกคนทันที';
+  if(!confirm(_msg)){back();return;}
+  FTE_COST=n;renderCockpit();
+  if(window.DB)window.DB.saveItem(COL_SET,'global',{fteCost:FTE_COST})
+    .then(function(){toast('บันทึกต้นทุนต่อ FTE เป็น '+n.toLocaleString('en-US')+' บาทต่อปีแล้ว');})
+    .catch(function(e){FTE_COST=old;renderCockpit();dbErr('fte save')(e);});}
 function cockGo(k){if(k==='dev'){var g=document.getElementById('fGap');if(g)g.value='dev';page=1;showTab('project');setProjView('reqs');renderReqTable();}else{showTab('project');setProjView('impl');}}
 function renderPhaseTimeline(){var el=document.getElementById('phaseTimeline');if(!el)return;var phs={};PIMPL.forEach(function(d){var a=piDate(d.s),b=piDate(d.e);if(!a||!b)return;if(!phs[d.ph])phs[d.ph]={a:a,b:b};if(a<phs[d.ph].a)phs[d.ph].a=a;if(b>phs[d.ph].b)phs[d.ph].b=b;});var keys=Object.keys(PI_PHASES).sort();var now=new Date();var cnt={};PIMPL.forEach(function(d){if(d.st==='In Progress')cnt[d.ph]=(cnt[d.ph]||0)+1;});var curKey='',best=0;Object.keys(cnt).sort().forEach(function(p){if(cnt[p]>best){best=cnt[p];curKey=p;}});if(!curKey)keys.forEach(function(p){if(!curKey&&phs[p]&&now>=phs[p].a&&now<=phs[p].b)curKey=p;});var curIdx=keys.indexOf(curKey);var steps=keys.map(function(p,i){var done=i<curIdx,cur=i===curIdx;var col=piPhColor(p);var lab=PI_PHASES[p].replace(/^\d+_/,'');return '<div class="ptl-step"><div class="ptl-bar" style="background:'+col+'"></div><div class="ptl-lab'+(cur?' cur':(done?' done':''))+'" title="'+attr(lab)+'">'+(done?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="#28cd41" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ':'')+esc(lab)+'</div></div>';}).join('');el.innerHTML='<div class="ptl-hd"><span class="ptl-ttl">เส้นทางโครงการ · 7 เฟส</span><span class="ptl-now">กำลังอยู่: '+(curKey?esc(PI_PHASES[curKey].replace(/^\d+_/,'')):'—')+'</span></div><div class="ptl-row">'+steps+'</div>';}
 function renderCockpit(){if(GCTX!=='pi')return;renderPhaseTimeline();var es=document.getElementById('execSummary'),ck=document.getElementById('cockpit');if(!es||!ck)return;
@@ -6385,8 +6514,7 @@ document.getElementById('importFile').addEventListener('change',e=>{const f=e.ta
       var nm=g("Process Name"),md=g("Module");var pv=prev[(md||'')+'|'+(nm||'')]||{};
       return {_id:++maxId,module:md,sub:g("Sub-Module"),name:nm,req:g("Requirement"),type:g("Type"),tags:g("Tags"),owner:g("Owner"),status:g("Status")||pv.status||"Not Started",gap:gap||pv.gap||"",remark:g("Remark"),srcSheet:g("Source Sheet")||"(import)",srcRow:g("Source Row")};});
     if(!got.length){toast("ไม่พบแถวข้อมูล");return;}
-    if(confirm("นำเข้า "+got.length+" แถว — OK = แทนที่ทั้งหมด (คงสถานะเดิมที่จับคู่ชื่อได้), Cancel = เพิ่มต่อท้าย"))REQS=got;else REQS=REQS.concat(got);
-    REQS.forEach(r=>r.gap=normGap(r.gap));reqReplaceAll();fillFilters();renderAll();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();toast(T('imported').replace('{n}',got.length));}catch(err){toast("นำเข้าไม่สำเร็จ: "+err.message);}e.target.value="";};
+    openImportConfirm(got);}catch(err){toast("นำเข้าไม่สำเร็จ: "+err.message);}e.target.value="";};
   rd.readAsBinaryString(f);});
 let toastT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);}
 
