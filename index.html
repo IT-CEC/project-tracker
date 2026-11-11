@@ -3235,6 +3235,29 @@ body.ro .gpadd,body.ro .gpx{display:none}
   #progEntry .pe-x,#progEntry .pe-del{min-width:34px;min-height:34px}
 }
 #progEntry .pe-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── tooltip ── ตามเคอร์เซอร์ ไม่กินคลิก และไม่ทับของที่กำลังชี้อยู่ */
+#erpTip{position:fixed;z-index:4000;pointer-events:none;opacity:0;
+  max-width:340px;padding:9px 12px;border-radius:11px;
+  background:var(--surface);color:var(--ink);
+  border:1px solid var(--line);
+  box-shadow:0 2px 6px rgba(16,24,40,.08),0 12px 28px rgba(16,24,40,.16);
+  font-family:inherit;font-size:12.5px;line-height:1.55;font-weight:500;
+  transition:opacity .12s;white-space:normal;word-break:break-word}
+#erpTip.on{opacity:1}
+#erpTip .erpTipH{font-size:13px;font-weight:700;color:var(--ink);
+  padding-bottom:7px;margin-bottom:7px;border-bottom:1px solid var(--line2)}
+#erpTip .erpTipL{color:var(--ink2);padding-left:12px;position:relative}
+#erpTip .erpTipL::before{content:'';position:absolute;left:2px;top:7.5px;
+  width:4px;height:4px;border-radius:50%;background:var(--ink3)}
+#erpTip .erpTipL+.erpTipL{margin-top:4px}
+#erpTip .erpTipL b{color:var(--ink);font-weight:600;margin-right:5px}
+#erpTip .erpTipL:empty{height:5px;padding:0}
+#erpTip .erpTipL:empty::before{display:none}
+#erpTip .erpTipL:only-child{padding-left:0;color:var(--ink)}
+#erpTip .erpTipL:only-child::before{display:none}
+@media (prefers-reduced-motion:reduce){#erpTip{transition:none}}
+@media (hover:none){#erpTip{display:none}}
 </style>
 <div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
   <div class="rcm-card" role="dialog" aria-modal="true">
@@ -3319,7 +3342,12 @@ function reqSaveOne(r){if(window.DB&&r&&r._id!=null)window.DB.saveItem(COL_REQ,r
 function reqDelOne(id){if(window.DB&&id!=null)window.DB.deleteItem(COL_REQ,id).catch(dbErr('req del'));}
 async function reqReplaceAll(){if(!window.DB)return;try{var ex=await window.DB.loadAll(COL_REQ);var keep={};REQS.forEach(function(r){keep[String(r._id)]=1;});await Promise.all(ex.filter(function(d){return !keep[String(d._id)];}).map(function(d){return window.DB.deleteItem(COL_REQ,d._id);}));await Promise.all(REQS.map(function(r){return window.DB.saveItem(COL_REQ,r._id,r);}));}catch(e){console.error('[req replace]',e);if(window.toast)toast('ซิงก์ Firebase มีปัญหา — ลองรีเฟรช');}}
 async function resetReqs(){if(!window.DB){REQS=reqBase();reqNorm();return;}try{var ex=await window.DB.loadAll(COL_REQ);await Promise.all(ex.map(function(d){return window.DB.deleteItem(COL_REQ,d._id);}));REQS=reqBase();await Promise.all(REQS.map(function(r){return window.DB.saveItem(COL_REQ,r._id,r);}));}catch(e){console.error('[req reset]',e);if(window.toast)toast('ซิงก์ Firebase มีปัญหา — ลองรีเฟรช');REQS=reqBase();}reqNorm();}
-async function loadSettings(){try{var s=await window.DB.loadAll(COL_SET);var g=s.find(function(x){return x.__docId==='global';})||s[0];if(g&&g.fteCost!=null){FTE_COST=g.fteCost;}else{await window.DB.saveItem(COL_SET,'global',{fteCost:FTE_COST});}}catch(e){console.error('[settings load]',e);}}
+/* งบ mandays เก็บอยู่ใน settings/global ก้อนเดียวกับ fteCost แต่เดิมอ่านแค่ fteCost
+   ตัวเลขที่บันทึกไปจึงไม่เคยกลับขึ้นหน้าจอ หน้า Gaps ขึ้นว่าทั้งที่มีข้อมูลแล้ว */
+function bucketFrom(g){if(!g)return;
+  ['bucketMd','bucketHrs','crMd','crHrs'].forEach(function(k){
+    if(g[k]!=null)BUCKET[k]=Number(g[k])||0;});}
+async function loadSettings(){try{var s=await window.DB.loadAll(COL_SET);var g=s.find(function(x){return x.__docId==='global';})||s[0];bucketFrom(g);if(g&&g.fteCost!=null){FTE_COST=g.fteCost;}else{await window.DB.saveItem(COL_SET,'global',{fteCost:FTE_COST});}}catch(e){console.error('[settings load]',e);}}
 var _reqFirst=true,_setFirst=true;
 // ══ Report Levels (report_levels collection) ══
 const RPT_SEED = [
@@ -5317,7 +5345,7 @@ function rptDel(id){
 
 function fillAbout(){var el=document.getElementById('aboutStats');if(!el)return;var mods=new Set(REQS.map(function(r){return r.module;}));var subs=new Set(REQS.map(function(r){return (r.module||'')+'|'+(r.sub||'');}));el.textContent='Requirements '+REQS.length+' · กลุ่มงาน '+mods.size+' · กลุ่มงานย่อย '+subs.size+' · Automation 2026: '+BR.length+' กระบวนการ · ข้อมูลสด Firebase';}
 function subscribeReqs(){if(!window.DB)return;window.DB.subscribe(COL_REQ,function(docs){if(_reqFirst){_reqFirst=false;return;}REQS=docs;reqNorm();fillFilters();renderAll();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();fillAbout();});}
-function subscribeSettings(){if(!window.DB)return;window.DB.subscribe(COL_SET,function(docs){if(_setFirst){_setFirst=false;return;}var g=docs.find(function(x){return x.__docId==='global';})||docs[0];if(g&&g.fteCost!=null){FTE_COST=g.fteCost;if(window.renderCockpit)renderCockpit();}});}
+function subscribeSettings(){if(!window.DB)return;window.DB.subscribe(COL_SET,function(docs){if(_setFirst){_setFirst=false;return;}var g=docs.find(function(x){return x.__docId==='global';})||docs[0];bucketFrom(g);if(typeof piCurV!=='undefined'&&piCurV==='reg'&&typeof renderRegisters==='function')renderRegisters();if(g&&g.fteCost!=null){FTE_COST=g.fteCost;if(window.renderCockpit)renderCockpit();}});}
 function resetData(){openResetConfirm();}
 function openResetConfirm(){var m=document.getElementById('resetConfirm');if(!m)return;var i=document.getElementById('rcmInput'),g=document.getElementById('rcmGo');if(i)i.value='';if(g)g.disabled=true;m.classList.add('open');setTimeout(function(){if(i)i.focus();},60);}
 function closeResetConfirm(){var m=document.getElementById('resetConfirm');if(m)m.classList.remove('open');}
@@ -5446,19 +5474,6 @@ function erpProgVarCard(){
     dsub:(d<0?('ช้ากว่าแผน '+Math.abs(d)+' จุด'):(d>0?('เร็วกว่าแผน '+d+' จุด'):'ตรงตามแผน'))
       +' · ข้อมูล ณ '+(p.at||p._key||''),
     sub:'จริง '+p.actual+'% เทียบแผน '+p.plan+'% · ข้อมูล ณ '+(p.at||p._key||'')};}
-/* นับ BRD ที่เลยวันที่ต้องลงนามแล้วแต่ยังไม่ Signed Off — เป็นงานที่ค้างคนอื่นอยู่
-   จึงควรเห็นตั้งแต่หน้าแรก ไม่ใช่ต้องเปิดเข้าไปในทะเบียน */
-function erpBrdOverdue(){
-  if(typeof PIMPL==='undefined')return null;
-  var list=PIMPL.filter(function(d){return !d.parent&&String(d.name||'').indexOf('BRD')===0;});
-  if(!list.length)return null;
-  var any=list.some(function(d){return d.bst||d.bsodue;});
-  if(!any)return null;
-  var now=new Date();now.setHours(0,0,0,0);
-  var late=list.filter(function(d){
-    if(!d.bsodue||d.bst==='Signed Off')return false;
-    var t=piDate(d.bsodue);return t&&t<now;});
-  return {n:late.length,names:late.map(function(d){return d.name.split(' ')[0];}).join(', ')};}
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};
@@ -5496,7 +5511,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
      กับวันที่ของ milestone จึงไม่ทิ้ง ย้ายไปเป็น tooltip ของการ์ด ชี้เมาส์ยังอ่านได้ */
   function c(k,v,sub,col){return `<div class="pjcard"${sub?` title="${attr(sub)}"`:''}><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+L(' · อีก ',' · in ')+Math.max(0,Math.ceil((_nm.e-now)/86400000))+L(' วัน',' days')):L('ไม่มี milestone ข้างหน้า','No upcoming milestone');
-  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol),c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('ความคืบหน้า จริง/แผน','Progress actual/plan'),pv.val,pv.sub,pv.col));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}var bo=erpBrdOverdue();if(bo)ex.push(c(L('BRD เลยกำหนดลงนาม','BRD past sign-off'),bo.n?(bo.n+L(' หัวข้อ',' items')):L('ไม่มี','None'),bo.n?(L('เลยวันที่ต้อง sign off แล้ว: ','Past sign-off date: ')+bo.names):L('ทุกหัวข้อยังไม่เลยวันที่ต้องลงนาม','No item is past its sign-off date'),bo.n?'#d02a20':'#1f8f36'));return ex;})()).join('');}
+  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol)].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('ความคืบหน้า จริง/แผน','Progress actual/plan'),pv.val,pv.sub,pv.col));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}return ex;})()).concat([c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')]).join('');}
 function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('tb-open');if(typeof tbClose==='function')tbClose();var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
 function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});
   document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
@@ -7933,6 +7948,75 @@ async function peSaveBucket(){
   if(window.toast)toast('บันทึกงบ mandays แล้ว ('+Object.keys(d).map(function(k){return labs[k];}).join(' · ')+')');
   peClose();}
 window.openProgEntry=openProgEntry;
+
+/* ══ tooltip ══════════════════════════════════════════════════════════
+   tooltip ของเบราว์เซอร์ขึ้นช้าราวหนึ่งวินาที ตัดบรรทัดเองไม่ได้ ตัวอักษรเล็ก
+   และหน้าตาเป็นของระบบปฏิบัติการ ไม่เข้ากับที่เหลือทั้งแอป
+
+   ตัวนี้ยืมค่า title เดิมมาใช้ทั้งหมด จึงไม่ต้องแก้ markup สักที่ (ตอนนี้มี
+   title อยู่ราว 70 จุด) วิธีคือถอด title ออกชั่วคราวตอนเมาส์เข้า ไม่งั้นจะ
+   เห็นสองอันซ้อนกัน แล้วคืนค่าเดิมตอนเมาส์ออก โค้ดอื่นที่อ่าน title จึงยังทำงาน
+
+   ใช้ textContent ไม่ใช่ innerHTML เพราะข้อความมาจากข้อมูลที่ผู้ใช้กรอก
+   ถ้าต่อเป็น HTML จะเป็นช่องโหว่ และ esc() ในแอปกันแค่ '<' ไม่กัน '&'
+
+   จอสัมผัสไม่มี hover จึงไม่มีผลอะไร และ title เดิมยังอยู่ครบ */
+(function(){
+  var tip=null,cur=null;
+  function box(){
+    if(!tip){tip=document.createElement('div');tip.id='erpTip';tip.setAttribute('role','tooltip');
+      document.body.appendChild(tip);}
+    return tip;}
+  function place(x,y){
+    var t=box(),pad=16,r=t.getBoundingClientRect();
+    var nx=x+pad,ny=y+pad;
+    if(nx+r.width>window.innerWidth-10)nx=x-r.width-pad;
+    if(ny+r.height>window.innerHeight-10)ny=y-r.height-pad;
+    t.style.left=Math.max(8,nx)+'px';
+    t.style.top=Math.max(8,ny)+'px';}
+  function show(n,x,y){
+    var txt=n.getAttribute('title');
+    if(txt==null||!String(txt).trim())return;
+    n._erpTip=txt;n.removeAttribute('title');cur=n;
+    var t=box();t.textContent='';
+    /* title ในแอปนี้ส่วนใหญ่เป็นบรรทัดเดียวคั่นด้วย · เช่น
+       "กำหนดเดิม 16/06/2026 · เลื่อน 2 ครั้ง · รวม 61 วัน"
+       โชว์ยาวพรืดแล้วอ่านยาก แตกเป็นบรรทัด ยกส่วนแรกเป็นหัวการ์ด ส่วนที่เป็น
+       "ป้าย: ค่า" ก็แยกสีให้ ไม่ได้เดาเนื้อหา แค่จัดรูปสิ่งที่มีอยู่ให้อ่านง่าย */
+    var parts=String(txt).split(String.fromCharCode(10));
+    if(parts.length===1)parts=parts[0].split(' · ');
+    parts=parts.map(function(x){return x.trim();}).filter(function(x){return x!=='';});
+    parts.forEach(function(line,k){
+      var d=document.createElement('div');
+      if(k===0&&parts.length>1){d.className='erpTipH';d.textContent=line;}
+      else{
+        d.className='erpTipL';
+        var m=line.match(/^([^:：]{1,26})[:：]\s*(.+)$/);
+        if(m){var bb=document.createElement('b');bb.textContent=m[1];
+          d.appendChild(bb);d.appendChild(document.createTextNode(m[2]));}
+        else d.textContent=line;}
+      t.appendChild(d);});
+    t.classList.add('on');place(x,y);}
+  function hide(){
+    if(cur&&cur._erpTip!=null){try{cur.setAttribute('title',cur._erpTip);}catch(e){}cur._erpTip=null;}
+    cur=null;if(tip)tip.classList.remove('on');}
+  document.addEventListener('mouseover',function(ev){
+    var n=ev.target&&ev.target.closest?ev.target.closest('[title]'):null;
+    if(n===cur)return;
+    hide();
+    if(!n)return;
+    if(n.closest('#loginGate'))return;          /* หน้า login มีฉากของตัวเอง */
+    show(n,ev.clientX,ev.clientY);},true);
+  document.addEventListener('mousemove',function(ev){if(cur)place(ev.clientX,ev.clientY);},true);
+  document.addEventListener('mouseout',function(ev){
+    if(!cur)return;
+    var to=ev.relatedTarget;
+    if(to&&cur.contains&&cur.contains(to))return;
+    hide();},true);
+  document.addEventListener('mousedown',hide,true);
+  window.addEventListener('scroll',hide,true);
+  window.addEventListener('blur',hide);
+})();
 </script>
 <!-- ══ Firebase modules (เพิ่มใหม่) — โหลดหลัง classic script เพื่อให้ฟังก์ชัน global พร้อมก่อน ══ -->
 <script type="module" src="js/db.js"></script>
