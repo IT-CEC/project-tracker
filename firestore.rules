@@ -32,6 +32,12 @@ service cloud.firestore {
     // ถ้าลบได้ ประวัติก็ไม่มีความหมาย เพราะคนที่อยากปิดร่องรอยลบทิ้งได้เอง
     match /audit_log/{id}  { allow read, create: if signedIn(); allow update, delete: if false; }
 
+    // ── รายงาน weekly ของผู้ขาย : เฉพาะ admin แก้ได้ เหมือนแผนงาน ──
+    // ตัวเลขพวกนี้เป็นของแผนงานโครงการ ไม่ใช่ข้อมูลที่แต่ละทีมกรอกเอง
+    // จึงคุมระดับเดียวกับ pi_tasks ไม่ใช่ระดับ requirements
+    match /progress/{id}      { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /gaps/{id}          { allow read: if signedIn(); allow write: if isAdmin(); }
+
     // ── ที่เหลือ : ทุกคนที่ล็อกอินแก้ได้ตามเดิม ──────────────────────
     match /requirements/{id}  { allow read, write: if signedIn(); }
     match /action_items/{id}  { allow read, write: if signedIn(); }
@@ -47,7 +53,7 @@ service cloud.firestore {
     //
     //  ข้อแลกเปลี่ยน: collection ที่ไม่ได้เขียนถึงจะถูกปฏิเสธทั้งอ่านและเขียน
     //  เพิ่ม collection ใหม่เมื่อไหร่ ต้องมาเพิ่มที่นี่ด้วย
-    //  ปัจจุบันมี 11 ตัว ครบตามรายการข้างบน
+    //  ปัจจุบันมี 13 ตัว ครบตามรายการข้างบน
     // ══════════════════════════════════════════════════════════════════
   }
 }

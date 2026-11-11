@@ -480,6 +480,10 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
   font-size:12.5px;font-weight:700;color:var(--ink)}
 .brdhd span{font-size:11.5px;font-weight:400;color:var(--ink3);margin-left:6px}
 /* ── หน้าสรุปความคืบหน้า / ทะเบียน BRD & Gaps ── */
+.regerr{margin:0 0 14px;padding:11px 14px;border-radius:11px;font-size:12.5px;line-height:1.55;
+  background:color-mix(in srgb,var(--red) 9%,transparent);
+  color:color-mix(in srgb,var(--red) 78%,var(--ink));
+  border:1px solid color-mix(in srgb,var(--red) 26%,transparent)}
 .regempty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
   padding:70px 20px;color:var(--ink2);font-size:14px;font-weight:600;text-align:center}
 .regempty span{font-size:12.5px;font-weight:400;color:var(--ink3)}
@@ -5085,10 +5089,21 @@ function progKey(dmy){var m=String(dmy||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4}
 function progSort(){PROG.sort(function(a,b){return String(b._key||'').localeCompare(String(a._key||''));});}
 function progCur(){return PROG.length?PROG[0]:null;}
 function gapSort(){GAPS.sort(function(a,b){return String(a.gid||'').localeCompare(String(b.gid||''),'en',{numeric:true});});}
+/* ถ้าอ่านไม่ได้แล้วกลืน error เงียบๆ หน้าจอจะขึ้นว่า "ยังไม่มีข้อมูล" ทั้งที่จริง
+   คือไม่มีสิทธิ์อ่าน คนดูจะไปตามหาข้อมูลผิดที่ เก็บเหตุผลไว้ให้หน้าจอบอกได้
+   (กรณีที่เจอจริง: เพิ่ม collection ใหม่แล้วลืมเพิ่มใน firestore.rules
+   ซึ่งไม่มี catch-all โดยตั้งใจ ของใหม่จึงถูกปฏิเสธทั้งอ่านและเขียน) */
+var PROG_ERR='',GAPS_ERR='';
+function progErrTxt(e){
+  var c=(e&&(e.code||e.message))||'';
+  return /permission/i.test(c)?'ไม่มีสิทธิ์อ่านข้อมูลส่วนนี้ — ต้องเพิ่ม collection ใน firestore.rules แล้ว deploy rules'
+    :('โหลดข้อมูลไม่ได้: '+c);}
 async function loadProgress(){if(!window.DB)return;
-  try{PROG=await window.DB.loadAll(COL_PROG);progSort();}catch(e){PROG=[];}}
+  try{PROG=await window.DB.loadAll(COL_PROG);progSort();PROG_ERR='';}
+  catch(e){PROG=[];PROG_ERR=progErrTxt(e);}}
 async function loadGaps(){if(!window.DB)return;
-  try{GAPS=await window.DB.loadAll(COL_GAPS);gapSort();}catch(e){GAPS=[];}}
+  try{GAPS=await window.DB.loadAll(COL_GAPS);gapSort();GAPS_ERR='';}
+  catch(e){GAPS=[];GAPS_ERR=progErrTxt(e);}}
 var _progFirst=true,_gapsFirst=true;
 function subscribeProgress(){if(!window.DB)return;window.DB.subscribe(COL_PROG,function(docs){
   if(_progFirst){_progFirst=false;return;}
@@ -5099,6 +5114,8 @@ function subscribeGaps(){if(!window.DB)return;window.DB.subscribe(COL_GAPS,funct
   GAPS=docs;gapSort();
   if(typeof piCurV!=='undefined'&&piCurV==='reg'&&typeof renderRegisters==='function')renderRegisters();});}
 /* หน้าใหม่ทั้งสองผูกกับโครงการ Oracle ฝั่ง Automation ไม่มี BRD/Gaps/รายงาน weekly */
+function regErrBanner(){var m=PROG_ERR||GAPS_ERR;return m?
+  '<div class="regerr">'+esc(m)+'</div>':'';}
 function regOnlyPI(el){if(GCTX==='pi')return false;
   if(el)el.innerHTML='<div class="regempty">หน้านี้ใช้กับโครงการวางระบบ Oracle เท่านั้น'
     +'<span>Automation 2026 ไม่มีรายงาน weekly จาก vendor</span></div>';
@@ -7248,7 +7265,7 @@ function renderProgSummary(){
      +'<span class="reghint">เทียบจริงกับแผน · เฟสที่ยังไม่มีตัวเลขรายงานจะแสดง —</span></div>'
      +pgsPhases(cur)+'</div>';
   }
-  el.innerHTML=h+pgsUpcoming()+'</div>';}
+  el.innerHTML=regErrBanner()+h+pgsUpcoming()+'</div>';}
 
 /* ── จาก wt/b ── */
 /* ══════════════════════════════════════════════════════════════════════
@@ -7409,7 +7426,7 @@ function rgSetQ(s){rgQ=(s==null?'':String(s));rgPaint();}
 function renderRegisters(){
   var el=document.getElementById(GP+'RegV');if(!el)return;
   if(regOnlyPI(el))return;
-  el.innerHTML='<div class="rgwrap">'+rgBrdSec()+rgGapSumSec()+rgListSec()+'</div>';
+  el.innerHTML=regErrBanner()+'<div class="rgwrap">'+rgBrdSec()+rgGapSumSec()+rgListSec()+'</div>';
 }
 /* ── จาก wt/c ── */
 /* ══════════════════════════════════════════════════════════════════════
