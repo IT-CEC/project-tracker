@@ -5415,6 +5415,41 @@ function setBrView(bv){curBrView=bv;document.querySelectorAll('.nav-subitem').fo
 function piMoveThumb(){var seg=document.getElementById('projToggle');if(!seg)return;var th=seg.querySelector('.pjt-thumb'),act=seg.querySelector('.pjt.on');if(!th||!act||!act.offsetWidth)return;th.style.width=act.offsetWidth+'px';th.style.transform='translateX('+(act.offsetLeft-4)+'px)';}
 function syncTopAdd(){var p=document.querySelector('.panel.active');p=p?p.id:'';var show={addReqBtn:false,addActBtn:false,addRptBtn:false,addBrBtn:false};if(p==='project'){if(curProjView==='reqs')show.addReqBtn=true;else if(curProjView==='action')show.addActBtn=true;else if(curProjView==='report')show.addRptBtn=true;}else if(p==='bridge'){if(curBrView==='table')show.addBrBtn=true;}Object.keys(show).forEach(function(k){var b=document.getElementById(k);if(b)b.style.display=show[k]?'':'none';});}
 function setProjView(pv){curProjView=pv;document.querySelectorAll('.nav-subitem').forEach(s=>s.classList.toggle('active-sub',s.dataset.pv===pv));refreshCrumb();document.querySelectorAll('#projToggle .pjt').forEach(b=>b.classList.toggle('on',b.dataset.pv===pv));requestAnimationFrame(piMoveThumb);var im=document.getElementById('implement'),rq=document.getElementById('reqs'),ac=document.getElementById('actionView'),rp=document.getElementById('reportView');if(im)im.style.display=pv==='impl'?'':'none';if(rq)rq.style.display=pv==='reqs'?'':'none';if(ac)ac.style.display=pv==='action'?'':'none';if(rp)rp.style.display=pv==='report'?'':'none';var vt=document.getElementById('piViewTabs');if(vt)vt.style.display=pv==='impl'?'':'none';var rb=document.getElementById('projRibbon');if(rb)rb.style.display=pv==='impl'?'':'none';var rb2=document.getElementById('reqRibbon');if(rb2)rb2.style.display=pv==='reqs'?'':'none';syncTopAdd();if(pv==='impl'){renderPI();setTimeout(piHome,90);}else if(pv==='reqs'){renderAll();}else if(pv==='action'){renderActs();}else if(pv==='report'){if(typeof renderRpts==='function')renderRpts();}if(typeof updateNavActive==='function')updateNavActive();}
+/* การ์ด "เฟสปัจจุบัน" เคยตอบจากวันที่อย่างเดียว ซึ่งบอกว่า "ปฏิทินเดินมาถึงเฟสไหน"
+   ไม่ใช่ "งานเดินไปถึงไหน" พอหน้าสรุปแสดงตัวเลขจากผู้ขายว่าเฟส 2 ยัง 84% แต่การ์ด
+   ข้างบนบอกว่าอยู่เฟส 3 แล้ว สองอย่างนี้ขัดกันเองบนจอเดียวกัน
+   ถ้ามีตัวเลขรายสัปดาห์ให้ยึดตามนั้น: เฟสแรกที่ยังไม่ถึง 100% คือเฟสที่งานค้างอยู่
+   ไม่มีตัวเลข ค่อยถอยไปใช้ช่วงวันเหมือนเดิม */
+function erpProgPhase(){
+  var p=(typeof progCur==='function')?progCur():null;
+  if(!p||!Array.isArray(p.phases))return null;
+  var open=p.phases.filter(function(x){return x&&x.a!=null&&x.a<100&&String(x.name||'').trim();});
+  if(!open.length)return null;
+  var f=open[0];
+  return {k:f.k,a:f.a,name:String(f.name).replace(/^Phase\s*\d+\s*[:.\-]\s*/i,'').replace(/^\d+_/,'')};}
+/* การ์ดสองใบนี้ขึ้นเฉพาะเมื่อมีข้อมูลจริง ไม่งั้นจะได้การ์ดเปล่ากินที่เฉยๆ
+   วางบนแถบสรุปเพราะแถบนี้เห็นได้ทุกมุมมอง ไม่ต้องเข้าหน้าสรุปก่อนถึงจะรู้ว่าช้า */
+function erpProgVarCard(){
+  var p=(typeof progCur==='function')?progCur():null;
+  if(!p||p.actual==null||p.plan==null)return null;
+  var d=Math.round(p.actual-p.plan);
+  return {val:p.actual+'% / '+p.plan+'%',
+    col:(d>=-5?'#1f8f36':(d>=-15?'#9a6b00':'#d02a20')),
+    sub:'จริง '+p.actual+'% เทียบแผน '+p.plan+'% · ส่วนต่าง '+(d>0?'+':'')+d
+       +' จุด · ข้อมูล ณ '+(p.at||p._key||'')};}
+/* นับ BRD ที่เลยวันที่ต้องลงนามแล้วแต่ยังไม่ Signed Off — เป็นงานที่ค้างคนอื่นอยู่
+   จึงควรเห็นตั้งแต่หน้าแรก ไม่ใช่ต้องเปิดเข้าไปในทะเบียน */
+function erpBrdOverdue(){
+  if(typeof PIMPL==='undefined')return null;
+  var list=PIMPL.filter(function(d){return !d.parent&&String(d.name||'').indexOf('BRD')===0;});
+  if(!list.length)return null;
+  var any=list.some(function(d){return d.bst||d.bsodue;});
+  if(!any)return null;
+  var now=new Date();now.setHours(0,0,0,0);
+  var late=list.filter(function(d){
+    if(!d.bsodue||d.bst==='Signed Off')return false;
+    var t=piDate(d.bsodue);return t&&t<now;});
+  return {n:late.length,names:late.map(function(d){return d.name.split(' ')[0];}).join(', ')};}
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};
@@ -5439,7 +5474,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   var curPhKey='';
   _pk.forEach(function(p){if(!curPhKey&&now>=phs[p].a&&now<=phs[p].b)curPhKey=p;});
   if(!curPhKey)_pk.forEach(function(p){if(!curPhKey&&now<phs[p].a)curPhKey=p;});
-  if(!curPhKey&&_pk.length)curPhKey=_pk[_pk.length-1];var curPh=curPhKey?PI_PHASES[curPhKey].replace(/^\d+_/,''):'—';var _pe=phs[curPhKey],_pstat='—',_pcol='#8e8e93',_psub='';if(curPhKey&&_pe){var _pl=PIMPL.filter(function(d){return d.ph===curPhKey&&piChildren(d).length===0;});var _ptw=0,_psw=0;_pl.forEach(function(d){var w=piDurOf(d);_ptw+=w;_psw+=piCalcProg(d)*w;});var _pprog=_ptw?Math.round(_psw/_ptw):0;/* นับเฉพาะงานใบให้ตรงกับ _pl ที่ใช้คิด progress — งานแม่รับสถานะมาจากลูกอยู่แล้ว
+  if(!curPhKey&&_pk.length)curPhKey=_pk[_pk.length-1];var _vp=erpProgPhase();if(_vp&&_vp.k&&phs[_vp.k])curPhKey=_vp.k;var curPh=_vp?_vp.name:(curPhKey?PI_PHASES[curPhKey].replace(/^\d+_/,''):'—');var _pe=phs[curPhKey],_pstat='—',_pcol='#8e8e93',_psub='';if(curPhKey&&_pe){var _pl=PIMPL.filter(function(d){return d.ph===curPhKey&&piChildren(d).length===0;});var _ptw=0,_psw=0;_pl.forEach(function(d){var w=piDurOf(d);_ptw+=w;_psw+=piCalcProg(d)*w;});var _pprog=_ptw?Math.round(_psw/_ptw):0;/* นับเฉพาะงานใบให้ตรงกับ _pl ที่ใช้คิด progress — งานแม่รับสถานะมาจากลูกอยู่แล้ว
        ถ้านับด้วยจะกลายเป็นนับซ้ำ */
     var _DAY=86400000;if(_pprog>=100){_pstat=L('เสร็จแล้ว','Done');_pcol='#28cd41';_psub=L('ความคืบหน้า 100%','100% complete');}else if(now>_pe.b){_pstat=L('ล่าช้า','Delayed');_pcol='#ff3b30';_psub=L('เลยกำหนด ','Overdue ')+Math.ceil((now-_pe.b)/_DAY)+L(' วัน',' days');}else if(_pe.over>0){/* งานในเฟสจบเลยวันจบของเฟสที่ตั้งไว้ — เกณฑ์เดียวกับ "เกิน N วัน" บนผัง
       สถานะของงานแต่ละตัวไม่มีผลกับการ์ดอีกต่อไป งานย่อยตัวเดียวล่าช้าจึงไม่ลามมาถึงตรงนี้ */
@@ -5452,7 +5487,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
      กับวันที่ของ milestone จึงไม่ทิ้ง ย้ายไปเป็น tooltip ของการ์ด ชี้เมาส์ยังอ่านได้ */
   function c(k,v,sub,col){return `<div class="pjcard"${sub?` title="${attr(sub)}"`:''}><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+L(' · อีก ',' · in ')+Math.max(0,Math.ceil((_nm.e-now)/86400000))+L(' วัน',' days')):L('ไม่มี milestone ข้างหน้า','No upcoming milestone');
-  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol),c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')].join('');}
+  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol),c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv)ex.push(c(L('ความคืบหน้า จริง/แผน','Progress actual/plan'),pv.val,pv.sub,pv.col));var bo=erpBrdOverdue();if(bo)ex.push(c(L('BRD เลยกำหนดลงนาม','BRD past sign-off'),bo.n?(bo.n+L(' หัวข้อ',' items')):L('ไม่มี','None'),bo.n?(L('เลยวันที่ต้อง sign off แล้ว: ','Past sign-off date: ')+bo.names):L('ทุกหัวข้อยังไม่เลยวันที่ต้องลงนาม','No item is past its sign-off date'),bo.n?'#d02a20':'#1f8f36'));return ex;})()).join('');}
 function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('tb-open');if(typeof tbClose==='function')tbClose();var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
 function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});
   document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
