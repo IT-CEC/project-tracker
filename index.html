@@ -2754,8 +2754,8 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         <button class="tbtn" onclick="clearPI()" data-i18n="clear">ล้าง</button><div class="kbnote barnote" id="piRvwNote"></div>
         <div class="barright"><span class="gtbar" id="piGtoolbar"><button class="gtbtn gtfold" id="piFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="gFocusBtn" onclick="toggleGFocus()" title="ขยาย Gantt เต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="piZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="piViewTabs">
         <button class="bvt on" data-piv="timeline">Timeline</button>
-        <button class="bvt" data-piv="summary">สรุปความคืบหน้า</button>
-        <button class="bvt" data-piv="reg">BRD &amp; Gaps</button>
+        <button class="bvt" data-piv="summary">Progress Summary</button>
+        <button class="bvt" data-piv="reg">Gaps</button>
         <button class="bvt" data-piv="table">Full Details</button>
       </div></div>
       </div>
@@ -2838,8 +2838,8 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
           <button class="tbtn" onclick="clearPI()">ล้าง</button>
           <div class="barright"><span class="gtbar" id="apGtoolbar"><button class="gtbtn gtfold" id="apFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="apFocusBtn" onclick="toggleGFocus()" title="ขยายเต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="apZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="apViewTabs">
           <button class="bvt on" data-piv="timeline">Timeline</button>
-          <button class="bvt" data-piv="summary">สรุปความคืบหน้า</button>
-          <button class="bvt" data-piv="reg">BRD &amp; Gaps</button>
+          <button class="bvt" data-piv="summary">Progress Summary</button>
+          <button class="bvt" data-piv="reg">Gaps</button>
           <button class="bvt" data-piv="table">Full Details</button>
         </div></div>
         </div>
@@ -3079,71 +3079,61 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
   .pgs .reghd .reghint{flex:1 1 100%;order:3;margin-top:-3px}
   .pgs-own{max-width:100%}
 }
-/* ── จาก wt/b ── */
-/* ───────── หน้า "BRD & Gaps" (#piRegV) — เพิ่มใหม่ ไม่แก้กฎเดิมข้างบน ─────────
-   สีทุกตัวมาจาก token เดิมเท่านั้น ยกเว้นจุดสถานะ BRD ที่รับค่าจาก BRD_STC
-   เข้ามาทาง --rgc และใช้เป็น "จุด" ไม่ใช่สีตัวอักษร เพราะเหลือง #ffcc00
-   กับแดง #ff3b30 เป็นตัวหนังสือไม่ผ่าน 4.5:1 ทั้งบนพื้นสว่างและพื้นมืด
-   ตัวหนังสือจึงเป็น --ink / --ink2 / --ink3 ล้วน */
-.rgwrap{min-width:0}
-.rgnote{font-size:12.5px;color:var(--ink3);margin:-3px 0 10px}
-.rgdash{color:var(--ink3);font-weight:400}
-.rghint{font-size:12px;color:var(--ink3);font-weight:400;margin-left:auto}
-.rgwrap table.dt{width:100%;border-collapse:collapse}
-/* กฎเดิมบังคับคอลัมน์ที่ 3 ของทุกตาราง .dt กว้างอย่างน้อย 240px เพราะหน้า Full Details
-   ใช้ช่องนั้นใส่ชื่อขั้นตอน ตารางในหน้านี้คอลัมน์ที่ 3 เป็นเวอร์ชัน/ประเภท
-   ถ้าปล่อยไว้ตารางจะยาวเกินจอโดยไม่มีเหตุ */
-.rgwrap table.dt thead th:nth-child(3),.rgwrap table.dt tbody td:nth-child(3){min-width:0}
-/* ช่องประเภท ("GAP - In Scope-SOW") ตกบรรทัดเป็นสามบรรทัดที่จอ 390px แถวจึงสูง 81px
-   ทั้งที่ข้างๆ ว่าง ตารางสามตัวนี้จึงอยู่บรรทัดเดียว แล้วให้ .tscroll เลื่อนแนวนอนแทน
-   เหมือนตารางอื่นในแอป (การ์ดนับมิติไม่เข้าข่าย ปล่อยให้ตกบรรทัดในกรอบตัวเอง) */
-.rgwrap .tablecard table.dt tbody td{white-space:nowrap}
-.rgwrap th.rgn{text-align:right}
-.rgwrap table.dt tbody tr.rgrow{cursor:pointer}
-/* เลยกำหนด sign off — บอกด้วยพื้นแถวกับป้าย ไม่ใช่สีตัวอักษรตัวเดียว */
-.rgwrap table.dt tbody tr.rgover{background:color-mix(in srgb,var(--red) 7%,transparent)}
-.rgwrap table.dt tbody tr.rgover:hover{background:color-mix(in srgb,var(--red) 13%,transparent)}
-.rgwrap td.rgduec{color:var(--ink);font-weight:700}
-.rgflag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
-  padding:1px 7px;border-radius:6px;white-space:nowrap;vertical-align:middle;
-  background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--ink);--rgc:var(--red)}
-.rgname{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap;max-width:430px}
-.rgst{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;color:var(--ink);font-weight:600}
-.rgdot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--rgc,var(--ink3))}
-.rgwrap td.rgn{text-align:right}
-/* งบ mandays — แคบพอดีตัว ไม่ต้องกินความกว้างทั้งหน้าเพราะมีสามคอลัมน์
-   แถว Balance คือผลรวมของสองแถวบนตามสไลด์ จึงคั่นเส้นแล้วเน้นน้ำหนัก */
-.rgbudcard{max-width:430px}
-.rgwrap tr.rgsum td{border-top:1px solid var(--line);border-bottom:0;color:var(--ink);font-weight:700}
-.rggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:12px}
-.rgdim{background:var(--surface);border:1px solid var(--line2);border-radius:14px;
-  overflow:hidden;min-width:0}
-.rgdim-hd{display:flex;align-items:center;gap:8px;padding:10px 13px;font-size:11px;font-weight:700;
-  letter-spacing:.03em;text-transform:uppercase;color:var(--ink3);border-bottom:1px solid var(--line2)}
-.rgdim-hd span{margin-left:auto;color:var(--ink);font-weight:700;font-size:12px;text-transform:none}
-.rgdim table.dt tbody td{padding:8px 13px;font-size:12.5px;color:var(--ink2);font-weight:600}
-.rgdim table.dt tbody td.rgdim-n{text-align:right;color:var(--ink);width:58px}
-.rgdim table.dt tbody tr:last-child td{border-bottom:0}
-.rgfilt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 11px}
-.rgtog{border:1px solid var(--line);background:var(--surface);color:var(--ink2);font-family:inherit;
-  font-size:12.5px;font-weight:600;padding:7px 13px;border-radius:10px;cursor:pointer;transition:.16s}
-.rgtog b{color:var(--ink);font-weight:700;margin-left:2px}
-.rgtog:hover{background:var(--chip);color:var(--ink)}
-.rgtog.on{background:color-mix(in srgb,var(--accent) 12%,transparent);
-  border-color:var(--accent);color:var(--ink)}
-.rginp{border:1px solid var(--line);background:var(--surface);color:var(--ink);font-family:inherit;
-  font-size:12.5px;padding:7px 12px;border-radius:10px;min-width:0;flex:0 1 230px}
-.rginp:focus{outline:none;border-color:var(--accent);
-  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
-.rgnorow{text-align:center;padding:34px 10px;color:var(--ink3);font-weight:400}
+/* ── หน้า Gaps ───────────────────────────────────────────────────────── */
+.rgwrap{display:block}
+.gpnote{padding:14px 16px;border:1px dashed var(--line);border-radius:12px;
+  font-size:13px;color:var(--ink2)}
+.gpnote span{display:block;font-size:12px;color:var(--ink3);margin-top:3px}
+.gpbuds{display:flex;gap:10px;flex-wrap:wrap}
+.gpbud{flex:1 1 150px;min-width:0;background:var(--surface);border:1px solid var(--line2);
+  border-radius:14px;padding:12px 14px}
+.gpbud.tot{border-color:var(--line)}
+.gpbud.used{background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.gpbud.left{background:color-mix(in srgb,var(--green) 7%,var(--surface))}
+.gpbud.neg{background:color-mix(in srgb,var(--red) 8%,var(--surface))}
+.gpbl{font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.03em}
+.gpbv{font-size:21px;font-weight:700;color:var(--ink);margin-top:3px;font-variant-numeric:tabular-nums}
+.gpbv span{font-size:12px;font-weight:500;color:var(--ink2)}
+.gpbh{font-size:11.5px;color:var(--ink3);margin-top:1px}
+.gpbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:11px}
+.gptog{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink2);
+  font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s}
+.gptog:hover{background:var(--hover)}
+.gptog.on{border-color:var(--accent);color:var(--ink);
+  background:color-mix(in srgb,var(--accent) 8%,var(--surface))}
+.gptog b{font-size:13px;color:var(--ink)}
+.gptog .gpmd{font-size:11px;font-weight:500;color:var(--ink3);
+  padding-left:6px;border-left:1px solid var(--line2)}
+.gpq{flex:1 1 200px;min-width:0;max-width:300px;padding:7px 12px;border-radius:10px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  font-family:inherit;font-size:12.5px}
+.gpq:focus{outline:none;border-color:var(--accent)}
+.gpadd{flex:none;padding:7px 14px;font-size:12.5px}
+.dt.gptbl td{padding:5px 8px;font-weight:500}
+.dt.gptbl th{white-space:nowrap}
+.dt.gptbl th:nth-child(3),.dt.gptbl td:nth-child(3){min-width:0}
+.gpid{font-weight:700;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.gpin{width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:6px 8px;
+  border:1px solid transparent;border-radius:8px;background:transparent;color:var(--ink);
+  font-family:inherit;font-size:12.5px}
+.gpin:hover{border-color:var(--line2);background:var(--surface)}
+.gpin:focus{outline:none;border-color:var(--accent);background:var(--surface)}
+.gpin::placeholder{color:var(--ink3)}
+.gpname{font-weight:600}
+.gpnum{text-align:right;font-variant-numeric:tabular-nums;max-width:90px}
+.gpsel{cursor:pointer}
+.gpdel{width:34px;text-align:center}
+.gpx{width:26px;height:26px;border:0;border-radius:7px;background:none;color:var(--ink3);
+  font-size:17px;line-height:1;cursor:pointer;transition:.15s}
+.gpx:hover{background:color-mix(in srgb,var(--red) 12%,transparent);color:var(--red)}
+body.ro .gpadd,body.ro .gpx{display:none}
 @media(max-width:760px){
-  .rggrid{grid-template-columns:1fr}
-  .rgbudcard{max-width:none}
-  .rgname{max-width:210px}
-  .rgfilt .rginp{flex:1 1 100%}
-  .rgfilt .rghint{margin-left:0}
+  .gpbud{flex:1 1 44%}
+  .gpq{max-width:none}
+  .dt.gptbl{min-width:760px}
 }
+
 /* ── จาก wt/c ── */
 /* ───────── กล่อง "กรอก/นำเข้าตัวเลขรายสัปดาห์" — openProgEntry() ─────────
    ทางเข้าข้อมูลทางเดียวของหน้าภาพรวมแผนงานโครงการกับทะเบียน Gaps
@@ -5450,10 +5440,12 @@ function erpProgVarCard(){
   var p=(typeof progCur==='function')?progCur():null;
   if(!p||p.actual==null||p.plan==null)return null;
   var d=Math.round(p.actual-p.plan);
-  return {val:p.actual+'% / '+p.plan+'%',
-    col:(d>=-5?'#1f8f36':(d>=-15?'#9a6b00':'#d02a20')),
-    sub:'จริง '+p.actual+'% เทียบแผน '+p.plan+'% · ส่วนต่าง '+(d>0?'+':'')+d
-       +' จุด · ข้อมูล ณ '+(p.at||p._key||'')};}
+  var col=(d>=-5?'#1f8f36':(d>=-15?'#9a6b00':'#d02a20'));
+  return {val:p.actual+'% / '+p.plan+'%', col:col, d:d,
+    dval:(d>0?'+':'')+d+'%',
+    dsub:(d<0?('ช้ากว่าแผน '+Math.abs(d)+' จุด'):(d>0?('เร็วกว่าแผน '+d+' จุด'):'ตรงตามแผน'))
+      +' · ข้อมูล ณ '+(p.at||p._key||''),
+    sub:'จริง '+p.actual+'% เทียบแผน '+p.plan+'% · ข้อมูล ณ '+(p.at||p._key||'')};}
 /* นับ BRD ที่เลยวันที่ต้องลงนามแล้วแต่ยังไม่ Signed Off — เป็นงานที่ค้างคนอื่นอยู่
    จึงควรเห็นตั้งแต่หน้าแรก ไม่ใช่ต้องเปิดเข้าไปในทะเบียน */
 function erpBrdOverdue(){
@@ -5504,7 +5496,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
      กับวันที่ของ milestone จึงไม่ทิ้ง ย้ายไปเป็น tooltip ของการ์ด ชี้เมาส์ยังอ่านได้ */
   function c(k,v,sub,col){return `<div class="pjcard"${sub?` title="${attr(sub)}"`:''}><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+L(' · อีก ',' · in ')+Math.max(0,Math.ceil((_nm.e-now)/86400000))+L(' วัน',' days')):L('ไม่มี milestone ข้างหน้า','No upcoming milestone');
-  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol),c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv)ex.push(c(L('ความคืบหน้า จริง/แผน','Progress actual/plan'),pv.val,pv.sub,pv.col));var bo=erpBrdOverdue();if(bo)ex.push(c(L('BRD เลยกำหนดลงนาม','BRD past sign-off'),bo.n?(bo.n+L(' หัวข้อ',' items')):L('ไม่มี','None'),bo.n?(L('เลยวันที่ต้อง sign off แล้ว: ','Past sign-off date: ')+bo.names):L('ทุกหัวข้อยังไม่เลยวันที่ต้องลงนาม','No item is past its sign-off date'),bo.n?'#d02a20':'#1f8f36'));return ex;})()).join('');}
+  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol),c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('ความคืบหน้า จริง/แผน','Progress actual/plan'),pv.val,pv.sub,pv.col));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}var bo=erpBrdOverdue();if(bo)ex.push(c(L('BRD เลยกำหนดลงนาม','BRD past sign-off'),bo.n?(bo.n+L(' หัวข้อ',' items')):L('ไม่มี','None'),bo.n?(L('เลยวันที่ต้อง sign off แล้ว: ','Past sign-off date: ')+bo.names):L('ทุกหัวข้อยังไม่เลยวันที่ต้องลงนาม','No item is past its sign-off date'),bo.n?'#d02a20':'#1f8f36'));return ex;})()).join('');}
 function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('tb-open');if(typeof tbClose==='function')tbClose();var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
 function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});
   document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
@@ -6781,6 +6773,8 @@ document.addEventListener('mouseup',ev=>{if(!piDrag)return;var dg=piDrag;piDrag=
   piEnforce();renderPI();});
 let piCurV='timeline';
 function renderPI(){var rows=filteredPI();var c=document.getElementById(GP+'Count');if(c)c.innerHTML='แสดง <b>'+rows.length+'</b> / '+PIMPL.length+' งาน';
+  var _rv=document.getElementById(GP+'RvwNote');
+  if(piCurV!=='timeline'&&_rv)_rv.innerHTML='';
   if(piCurV==='timeline'){piRvwNote();renderPIGantt();}
   else if(piCurV==='summary')renderProgSummary();
   else if(piCurV==='reg')renderRegisters();
@@ -7260,174 +7254,190 @@ function renderProgSummary(){
      +(ok?'':'<span>ปุ่มกรอกตัวเลขยังใช้ไม่ได้ เพราะหน้ากรอกข้อมูลยังไม่ถูกเพิ่มเข้ามา</span>')
      +'<span class="pgs-empb">'+btn+'</span></div>';
   }else{
-    h+=pgsCards(cur)+pgsLight(cur)
+    /* การ์ดสี่ใบเดิมถอดออกเพราะซ้ำกับแถบสรุปข้างบน ตัวเลขทั้งหมดยังอยู่
+       ในบล็อกไฟสถานะอยู่แล้ว (จริง ตามแผน ส่วนต่าง) จึงไม่เสียข้อมูล */
+    h+=pgsLight(cur)
      +'<div class="regsec pgs-sec"><div class="reghd"><h3>ความคืบหน้ารายเฟส</h3>'
      +'<span class="reghint">เทียบจริงกับแผน · เฟสที่ยังไม่มีตัวเลขรายงานจะแสดง —</span></div>'
      +pgsPhases(cur)+'</div>';
   }
   el.innerHTML=regErrBanner()+h+pgsUpcoming()+'</div>';}
 
-/* ── จาก wt/b ── */
-/* ══════════════════════════════════════════════════════════════════════
-   หน้า "BRD & Gaps" (#piRegV) — ตัวจริงของ renderRegisters()
-   เขียนทับตัวเปล่าที่ประกาศไว้ตอนวางสัญญารูปแบบข้อมูล (ดูคอมเมนต์ก้อนนั้น)
+/* ── หน้า Gaps (เขียนใหม่ แทนหน้า BRD & Gaps เดิม) ──────────────────────
+   ถอดทะเบียน BRD ออกเพราะข้อมูลชุดเดียวกันแสดงอยู่แล้วทั้งในผังและใน Full Details
+   เหลือเฉพาะ Gaps ซึ่งไม่มีที่อื่นแสดง และทำให้แก้ไขได้ในตัว เพราะ man-day ของ
+   แต่ละข้อเป็นตัวเลขที่ทีมต้องกรอกเอง ไม่ได้มาจากรายงานผู้ขาย
 
-   สามส่วนเรียงตามสไลด์ weekly ของ vendor
-     1) ทะเบียน BRD     ← สไลด์ "BRD Summary"  · อ่านจากฟิลด์ b* บนงาน PIMPL
-     2) สรุป Gaps       ← สไลด์ "Gaps Summary" · งบจาก BUCKET + นับ GAPS แยกมิติ
-     3) รายการ Gaps     ← สไลด์ "Gaps List – IN Scope / – TBC" รวมเป็นตารางเดียว
+   ใช้ data attribute กับตัวดักเหตุการณ์ที่ผูกครั้งเดียว ไม่ใช่ onchange ในแท็ก
+   เพราะค่าที่ผู้ใช้กรอกจะต้องถูกต่อเข้าไปใน string ของ handler ซึ่งเป็นช่องโหว่ */
+var gpScope='all', gpQ='';
+function gpAll(){return (typeof GAPS!=='undefined'&&Array.isArray(GAPS))?GAPS:[];}
+function gpNum(v){var n=parseFloat(String(v==null?'':v).replace(/,/g,''));return isFinite(n)?n:0;}
+function gpRows(){
+  var q=gpQ.trim().toLowerCase();
+  return gpAll().filter(function(g){
+    if(gpScope!=='all'&&g.scope!==gpScope)return false;
+    if(!q)return true;
+    return ((g.gid||'')+' '+(g.name||'')+' '+(g.type||'')+' '+(g.st||'')).toLowerCase().indexOf(q)>=0;});}
+function gpCount(sc){var a=gpAll().filter(function(g){return sc==='all'||g.scope===sc;});
+  return {n:a.length, md:a.reduce(function(s,g){return s+gpNum(g.md);},0)};}
+function gpMd(n){return (Math.round(n*10)/10).toLocaleString('en-US');}
 
-   หน้านี้ "อ่านอย่างเดียว" ไม่เขียน Firestore เลย การแก้ข้อมูล BRD ทำที่
-   หน้าต่างงานเดิม (openPI) เพื่อไม่ให้มีที่กรอกสองที่แล้วหลุดจากกัน
-   ══════════════════════════════════════════════════════════════════════ */
-var rgScope='all';                       /* 'all' | 'in' | 'tbc' */
-var rgQ='';
-/* มิติที่สไลด์ Gaps Summary นับแยก — ชื่อฟิลด์ตามสัญญาข้อมูลคู่กับป้ายบนจอ
-   มิติไหนยังไม่มีใครกรอก ตารางของมันถูกซ่อน ไม่โชว์กรอบเปล่า */
-var RG_DIMS=[['st','สถานะ'],['type','ประเภท'],['blocker','Milestone blocker'],
-             ['cls','Classification'],['bsp','BSP status'],['nature','Task nature']];
-function rgGaps(){return (typeof GAPS!=='undefined'&&Array.isArray(GAPS))?GAPS:[];}
-function rgTxt(x){return (x==null?'':String(x)).trim();}
-/* ช่องที่ยังไม่มีข้อมูลแสดงขีด ไม่ปล่อยว่าง เพราะช่องว่างอ่านเป็น "ไม่มีคอลัมน์นี้" */
-function rgDash(x){var s=rgTxt(x);return s?esc(s):'<span class="rgdash">—</span>';}
-function rgFmt(n){return Number(n||0).toLocaleString('en-US');}
-function rgDmy(s){var m=rgTxt(s).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  return m?new Date(+m[3],+m[2]-1,+m[1]):null;}
-function rgToday(){var t=new Date();t.setHours(0,0,0,0);return t;}
-/* เรียงตามเลข BRD ไม่ใช่ลำดับในผัง เพราะในผัง BRD05 มาก่อน BRD03 อยู่ */
-function rgBrdNo(d){var m=rgTxt(d&&d.name).match(/^BRD\s*0*(\d+)/i);return m?+m[1]:9999;}
-function rgBrdRows(){return (typeof PIMPL!=='undefined'?PIMPL:[])
-  .filter(function(d){return d&&!d.parent&&/^BRD/i.test(rgTxt(d.name));})
-  .slice().sort(function(a,b){return (rgBrdNo(a)-rgBrdNo(b))
-    ||rgTxt(a.name).localeCompare(rgTxt(b.name),'en');});}
-function rgBrdOver(d){if(rgTxt(d.bst)==='Signed Off')return false;
-  var due=rgDmy(d.bsodue);return !!due&&due<rgToday();}
-/* สถานะ BRD ใช้สีจาก BRD_STC เป็น "จุด" ไม่ใช่สีตัวอักษร เพราะ #ffcc00
-   เป็นตัวหนังสือไม่ผ่าน 4.5:1 ทั้งบนพื้นสว่างและพื้นมืด ตัวหนังสือจึงเป็น --ink
-   ค่าสีมาจากตารางที่ประกาศไว้ในโค้ดเท่านั้น ไม่เอาข้อความจากข้อมูลมาต่อใน style */
-function rgStCell(st){var s=rgTxt(st);if(!s)return '<span class="rgdash">—</span>';
-  var c=BRD_STC[s]||'';
-  return '<span class="rgst"'+(c?' style="--rgc:'+c+'"':'')+'><span class="rgdot"></span>'+esc(s)+'</span>';}
+/* ── งบ ── ยอดรวมคือผลบวกของสองแถวตามที่สไลป์แสดง ไม่ใช่ส่วนต่าง
+   ส่วน "ใช้ไปแล้ว" มาจาก man-day ที่กรอกในตารางข้างล่าง จึงขยับเองเมื่อแก้ */
+function gpBudget(){
+  var b=(typeof BUCKET!=='undefined'&&BUCKET)?BUCKET:{};
+  var bm=gpNum(b.bucketMd),bh=gpNum(b.bucketHrs),cm=gpNum(b.crMd),ch=gpNum(b.crHrs);
+  if(!bm&&!bh&&!cm&&!ch)return '<div class="gpnote">ยังไม่ได้บันทึกงบ mandays '
+    +'<span>กรอกได้ที่ปุ่ม “อัปเดตตัวเลขสัปดาห์นี้” ในหน้า Progress Summary</span></div>';
+  var used=gpCount('all').md, tot=bm+cm;
+  var left=tot-used;
+  var cell=function(l,md,hr,cls){return '<div class="gpbud'+(cls?' '+cls:'')+'">'
+    +'<div class="gpbl">'+esc(l)+'</div><div class="gpbv">'+gpMd(md)+' <span>วัน</span></div>'
+    +(hr!=null?'<div class="gpbh">'+gpMd(hr)+' ชั่วโมง</div>':'')+'</div>';};
+  return '<div class="gpbuds">'
+    +cell('Bucket',bm,bh)+cell('CR',cm,ch)+cell('รวมงบ',tot,bh+ch,'tot')
+    +cell('ใช้ไปแล้ว',used,null,'used')
+    +cell('คงเหลือ',left,null,left<0?'neg':'left')+'</div>';}
 
-function rgBrdSec(){
-  var rows=rgBrdRows();
-  var h='<section class="regsec"><div class="reghd"><h3>ทะเบียน BRD</h3>'
-   +'<span class="reghint">'+rows.length+' หัวข้อ · คลิกแถวเพื่อเปิดงานในผัง</span></div>';
-  if(!rows.length)return h+'<div class="regempty">ยังไม่มีงาน BRD ในผังโครงการ'
-   +'<span>ทะเบียนนี้อ่านจากงานในผังที่ชื่อขึ้นต้นด้วย BRD</span></div></section>';
-  var filled=rows.filter(function(d){return rgTxt(d.bver)||rgTxt(d.bdisc)||rgTxt(d.bsub)
-    ||rgTxt(d.bsodue)||rgTxt(d.bst);}).length;
-  if(!filled)h+='<div class="rgnote">ยังไม่ได้กรอกข้อมูล BRD — เปิดงานในผังแล้วกรอก'
-   +' เวอร์ชัน / Discovery / วันส่ง / วัน sign off / สถานะ</div>';
-  var over=rows.filter(rgBrdOver).length;
-  if(over)h+='<div class="rgnote">เลยกำหนด sign off แล้ว '+over+' หัวข้อ</div>';
-  h+='<div class="tablecard"><div class="tscroll"><table class="dt rgtbl">'
-   +'<thead><tr><th>ลำดับ</th><th>หัวข้อ BRD</th><th>เวอร์ชันล่าสุด</th><th>Discovery</th>'
-   +'<th>ส่งล่าสุด</th><th>ต้อง sign off</th><th>สถานะ</th></tr></thead><tbody>';
-  h+=rows.map(function(d,i){var ov=rgBrdOver(d);
-    return '<tr class="rgrow'+(ov?' rgover':'')+'" onclick="openPI('+(+d._pi)+')">'
-     +'<td class="muted num">'+(i+1)+'</td>'
-     +'<td><div class="rgname" title="'+attr(rgTxt(d.name))+'">'+esc(rgTxt(d.name))+'</div></td>'
-     +'<td class="num">'+rgDash(d.bver)+'</td>'
-     +'<td class="muted num">'+rgDash(d.bdisc)+'</td>'
-     +'<td class="muted num">'+rgDash(d.bsub)+'</td>'
-     +'<td class="num'+(ov?' rgduec':'')+'">'+rgDash(d.bsodue)
-       +(ov?' <span class="rgflag"><span class="rgdot"></span>เลยกำหนด</span>':'')+'</td>'
-     +'<td>'+rgStCell(d.bst)+'</td></tr>';}).join('');
-  return h+'</tbody></table></div></div></section>';
-}
+function gpHead(){
+  var i=gpCount('in'),t=gpCount('tbc'),a=gpCount('all');
+  var tab=function(k,l,c){return '<button type="button" class="gptog'+(gpScope===k?' on':'')
+    +'" data-gpsc="'+k+'">'+esc(l)+' <b>'+c.n+'</b>'
+    +(c.md?'<span class="gpmd">'+gpMd(c.md)+' วัน</span>':'')+'</button>';};
+  return '<div class="gpbar">'+tab('in','In Scope',i)+tab('tbc','TBC',t)+tab('all','ทั้งหมด',a)
+    +'<input type="text" id="gpQ" class="gpq" placeholder="ค้นหา GAP ID หรือชื่องาน…" value="'+attr(gpQ)+'">'
+    +'<button type="button" class="btn btn-pri gpadd" data-gpadd="1">+ เพิ่มรายการ</button></div>';}
 
-/* งบ mandays / ชั่วโมง — สไลด์แสดงแถว Balance เป็น "ผลรวม" ของ Bucket กับ CR
-   (30+50=80 mandays · 240+400=640 ชม.) ไม่ใช่ส่วนต่าง จึงบวกกัน และคิดสดทุกครั้ง
-   ไม่เก็บค่าที่คิดแล้วไว้ เพื่อให้แก้ Bucket/CR ที่เดียวแล้วแถวล่างตามเอง */
-function rgHasBucket(){var b=(typeof BUCKET!=='undefined'&&BUCKET)?BUCKET:{};
-  return !!((+b.bucketMd||0)||(+b.bucketHrs||0)||(+b.crMd||0)||(+b.crHrs||0));}
-function rgBucketSec(){
-  if(!rgHasBucket())return '<div class="rgnote">ยังไม่ได้บันทึกงบ mandays / ชั่วโมง</div>';
-  var b=BUCKET,bm=+b.bucketMd||0,bh=+b.bucketHrs||0,cm=+b.crMd||0,ch=+b.crHrs||0;
-  var row=function(lab,m,hr,cls){return '<tr'+(cls?' class="'+cls+'"':'')+'><td>'+esc(lab)+'</td>'
-    +'<td class="num rgn">'+rgFmt(m)+'</td><td class="num rgn">'+rgFmt(hr)+'</td></tr>';};
-  return '<div class="tablecard rgbudcard"><div class="tscroll"><table class="dt rgtbl">'
-   +'<thead><tr><th>งบประมาณ</th><th class="rgn">Mandays</th><th class="rgn">ชั่วโมง</th></tr></thead><tbody>'
-   +row('Bucket',bm,bh)+row('CR',cm,ch)+row('Balance',bm+cm,bh+ch,'rgsum')
-   +'</tbody></table></div></div>';
-}
-function rgDimSec(){
-  var G=rgGaps(),out=[];
-  RG_DIMS.forEach(function(p){
-    var f=p[0],lab=p[1],m={},tot=0;
-    G.forEach(function(g){var v=rgTxt(g&&g[f]);if(!v)return;m[v]=(m[v]||0)+1;tot++;});
-    if(!tot)return;
-    var ks=Object.keys(m).sort(function(a,b){return (m[b]-m[a])||a.localeCompare(b,'en');});
-    out.push('<div class="rgdim"><div class="rgdim-hd">'+esc(lab)+'<span>'+tot+'</span></div>'
-     +'<table class="dt rgtbl"><tbody>'+ks.map(function(k){
-        return '<tr><td>'+esc(k)+'</td><td class="num rgdim-n">'+m[k]+'</td></tr>';}).join('')
-     +'</tbody></table></div>');
-  });
-  return out.length?'<div class="rggrid">'+out.join('')+'</div>':'';
-}
-function rgGapSumSec(){
-  var G=rgGaps();
-  var h='<section class="regsec"><div class="reghd"><h3>สรุป Gaps</h3>'
-   +'<span class="reghint">'+G.length+' รายการ</span></div>';
-  if(!G.length&&!rgHasBucket())return h+'<div class="regempty">ยังไม่มีข้อมูล Gaps'
-   +'<span>ตัวเลขทั้งหมดในส่วนนี้มาจากรายงาน weekly ของ vendor</span></div></section>';
-  return h+rgBucketSec()+rgDimSec()+'</section>';
-}
+var GP_SCOPE=[['in','In Scope'],['tbc','TBC']];
+function gpRowHtml(g){
+  var inp=function(f,v,cls,ph){return '<input type="text" class="gpin'+(cls?' '+cls:'')+'" data-gid="'
+    +attr(g.gid)+'" data-f="'+f+'" value="'+attr(v==null?'':String(v))+'"'
+    +(ph?' placeholder="'+attr(ph)+'"':'')+'>';};
+  var sel='<select class="gpin gpsel" data-gid="'+attr(g.gid)+'" data-f="scope">'
+    +GP_SCOPE.map(function(o){return '<option value="'+o[0]+'"'+(g.scope===o[0]?' selected':'')+'>'
+      +esc(o[1])+'</option>';}).join('')+'</select>';
+  return '<tr><td class="gpid">'+esc(g.gid||'')+'</td>'
+    +'<td>'+inp('name',g.name,'gpname')+'</td>'
+    +'<td>'+sel+'</td>'
+    +'<td>'+inp('type',g.type,'','—')+'</td>'
+    +'<td>'+inp('st',g.st,'','—')+'</td>'
+    +'<td>'+inp('blocker',g.blocker,'','—')+'</td>'
+    +'<td>'+inp('md',g.md?gpMd(gpNum(g.md)):'','gpnum','0')+'</td>'
+    +'<td class="gpdel"><button type="button" class="gpx" data-gpdel="'+attr(g.gid)
+    +'" title="ลบรายการนี้" aria-label="ลบรายการนี้">\u00d7</button></td></tr>';}
 
-function rgScopeN(s){return rgGaps().filter(function(g){return rgTxt(g&&g.scope)===s;}).length;}
-function rgList(){var q=rgQ.toLowerCase();
-  return rgGaps().filter(function(g){
-    if(rgScope!=='all'&&rgTxt(g&&g.scope)!==rgScope)return false;
-    if(q&&(rgTxt(g&&g.name)+' '+rgTxt(g&&g.gid)).toLowerCase().indexOf(q)<0)return false;
-    return true;});}
-function rgListRows(){
-  var rows=rgList();
-  if(!rows.length)return '<tr><td colspan="6" class="rgnorow">ไม่พบรายการ</td></tr>';
-  return rows.map(function(g){return '<tr>'
-   +'<td class="num">'+rgDash(g.gid)+'</td>'
-   +'<td><div class="rgname" title="'+attr(rgTxt(g.name))+'">'+esc(rgTxt(g.name))+'</div></td>'
-   +'<td class="muted">'+rgDash(g.type)+'</td>'
-   +'<td>'+rgDash(g.st)+'</td>'
-   +'<td class="muted">'+rgDash(g.blocker)+'</td>'
-   +'<td class="num rgn">'+((+g.md)?rgFmt(+g.md):'<span class="rgdash">—</span>')+'</td>'
-   +'</tr>';}).join('');}
-function rgCountTxt(){return 'แสดง '+rgList().length+' จาก '+rgGaps().length;}
-function rgListSec(){
-  var G=rgGaps();
-  var h='<section class="regsec"><div class="reghd"><h3>รายการ Gaps</h3>'
-   +'<span class="reghint">In Scope '+rgScopeN('in')+' · TBC '+rgScopeN('tbc')+'</span></div>';
-  if(!G.length)return h+'<div class="regempty">ยังไม่มีรายการ Gaps'
-   +'<span>รายการจะขึ้นเมื่อมีข้อมูล Gaps ในฐานข้อมูล</span></div></section>';
-  h+='<div class="rgfilt">'
-   +[['all','ทั้งหมด',G.length],['in','In Scope',rgScopeN('in')],['tbc','TBC',rgScopeN('tbc')]]
-      .map(function(t){return '<button type="button" class="rgtog'+(rgScope===t[0]?' on':'')
-        +'" data-rgs="'+t[0]+'" onclick="rgSetScope(\''+t[0]+'\')">'+esc(t[1])
-        +' <b>'+t[2]+'</b></button>';}).join('')
-   +'<input type="text" class="rginp" id="rgQ" placeholder="ค้นหาชื่องาน…" value="'+attr(rgQ)
-     +'" oninput="rgSetQ(this.value)">'
-   +'<span class="rghint" id="rgCount">'+esc(rgCountTxt())+'</span></div>';
-  h+='<div class="tablecard"><div class="tscroll"><table class="dt rgtbl">'
-   +'<thead><tr><th>GAP ID</th><th>ชื่องาน</th><th>ประเภท</th><th>สถานะ</th>'
-   +'<th>Milestone blocker</th><th class="rgn">Mandays</th></tr></thead>'
-   +'<tbody id="rgBody">'+rgListRows()+'</tbody></table></div></div>';
-  return h+'</section>';
-}
-/* เปลี่ยนตัวกรองแล้วทาสีใหม่เฉพาะตัวตาราง ไม่ล้างทั้งหน้า
-   ไม่งั้นช่องค้นหาถูกสร้างใหม่ทุกตัวอักษรแล้ว cursor หลุดออกจากช่อง */
-function rgPaint(){
-  var tb=document.getElementById('rgBody');if(tb)tb.innerHTML=rgListRows();
-  var c=document.getElementById('rgCount');if(c)c.textContent=rgCountTxt();
-  document.querySelectorAll('#'+GP+'RegV .rgtog').forEach(function(b){
-    b.classList.toggle('on',b.dataset.rgs===rgScope);});}
-function rgSetScope(s){rgScope=(s==='in'||s==='tbc')?s:'all';rgPaint();}
-function rgSetQ(s){rgQ=(s==null?'':String(s));rgPaint();}
+function gpTable(){
+  var rows=gpRows();
+  if(!gpAll().length)return '<div class="regempty">ยังไม่มีรายการ Gaps'
+    +'<span>กด “+ เพิ่มรายการ” หรือ นำเข้าจากรายงานผู้ขายในหน้า Progress Summary</span></div>';
+  if(!rows.length)return '<div class="regempty">ไม่พบรายการที่ตรงกับที่ค้น'
+    +'<span>ลองล้างคำค้นหรือเปลี่ยนกลุ่ม</span></div>';
+  return '<div class="tablecard"><div class="tscroll" style="max-height:620px">'
+    +'<table class="dt gptbl"><thead><tr>'
+    +'<th>GAP ID</th><th>ชื่องาน</th><th>กลุ่ม</th><th>ประเภท</th>'
+    +'<th>สถานะ</th><th>Milestone blocker</th><th>man-days</th><th></th>'
+    +'</tr></thead><tbody id="gpBody">'+rows.map(gpRowHtml).join('')+'</tbody></table></div></div>';}
 
 function renderRegisters(){
   var el=document.getElementById(GP+'RegV');if(!el)return;
   if(regOnlyPI(el))return;
-  el.innerHTML=regErrBanner()+'<div class="rgwrap">'+rgBrdSec()+rgGapSumSec()+rgListSec()+'</div>';
-}
+  el.innerHTML=regErrBanner()
+    +'<div class="rgwrap">'
+    +'<div class="regsec"><div class="reghd"><h3>งบ mandays</h3>'
+    +'<span class="reghint">ยอดรวมคือ Bucket บวก CR · ใช้ไปแล้วคิดจาก man-day ที่กรอกในตาราง</span>'
+    +'</div>'+gpBudget()+'</div>'
+    +'<div class="regsec"><div class="reghd"><h3>รายการ Gaps</h3>'
+    +'<span class="reghint">แก้ไขในตารางได้ทันที บันทึกเมื่อออกจากช่อง</span></div>'
+    +gpHead()+'<div id="gpList">'+gpTable()+'</div></div>'
+    +'</div>';
+  gpBind(el);}
+
+/* วาดใหม่เฉพาะตารางกับแถบนับ ไม่วาดทั้งหน้า ไม่งั้นช่องค้นหาถูกสร้างใหม่
+   ทุกตัวอักษรแล้ว cursor หลุด */
+/* อัปเดตเฉพาะตัวเลขในปุ่มที่มีอยู่ ไม่สร้างปุ่มใหม่ ไม่งั้นช่องค้นหาถูกสร้างใหม่
+   ทุกตัวอักษรแล้ว cursor หลุดไปจากช่อง */
+function gpCounts(){
+  ['in','tbc','all'].forEach(function(k){
+    var b=document.querySelector('#'+GP+'RegV [data-gpsc="'+k+'"]');if(!b)return;
+    var c=gpCount(k),bb=b.querySelector('b'),m=b.querySelector('.gpmd');
+    if(bb)bb.textContent=c.n;
+    if(c.md){var txt=gpMd(c.md)+' วัน';
+      if(m)m.textContent=txt;
+      else{var sp=document.createElement('span');sp.className='gpmd';sp.textContent=txt;b.appendChild(sp);}}
+    else if(m)m.parentNode.removeChild(m);
+    b.classList.toggle('on',gpScope===k);});}
+function gpPaint(){
+  var w=document.getElementById('gpList');if(w)w.innerHTML=gpTable();
+  gpCounts();
+  var bd=document.querySelector('#'+GP+'RegV .gpbuds');
+  if(bd)bd.outerHTML=gpBudget();}
+
+function gpBind(el){
+  if(el._gpBound)return; el._gpBound=1;
+  el.addEventListener('change',function(ev){
+    var t=ev.target;if(!t||!t.dataset||!t.dataset.gid)return;
+    gpSet(t.dataset.gid,t.dataset.f,t.value,t);});
+  el.addEventListener('input',function(ev){
+    if(ev.target&&ev.target.id==='gpQ'){gpQ=ev.target.value;gpPaint();}});
+  el.addEventListener('click',function(ev){
+    var t=ev.target.closest?ev.target.closest('[data-gpsc],[data-gpadd],[data-gpdel]'):null;
+    if(!t)return;
+    if(t.hasAttribute('data-gpsc')){gpScope=t.getAttribute('data-gpsc');gpPaint();return;}
+    if(t.hasAttribute('data-gpadd')){gpAdd();return;}
+    if(t.hasAttribute('data-gpdel')){gpDel(t.getAttribute('data-gpdel'));}});}
+
+function gpSave(g,patch){
+  if(!window.DB)return Promise.resolve();
+  return window.DB.saveItem(COL_GAPS,g.gid,patch).catch(dbErr('gaps save'));}
+
+function gpSet(gid,f,val,elm){
+  var g=gpAll().find(function(x){return x.gid===gid;});if(!g)return;
+  if(erpDenyEdit()){if(elm)elm.value=(f==='md')?(g.md?gpMd(gpNum(g.md)):''):(g[f]||'');return;}
+  var v=String(val==null?'':val).trim();
+  if(f==='md'){
+    var n=gpNum(v);
+    if(v&&(!isFinite(parseFloat(v.replace(/,/g,'')))||n<0)){
+      toast('man-days ต้องเป็นตัวเลขไม่ติดลบ');if(elm)elm.value=g.md?gpMd(gpNum(g.md)):'';return;}
+    g.md=n; if(elm)elm.value=n?gpMd(n):'';
+    gpSave(g,{md:n}); gpPaint(); return;}
+  if(f==='scope'){
+    if(v!=='in'&&v!=='tbc')return;
+    g.scope=v; gpSave(g,{scope:v}); gpPaint(); return;}
+  g[f]=v; var p={};p[f]=v; gpSave(g,p);
+  if(f==='name')gpPaint();}
+
+/* เลขรันของ GAP ใหม่ ต่อจากเลขสูงสุดที่มี ไม่ใช่นับจำนวนแถว เพราะถ้าเคยลบไปแล้ว
+   การนับแถวจะให้เลขที่ชนกับของเดิม */
+function gpNextId(){
+  var mx=0;gpAll().forEach(function(g){var m=String(g.gid||'').match(/(\d+)\s*$/);
+    if(m)mx=Math.max(mx,parseInt(m[1],10));});
+  return 'GAP'+('00'+(mx+1)).slice(-3);}
+
+function gpAdd(){
+  if(erpDenyEdit())return;
+  var gid=gpNextId();
+  var g={_key:gid,gid:gid,name:'',scope:(gpScope==='in'?'in':'tbc'),
+    type:'',st:'',blocker:'',cls:'',bsp:'',nature:'',md:0,hrs:0};
+  gpAll().push(g);
+  if(typeof gapSort==='function')gapSort();
+  gpPaint();
+  if(window.DB)window.DB.saveItem(COL_GAPS,gid,g)
+    .then(function(){toast('เพิ่ม '+gid+' แล้ว กรอกชื่องานได้เลย');})
+    .catch(dbErr('gaps add'));
+  setTimeout(function(){var i=document.querySelector('.gpin[data-gid="'+gid+'"][data-f="name"]');
+    if(i){i.focus();i.scrollIntoView({block:'center'});}},60);}
+
+function gpDel(gid){
+  if(erpDenyEdit())return;
+  var g=gpAll().find(function(x){return x.gid===gid;});if(!g)return;
+  if(!confirm('ลบ '+gid+(g.name?(' — '+g.name):'')+' ?\n\nลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที'))return;
+  var i=gpAll().indexOf(g);if(i>=0)gpAll().splice(i,1);
+  gpPaint();
+  if(window.DB)window.DB.deleteItem(COL_GAPS,gid)
+    .then(function(){toast('ลบ '+gid+' แล้ว');})
+    .catch(dbErr('gaps delete'));}
+
 /* ── จาก wt/c ── */
 /* ══════════════════════════════════════════════════════════════════════
    กรอก/นำเข้าตัวเลขรายสัปดาห์ — openProgEntry()
