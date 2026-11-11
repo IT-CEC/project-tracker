@@ -476,6 +476,15 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 /* เครื่องหมายงานย่อย — เล็กและจางกว่าชื่องาน เป็นบริบท ไม่ใช่เนื้อหา */
 .submk{color:var(--ink3);font-weight:400;margin-right:2px}
 .sumcell{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:var(--ink3);white-space:nowrap}
+/* ── หน้าสรุปความคืบหน้า / ทะเบียน BRD & Gaps ── */
+.regempty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:70px 20px;color:var(--ink2);font-size:14px;font-weight:600;text-align:center}
+.regempty span{font-size:12.5px;font-weight:400;color:var(--ink3)}
+.regsec{margin-bottom:22px}
+.reghd{display:flex;align-items:center;gap:10px;margin:0 0 11px}
+.reghd h3{font-size:15px;font-weight:700;color:var(--ink)}
+.reghd .reghint{font-size:12px;color:var(--ink3);font-weight:400}
+.reghd .regact{margin-left:auto;display:flex;gap:8px}
 .namecell{display:flex;align-items:center;gap:5px;min-width:0}
 .stepcell{display:flex;align-items:center;gap:6px;min-width:0}
 .stepcell .truncate{min-width:0;flex:0 1 auto}
@@ -2738,14 +2747,14 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         <button class="tbtn" onclick="clearPI()" data-i18n="clear">ล้าง</button><div class="kbnote barnote" id="piRvwNote"></div>
         <div class="barright"><span class="gtbar" id="piGtoolbar"><button class="gtbtn gtfold" id="piFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="gFocusBtn" onclick="toggleGFocus()" title="ขยาย Gantt เต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="piZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="piViewTabs">
         <button class="bvt on" data-piv="timeline">Timeline</button>
-        <button class="bvt" data-piv="status">Status</button>
-        <button class="bvt" data-piv="priority">Priority</button>
+        <button class="bvt" data-piv="summary">สรุปความคืบหน้า</button>
+        <button class="bvt" data-piv="reg">BRD &amp; Gaps</button>
         <button class="bvt" data-piv="table">Full Details</button>
       </div></div>
       </div>
       <div class="piview" id="piTimeline"><div class="ganttwrap" id="piGantt" style="max-height:calc(100vh - 300px);min-height:360px"></div></div>
-      <div class="piview" id="piStatusV" style="display:none"><div class="kbnote" id="piKbNote"></div><div class="kb" id="piKbStatus"></div></div>
-      <div class="piview" id="piPriorityV" style="display:none"><div class="kb" id="piKbPriority"></div></div>
+      <div class="piview" id="piSummaryV" style="display:none"></div>
+      <div class="piview" id="piRegV" style="display:none"></div>
       <div class="piview" id="piTableV" style="display:none"><div class="tablecard"><div class="tscroll" style="max-height:620px"><table class="dt" id="piTbl"><thead><tr><th data-pis="ph"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Category <span class="ar"></span></th><th data-pis="_root"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M3 12h12"/><path d="M3 17h7"/></svg></span>งานหลัก <span class="ar"></span></th><th data-pis="name"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></span>ขั้นตอน <span class="ar"></span></th><th data-pis="st"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></span>สถานะ <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>ทีม</th><th data-pis="s"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>เริ่ม <span class="ar"></span></th><th data-pis="e"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>สิ้นสุด <span class="ar"></span></th><th data-pis="prog"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>Progress <span class="ar"></span></th><th data-pis="pr"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span>Priority <span class="ar"></span></th></tr></thead><tbody></tbody></table></div></div></div>
     </div>
       <div class="projview" id="reqs" style="display:none">
@@ -2822,14 +2831,14 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
           <button class="tbtn" onclick="clearPI()">ล้าง</button>
           <div class="barright"><span class="gtbar" id="apGtoolbar"><button class="gtbtn gtfold" id="apFoldBtn" onclick="piToggleAllPhases()" title="หุบทุกเฟส"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline class="fu" points="7 5 12 10 17 5"/><polyline class="fu" points="7 19 12 14 17 19"/><polyline class="fd" points="7 10 12 5 17 10"/><polyline class="fd" points="7 14 12 19 17 14"/></svg></button><button class="gtbtn" id="apFocusBtn" onclick="toggleGFocus()" title="ขยายเต็มเฟรม"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button><button class="gtbtn" onclick="piScroll(-1)" title="ก่อนหน้า">‹</button><button class="gtbtn" onclick="piToday()" data-i18n="today">วันนี้</button><button class="gtbtn" onclick="piScroll(1)" title="ถัดไป">›</button><select id="apZoom" onchange="setTimeout(piFocusTasks,90)"><option value="80">Hours</option><option value="38">Day</option><option value="15">Week</option><option value="9.5">Bi-week</option><option value="5" selected>Month</option><option value="2.2">Quarter</option><option value="1">Year</option><option value="0.42">5 Years</option></select></span><div class="brviewtabs" id="apViewTabs">
           <button class="bvt on" data-piv="timeline">Timeline</button>
-          <button class="bvt" data-piv="status">Status</button>
-          <button class="bvt" data-piv="priority">Priority</button>
+          <button class="bvt" data-piv="summary">สรุปความคืบหน้า</button>
+          <button class="bvt" data-piv="reg">BRD &amp; Gaps</button>
           <button class="bvt" data-piv="table">Full Details</button>
         </div></div>
         </div>
         <div id="apTimeline"><div class="ganttwrap" id="apGantt" style="max-height:calc(100vh - 320px);min-height:360px"></div></div>
-        <div id="apStatusV" style="display:none"><div class="kbnote" id="apKbNote"></div><div class="kb" id="apKbStatus"></div></div>
-        <div id="apPriorityV" style="display:none"><div class="kb" id="apKbPriority"></div></div>
+        <div id="apSummaryV" style="display:none"></div>
+        <div id="apRegV" style="display:none"></div>
         <div id="apTableV" style="display:none"><div class="tablecard"><div class="tscroll" style="max-height:620px"><table class="dt" id="apTbl"><thead><tr><th data-pis="ph"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>Category <span class="ar"></span></th><th data-pis="_root"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18"/><path d="M3 12h12"/><path d="M3 17h7"/></svg></span>งานหลัก <span class="ar"></span></th><th data-pis="name"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></span>ขั้นตอน <span class="ar"></span></th><th data-pis="st"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></span>สถานะ <span class="ar"></span></th><th><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>ทีม</th><th data-pis="s"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>เริ่ม <span class="ar"></span></th><th data-pis="e"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>สิ้นสุด <span class="ar"></span></th><th data-pis="prog"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>Progress <span class="ar"></span></th><th data-pis="pr"><span class="thi"><svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></span>Priority <span class="ar"></span></th></tr></thead><tbody></tbody></table></div></div></div>
       </div>
       <div class="brview" id="brTableView">
@@ -4788,6 +4797,69 @@ const ACT_SEED = [
  }
 ];
 let ACTS = [];
+/* ══════════════════════════════════════════════════════════════════════
+   สัญญารูปแบบข้อมูลของหน้า "ภาพรวมแผนงานโครงการ" ชุดใหม่
+   ออกแบบให้ตรงกับรายงาน weekly ที่ vendor ส่งมา เพราะตัวเลขที่ระบบคิดเอง
+   จากสถานะ (In Review=75% Completed=100%) ให้คนละค่ากับ % Complete ของ
+   MS Project ที่ vendor ใช้ — วัดแล้วต่างกัน 57% กับ 32% ณ 10/11/2026
+   จึงเก็บตัวเลขของ vendor ไว้ตรงๆ แทนที่จะพยายามคำนวณให้ตรง
+
+   PROG  (collection 'progress')  doc id = วันที่รายงานแบบ YYYY-MM-DD
+     {_key:'2026-11-10', at:'10/11/2026',
+      actual:32, plan:64, next:66, go:'01/07/2027',
+      phases:[{k:'01', name:'Phase 1: Planning & Kick-off', a:100, p:100, n:100}, ...]}
+     เรียงใหม่สุดขึ้นก่อน · PROG[0] คือสัปดาห์ปัจจุบัน
+
+   GAPS  (collection 'gaps')  doc id = gid
+     {_key:'GAP004', gid:'GAP004', name:'...',
+      scope:'in'|'tbc',            // In Scope หรือ TBC
+      type:'GAP - In Scope-SOW'|'SOW Modules'|'',
+      st:'', blocker:'', cls:'', bsp:'', nature:'', md:0, hrs:0}
+
+   BRD   เก็บเป็นฟิลด์เพิ่มบนงานใน PIMPL ที่เป็นงาน BRD อยู่แล้ว
+     ไม่สร้างที่เก็บซ้ำ เพื่อให้ Timeline กับทะเบียน BRD ไม่หลุดจากกัน
+     bver   เวอร์ชันล่าสุด เช่น 'V3.0'
+     bdisc  วัน Discovery        dd/mm/yyyy
+     bsub   วันส่งล่าสุด          dd/mm/yyyy
+     bsodue วันที่ต้อง sign off   dd/mm/yyyy
+     bst    'Customer Review'|'SR Review'|'E-signoff Request'
+            |'Pending further clarification'|'Signed Off'
+
+   settings/global เพิ่ม: bucketMd bucketHrs crMd crHrs (งบ mandays/ชั่วโมง)
+   ══════════════════════════════════════════════════════════════════════ */
+const COL_PROG='progress', COL_GAPS='gaps';
+const BRD_ST=['Customer Review','SR Review','E-signoff Request','Pending further clarification','Signed Off'];
+const BRD_STC={'Customer Review':'#ff9500','SR Review':'#ffcc00','E-signoff Request':'#ff3b30',
+               'Pending further clarification':'#8e8e93','Signed Off':'#28cd41'};
+const GAP_SCOPE={in:'In Scope',tbc:'TBC'};
+var PROG=[], GAPS=[], BUCKET={bucketMd:0,bucketHrs:0,crMd:0,crHrs:0};
+/* วันที่ในระบบเป็น dd/mm/yyyy ส่วน doc id ต้องเรียงได้ จึงใช้ YYYY-MM-DD */
+function progKey(dmy){var m=String(dmy||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  return m?(m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2)):'';}
+function progSort(){PROG.sort(function(a,b){return String(b._key||'').localeCompare(String(a._key||''));});}
+function progCur(){return PROG.length?PROG[0]:null;}
+function gapSort(){GAPS.sort(function(a,b){return String(a.gid||'').localeCompare(String(b.gid||''),'en',{numeric:true});});}
+async function loadProgress(){if(!window.DB)return;
+  try{PROG=await window.DB.loadAll(COL_PROG);progSort();}catch(e){PROG=[];}}
+async function loadGaps(){if(!window.DB)return;
+  try{GAPS=await window.DB.loadAll(COL_GAPS);gapSort();}catch(e){GAPS=[];}}
+var _progFirst=true,_gapsFirst=true;
+function subscribeProgress(){if(!window.DB)return;window.DB.subscribe(COL_PROG,function(docs){
+  if(_progFirst){_progFirst=false;return;}
+  PROG=docs;progSort();
+  if(typeof piCurV!=='undefined'&&piCurV==='summary'&&typeof renderProgSummary==='function')renderProgSummary();});}
+function subscribeGaps(){if(!window.DB)return;window.DB.subscribe(COL_GAPS,function(docs){
+  if(_gapsFirst){_gapsFirst=false;return;}
+  GAPS=docs;gapSort();
+  if(typeof piCurV!=='undefined'&&piCurV==='reg'&&typeof renderRegisters==='function')renderRegisters();});}
+/* หน้าใหม่ทั้งสองผูกกับโครงการ Oracle ฝั่ง Automation ไม่มี BRD/Gaps/รายงาน weekly */
+function regOnlyPI(el){if(GCTX==='pi')return false;
+  if(el)el.innerHTML='<div class="regempty">หน้านี้ใช้กับโครงการวางระบบ Oracle เท่านั้น'
+    +'<span>Automation 2026 ไม่มีรายงาน weekly จาก vendor</span></div>';
+  return true;}
+/* ตัวจริงของสองฟังก์ชันนี้อยู่ท้ายไฟล์ ถูกเขียนทับตอนประกอบหน้า */
+function renderProgSummary(){var el=document.getElementById(GP+'SummaryV');if(!el)return;if(regOnlyPI(el))return;}
+function renderRegisters(){var el=document.getElementById(GP+'RegV');if(!el)return;if(regOnlyPI(el))return;}
 const COL_ACT='action_items';
 const ACT_STATUS=['Not Started','In Process','In Review','On Hold','Done'];
 const ACT_SC={'Not Started':'#8e8e93','In Process':'#ff9500','In Review':'#0071e3','On Hold':'#af52de','Done':'#28cd41'};
@@ -6383,7 +6455,10 @@ document.addEventListener('mouseup',ev=>{if(!piDrag)return;var dg=piDrag;piDrag=
   piEnforce();renderPI();});
 let piCurV='timeline';
 function renderPI(){var rows=filteredPI();var c=document.getElementById(GP+'Count');if(c)c.innerHTML='แสดง <b>'+rows.length+'</b> / '+PIMPL.length+' งาน';
-  if(piCurV==='timeline'){piRvwNote();renderPIGantt();}else if(piCurV==='status'){piKbSummary();renderPIKb(GP+'KbStatus',KB_STATUSES,STATUS_COLORS,'st',function(g,items){if(g!=='In Review')return '';var lf=items.filter(function(d){return piChildren(d).length===0;});if(!lf.length)return '';var c=lf.filter(function(d){return (d.rvw||'Civil')==='Civil';}).length;return L('งานย่อย: ','Sub-tasks: ')+'Civil '+c+' · PS '+(lf.length-c);});}else if(piCurV==='priority')renderPIKb(GP+'KbPriority',PI_PRL,PI_PRC,'pr');else renderPITbl();}
+  if(piCurV==='timeline'){piRvwNote();renderPIGantt();}
+  else if(piCurV==='summary')renderProgSummary();
+  else if(piCurV==='reg')renderRegisters();
+  else renderPITbl();}
 function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi===id);if(!d)return;var _isSum=piIsSummary(d),_cp=piCalcProg(d);
   document.getElementById('mTitle').textContent=d.name;var _par=d.parent?PIMPL.find(function(z){return z._key===d.parent;}):null;var _nc=piChildren(d).length;document.getElementById('mSub').textContent=PI_PHASES[d.ph]+(_par?(' › '+_par.name):'')+(_nc?(' · งานย่อย '+_nc):'');
   var rw=(l,vv)=>`<div class="fld"><label>${l}</label><div class="roval">${vv}</div></div>`;
@@ -6415,7 +6490,7 @@ function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi==
   document.getElementById('modal').classList.add('open');}
 function toggleGFocus(){var pid=GCTX==='ap'?'bridge':'project';var p=document.getElementById(pid);if(!p)return;p.classList.toggle('gfocus');var on=p.classList.contains('gfocus');var b=document.getElementById(GCTX==='ap'?'apFocusBtn':'gFocusBtn');if(b)b.classList.toggle('on',on);var m=document.querySelector('.main');if(m)m.classList.toggle('gffit',on);var gw=document.getElementById(GCTX==='ap'?'apGantt':'piGantt');if(gw&&on&&gw.dataset.origMaxH==null)gw.dataset.origMaxH=gw.style.maxHeight||'';var applyH=function(){if(!gw)return;if(p.classList.contains('gfocus')){if(m)m.scrollTop=0;var t=Math.round(gw.getBoundingClientRect().top);gw.style.maxHeight='calc(100vh - '+(t+16)+'px)';}else{gw.style.maxHeight=gw.dataset.origMaxH||'';delete gw.dataset.origMaxH;}};applyH();setTimeout(function(){applyH();piToday();},90);}
 function piGanttHover(){var gw=document.getElementById(PIGID);if(!gw||gw._hb)return;gw._hb=1;gw.addEventListener("mouseover",function(e){var hi=gw.querySelector(".g-hdrhi");if(!hi)return;var bar=e.target.closest?e.target.closest(".g-bar"):null;if(bar){hi.style.left=bar.dataset.hl+"px";hi.style.width=bar.dataset.hw+"px";hi.classList.add("on");}else{hi.classList.remove("on");}});}
-function piSwitchView(piv){piCurV=piv;var P=GP;var suf={timeline:'Timeline',status:'StatusV',priority:'PriorityV',table:'TableV'};document.querySelectorAll('#'+P+'ViewTabs .bvt').forEach(function(x){x.classList.toggle('on',x.dataset.piv===piv);});var gt=document.getElementById(P+'Gtoolbar');if(gt)gt.style.display=piv==='timeline'?'':'none';['Timeline','StatusV','PriorityV','TableV'].forEach(function(sx){var e=document.getElementById(P+sx);if(e)e.style.display='none';});var el=document.getElementById(P+suf[piv]);if(el)el.style.display='';renderPI();}
+function piSwitchView(piv){piCurV=piv;var P=GP;var suf={timeline:'Timeline',summary:'SummaryV',reg:'RegV',table:'TableV'};document.querySelectorAll('#'+P+'ViewTabs .bvt').forEach(function(x){x.classList.toggle('on',x.dataset.piv===piv);});var gt=document.getElementById(P+'Gtoolbar');if(gt)gt.style.display=piv==='timeline'?'':'none';['Timeline','SummaryV','RegV','TableV'].forEach(function(sx){var e=document.getElementById(P+sx);if(e)e.style.display='none';});var el=document.getElementById(P+suf[piv]);if(el)el.style.display='';renderPI();}
 function bindPI(){document.querySelectorAll('.bvt[data-piv]').forEach(function(b){b.onclick=function(){piSwitchView(b.dataset.piv);};});
   ['pi','ap'].forEach(function(p){['Phase','Status','Asg','Search','Zoom'].forEach(function(sx){var e=document.getElementById(p+sx);if(e)e.addEventListener('input',renderPI);});});
   document.querySelectorAll('#piTbl thead th[data-pis],#apTbl thead th[data-pis]').forEach(function(th){th.onclick=function(){var k=th.dataset.pis;if(piSortK===k)piSortD*=-1;else{piSortK=k;piSortD=1;}var tbl=th.closest('table');tbl.querySelectorAll('th .ar').forEach(function(a){a.textContent='';});var ar=th.querySelector('.ar');if(ar)ar.textContent=piSortD>0?'▲':'▼';renderPITbl();};});}
@@ -6664,9 +6739,9 @@ window.addEventListener('resize',function(){document.querySelectorAll('.cs').for
   if(typeof piRvwNote==='function')piRvwNote();});
 
 window.startApp=async function(){
-var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillRptFilters();rptBind();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
+var _ld=document.getElementById('appLoading');if(_ld)_ld.style.display='flex';applyTheme(localStorage.getItem('erp_theme')||'light');await loadSettings();await loadState();await loadBR();await loadProgress();await loadGaps();fillAbout();buildAP();await loadPhases('pi');await loadPhases('ap');await loadPITasks('pi');await loadPITasks('ap');setGanttCtx('pi');await loadPlan();await loadActs();await loadRpts();fillRptFilters();rptBind();fillActFilters();actBind();fillFilters();fillBrFilters();fillPIFilters();renderAll();renderBridge();renderPI();renderProjRibbon();renderCockpit();bindBr();bindPI();piGanttHover();renderTasks();renderBridgeList();renderSwatches();applyAccent();enhanceSelects(document);csStartObserver();applyLang(localStorage.getItem('erp_lang')||'th');
 if(_ld)_ld.style.display='none';erpSyncActor();erpApplyRole();showTab('project');setTimeout(erpAskDevice,700);
-subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePhases('pi');subscribePhases('ap');subscribePlan();subscribeActs();subscribeRpts();
+subscribeReqs();subscribeSettings();subscribeBr();subscribePI('pi');subscribePI('ap');subscribePhases('pi');subscribePhases('ap');subscribePlan();subscribeActs();subscribeRpts();subscribeProgress();subscribeGaps();
 var _syncS=null;function renderSyncBadge(){var _sb=document.getElementById('syncBadge');if(!_sb||!_syncS)return;var s=_syncS;_sb.querySelector('.sb-txt').textContent=!s.online?L('ออฟไลน์ — ยังไม่ซิงก์','Offline — not synced'):(s.saving?L('กำลังบันทึก…','Saving…'):L('เชื่อมต่อแล้ว','Connected'));}
 if(window.DB&&window.DB.onStatus){var _sb=document.getElementById('syncBadge');window.DB.onStatus(function(s){if(!_sb)return;_syncS=s;_sb.style.display='flex';_sb.classList.toggle('off',!s.online);_sb.classList.toggle('saving',s.online&&s.saving);renderSyncBadge();});}
 };
