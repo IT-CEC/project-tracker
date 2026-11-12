@@ -5554,7 +5554,10 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
       _pstat=L('ล่าช้า','Delayed');_pcol='var(--stat-bad)';
       _psub=L('มีงานเกินกรอบเฟส ','Tasks exceed phase by ')+_pe.over+L(' วัน',' days');}else if(now<_pe.a){_pstat=L('ยังไม่เริ่ม','Not Started');_pcol='var(--ink3)';_psub=L('เริ่ม ','Starts ')+fmtDMY(_pe.a);}else{var _exp=Math.max(0,Math.min(100,Math.round((now-_pe.a)/(_pe.b-_pe.a)*100)));if(_pprog<_exp-15){_pstat=L('เสี่ยง','At Risk');_pcol='var(--stat-warn)';}else{_pstat=L('ตามแผน','On Track');_pcol='var(--stat-ok)';}_psub=L('จริง ','Actual ')+_pprog+L('% · แผน ','% · Plan ')+_exp+'%';}}
   var glR=PIMPL.find(d=>/go live/i.test(d.name)&&d.s===d.e);var glD=glR?piDate(glR.e):(PIMPL.map(d=>piDate(d.e)).filter(Boolean).sort((a,b)=>b-a)[0]||null),golive=glD?fmtDMY(glD):'—';
-  var tot=REQS.length,as=REQS.filter(gapAssessed).length,pctA=tot?Math.round(as/tot*100):0,dev=REQS.filter(x=>x.gap==='3. Customization'||x.gap==='5. Not supported').length;
+  /* แถบสรุปวาดก่อนที่ requirements จะโหลดเสร็จได้ ถ้าอ่าน REQS ตรงๆ
+     ทั้งฟังก์ชันโยน TypeError แถบสรุปหายทั้งแถบ ไม่ใช่แค่สองใบสุดท้าย */
+  var _rq=(typeof REQS!=='undefined'&&Array.isArray(REQS))?REQS:[];
+  var tot=_rq.length,as=_rq.filter(gapAssessed).length,pctA=tot?Math.round(as/tot*100):0,dev=_rq.filter(x=>x.gap==='3. Customization'||x.gap==='5. Not supported').length;
   /* เอาบรรทัดคำอธิบายใต้ตัวเลขออกตามที่ผู้ใช้ขอ — สองใบเป็นคำอธิบายเฉยๆ
      (จากแผนงาน / กำหนดขึ้นระบบจริง) แต่อีกสองใบมีข้อมูลจริงคือ Actual vs Plan
      กับวันที่ของ milestone จึงไม่ทิ้ง ย้ายไปเป็น tooltip ของการ์ด ชี้เมาส์ยังอ่านได้ */
@@ -6810,9 +6813,26 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var _qtxt=_qd>0?('เลื่อนแล้ว '+_pdue.n+' ครั้ง · ช้ากว่าเดิม '+_qd+' วัน')
               :(_qd<0?('เลื่อนแล้ว '+_pdue.n+' ครั้ง · เร็วกว่าเดิม '+(-_qd)+' วัน')
                      :('เลื่อนแล้ว '+_pdue.n+' ครั้ง · วันจบเท่าเดิม'));
-      var _qlog=(_phd.dueLog||[]).map(function(x){
-        return '· '+x.from+' → '+x.to+(x.why?(' — '+x.why):' — (ไม่ได้ระบุเหตุผล)')+'  ['+x.at+']';}).join('\n');
-      var _qtip='วันจบเดิม '+_pdue.base+' → ปัจจุบัน '+(_phd.e||'-')+'\n'+_qlog
+      /* การ์ดนี้เคยไล่ log ดิบของตัวเฟสทีละบรรทัด ซึ่งเป็นร่องรอยการลากแถบ
+         ไปมาของคนแก้ผัง (ของจริงมีเคสเลื่อออกแล้วดึงกลับเข้าที่เดิมในนาทีเดียวกัน)
+         สิ่งที่คนอยากรู้คือ "งานไหนในเฟสนี้เลื่อนกี่ครั้ง กี่วัน" จึงสรุปรายงานหลักแทน
+         เรียงจากเลื่อนมากสุดก่อน เพราะสิ่งที่ต้องตามคือตัวที่ดึงเฟสไว้มากที่สุด */
+      var _qTops=PIMPL.filter(function(z){return z.ph===ph&&!z.parent;});
+      var _qSlip=_qTops.map(function(z){var i=piDueInfo(z);return i?{d:z,i:i}:null;})
+        .filter(Boolean)
+        .sort(function(a,b){return (b.i.days||0)-(a.i.days||0);});
+      var _QMAX=12;
+      var _qlines=_qSlip.slice(0,_QMAX).map(function(x){
+        var dd=x.i.days;
+        return x.d.name+' — เลื่อน '+x.i.n+' ครั้ง · '
+          +(dd>0?('+'+dd+' วัน'):(dd<0?('−'+(-dd)+' วัน'):'วันจบเท่าเดิม'));});
+      if(_qSlip.length>_QMAX)_qlines.push('และอีก '+(_qSlip.length-_QMAX)+' งาน');
+      /* ไม่มีงานหลักไหนเลื่อนเลย — ถอยกลับไปไล่ log ของเฟสแบบเดิม ดีกว่าการ์ดว่าง */
+      if(!_qlines.length)_qlines=(_phd.dueLog||[]).map(function(x){
+        return x.from+' → '+x.to+(x.why?(' — '+x.why):' — (ไม่ได้ระบุเหตุผล)');});
+      else _qlines.unshift('งานหลักที่ถูกเลื่อน '+_qSlip.length+' จาก '+_qTops.length+' งาน');
+      var _qhd='เฟสถูกเลื่อน '+_pdue.n+' ครั้ง · วันจบ '+_pdue.base+' → '+(_phd.e||'-');
+      var _qtip=_qhd+'\n'+_qlines.join('\n')
         +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' → '+_pdue.drift.to+')'):'');
       _pslip=`<span class="g-phslip${_qd>0?'':' ok'}" title="${attr(_qtip)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_qtxt}</span>`;
       /* เหมือนระดับงาน — เฟสที่เลื่อนหลายครั้งต้องเห็นทุกครั้ง */
