@@ -710,6 +710,9 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .btn-pri{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(0,113,227,.28)}.btn-pri:hover{background:var(--accent-d);box-shadow:0 3px 10px rgba(0,113,227,.32)}
 .btn-sec{background:var(--surface);color:var(--ink);border-color:var(--line)}.btn-sec:hover{background:var(--chip)}
 .btn-danger{background:none;color:var(--red);margin-left:auto}
+/* ปุ่มยืนยันของ action ที่ย้อนไม่ได้ ใช้สีเตือนเต็มใบ ไม่ใช่สีปุ่มหลัก */
+.btn.btn-dgr{background:var(--red);color:#fff;border-color:transparent}
+.btn.btn-dgr:hover{filter:brightness(.92)}
 .m-auto{font-size:11.5px;color:var(--ink3);display:inline-flex;align-items:center;gap:5px}
 .lgadd{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
 .lgadd textarea{flex:1;min-height:52px;resize:vertical;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;outline:none}
@@ -2694,7 +2697,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         <span class="robadge" id="roBadge" style="display:none" title="แผนงานโครงการและ Automation แก้ได้เฉพาะผู้ดูแล IT">ดูอย่างเดียว</span>
         <button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button>
         <button class="tb-user" data-pop="tbUser" aria-expanded="false" aria-controls="tbUser" aria-label="เมนูผู้ใช้"><span class="tb-av">CE</span><span class="tb-un">Civil ERP Team</span></button>
-        <button class="tb-out" onclick="if(confirm('ออกจากระบบ?'))erpLogout()" title="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="tb-outl">ออกจากระบบ</span></button>
+        <button class="tb-out" onclick="erpAskLogout()" title="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="tb-outl">ออกจากระบบ</span></button>
         <button class="tb-ham" data-pop="tbAll" aria-expanded="false" aria-controls="tbAll" aria-label="เมนูทั้งหมด" title="เมนูทั้งหมด"><i></i><i></i><i></i></button>
       </div>
     </div>
@@ -2717,7 +2720,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
           <div class="sb-urole" id="syncBadge"><span class="sb-txt">เชื่อมต่อแล้ว</span></div>
         </div>
       </div>
-      <a class="sb-item" onclick="if(confirm('ออกจากระบบ?'))erpLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="sb-label">ออกจากระบบ</span></a>
+      <a class="sb-item" onclick="erpAskLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="sb-label">ออกจากระบบ</span></a>
     </div>
     <div class="tb-pop" id="tbAll">
       <div class="tb-grp"><div class="sb-section" data-nav="secOracle">PROJECT ORACLE IMPLEMENTATION</div>
@@ -2943,7 +2946,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
           <div class="ssec" id="sec-account">
             <div class="scard">
               <div class="srow"><div><div class="st">บัญชีที่ใช้งาน</div><div class="ss">เข้าสู่ระบบด้วยบัญชีทีมร่วมกัน · team@civil.co.th</div></div></div>
-              <div class="srow"><div><div class="st">ออกจากระบบ</div><div class="ss">กลับไปหน้าเข้าสู่ระบบ (ทุกคนใช้รหัสเดียวกัน)</div></div><button class="btn btn-sec" onclick="if(confirm('ออกจากระบบ?'))erpLogout()">ออกจากระบบ</button></div>
+              <div class="srow"><div><div class="st">ออกจากระบบ</div><div class="ss">กลับไปหน้าเข้าสู่ระบบ (ทุกคนใช้รหัสเดียวกัน)</div></div><button class="btn btn-sec" onclick="erpAskLogout()">ออกจากระบบ</button></div>
             </div>
           </div>
         </div>
@@ -2959,18 +2962,18 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
 </div>
 
 <style id="resetConfirmCss">
-#resetConfirm,#importConfirm{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
-#resetConfirm.open,#importConfirm.open{opacity:1;pointer-events:auto}
-#resetConfirm .rcm-card,#importConfirm .rcm-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:min(440px,94vw);padding:26px 26px 20px;transform:scale(.96);transition:transform .2s}
-#resetConfirm.open .rcm-card,#importConfirm.open .rcm-card{transform:none}
-#resetConfirm .rcm-ic,#importConfirm .rcm-ic{width:46px;height:46px;border-radius:50%;background:rgba(255,59,48,.12);color:#ff3b30;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
-#resetConfirm h3,#importConfirm h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
-#resetConfirm p,#importConfirm p{font-size:13px;line-height:1.6;color:var(--ink2);margin-bottom:12px}
-#resetConfirm .rcm-hint,#importConfirm .rcm-hint{font-size:13px;color:var(--ink2);margin-bottom:8px}
-#resetConfirm .rcm-hint b,#importConfirm .rcm-hint b{color:#ff3b30}
-#resetConfirm #rcmInput,#importConfirm #impInput{width:100%;font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);margin-bottom:16px;font-family:inherit}
-#resetConfirm #rcmInput:focus,#importConfirm #impInput:focus{outline:none;border-color:#ff3b30;box-shadow:0 0 0 3px rgba(255,59,48,.15)}
-#resetConfirm .rcm-act,#importConfirm .rcm-act{display:flex;gap:10px;justify-content:flex-end}
+#erpAsk,#resetConfirm,#importConfirm{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.42);opacity:0;pointer-events:none;transition:opacity .2s;padding:20px}
+#erpAsk,#resetConfirm.open,#importConfirm.open{opacity:1;pointer-events:auto}
+#erpAsk,#resetConfirm .rcm-card,#importConfirm .rcm-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:min(440px,94vw);padding:26px 26px 20px;transform:scale(.96);transition:transform .2s}
+#erpAsk,#resetConfirm.open .rcm-card,#importConfirm.open .rcm-card{transform:none}
+#erpAsk,#resetConfirm .rcm-ic,#importConfirm .rcm-ic{width:46px;height:46px;border-radius:50%;background:rgba(255,59,48,.12);color:#ff3b30;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+#erpAsk,#resetConfirm h3,#importConfirm h3{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
+#erpAsk,#resetConfirm p,#importConfirm p{font-size:13px;line-height:1.6;color:var(--ink2);margin-bottom:12px}
+#erpAsk,#resetConfirm .rcm-hint,#importConfirm .rcm-hint{font-size:13px;color:var(--ink2);margin-bottom:8px}
+#erpAsk,#resetConfirm .rcm-hint b,#importConfirm .rcm-hint b{color:#ff3b30}
+#erpAsk,#resetConfirm #rcmInput,#importConfirm #impInput{width:100%;font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--ink);margin-bottom:16px;font-family:inherit}
+#erpAsk,#resetConfirm #rcmInput:focus,#importConfirm #impInput:focus{outline:none;border-color:#ff3b30;box-shadow:0 0 0 3px rgba(255,59,48,.15)}
+#erpAsk,#resetConfirm .rcm-act,#importConfirm .rcm-act{display:flex;gap:10px;justify-content:flex-end}
 #importConfirm .impopt{display:flex;gap:10px;align-items:flex-start;padding:12px 13px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;cursor:pointer;transition:border-color .15s,background .15s}
 #importConfirm .impopt:hover{background:var(--hover)}
 #importConfirm .impopt.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 6%,transparent)}
@@ -2980,8 +2983,8 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
 #importConfirm .impopt span{font-size:12px;line-height:1.5;color:var(--ink2)}
 #importConfirm .impwrap{display:none}
 #importConfirm .impwrap.on{display:block}
-#resetConfirm #rcmGo{background:#ff3b30;color:#fff}
-#resetConfirm #rcmGo:disabled{opacity:.4;cursor:not-allowed}
+#erpAsk,#resetConfirm #rcmGo{background:#ff3b30;color:#fff}
+#erpAsk,#resetConfirm #rcmGo:disabled{opacity:.4;cursor:not-allowed}
 #impGo{background:var(--accent);color:#fff}
 #impGo.danger{background:#ff3b30}
 #impGo:disabled{opacity:.4;cursor:not-allowed}
@@ -3157,7 +3160,7 @@ body.ro .gpadd,body.ro .gpx{display:none}
 /* ── จาก wt/c ── */
 /* ───────── กล่อง "กรอก/นำเข้าตัวเลขรายสัปดาห์" — openProgEntry() ─────────
    ทางเข้าข้อมูลทางเดียวของหน้าภาพรวมแผนงานโครงการกับทะเบียน Gaps
-   เข้าชุดกับ #resetConfirm / #importConfirm ข้างบน (การ์ดกลางจอ ฉากหลังมืด)
+   เข้าชุดกับ #erpAsk,#resetConfirm / #importConfirm ข้างบน (การ์ดกลางจอ ฉากหลังมืด)
    ต่างกันแค่กว้างกว่าเพราะมีตารางรายเฟส และตัวการ์ดเลื่อนในตัวเองได้
    สีทุกจุดมาจากตัวแปรเดิม ธีมมืดจึงถูกเองโดยไม่ต้องเขียนกฎ dark ซ้ำ
    โปร่งใสของเฉดใช้ color-mix บนตัวแปร ไม่ใส่ค่า rgb ดิบลงไปใหม่ */
@@ -3277,7 +3280,10 @@ body.ro .gpadd,body.ro .gpx{display:none}
 #erpTip .erpTipL:only-child{padding-left:0;color:var(--ink)}
 #erpTip .erpTipL:only-child::before{display:none}
 @media (prefers-reduced-motion:reduce){#erpTip{transition:none}}
-@media (hover:none){#erpTip{display:none}}
+/* เดิมซ่อน tooltip บนจอสัมผัส ทำให้ข้อมูลใน title 649 จุดเข้าไม่ถึงเลย
+   ตอนนี้แตะเพื่อเปิด แตะที่อื่นเพื่อปิด จึงไม่ต้องซ่อนอีก
+   บนจอสัมผัสการ์ดกว้างเต็มที่ได้ เพราะมีที่ให้น้อยกว่าเมาส์ */
+@media (hover:none){#erpTip{max-width:calc(100vw - 24px);font-size:13px}}
 
 /* ── แถบสรุปบนมือถือ ──
    .pjcard ขอ min-width:128px ไว้ แต่กลุ่มการ์ดรวมที่ประกาศทีหลังตั้ง min-width:0
@@ -3318,6 +3324,69 @@ body.ro .gpadd,body.ro .gpx{display:none}
    ผสมกับ --bg แทนซึ่งเข้มกว่า ได้พื้นที่มืดพอให้ตัวอักษรสีสดลอยขึ้นมา */
 [data-theme="dark"] .pjrisk.bad{background:color-mix(in srgb,var(--stat-bad) 16%,var(--bg))}
 [data-theme="dark"] .pjrisk.warn{background:color-mix(in srgb,var(--stat-warn) 17%,var(--bg))}
+
+/* ══ ขอบ focus สำหรับคนใช้คีย์บอร์ด ══
+   ระบบมี outline:none อยู่ 16 กฎ แต่ใส่ของทดแทนเฉพาะช่องกรอก
+   ปุ่มในหน้าโครงการจึงไม่มีอะไรบอกตำแหน่งเลย
+   ใช้ :focus-visible จึงขึ้นเฉพาะตอนไล่ด้วยคีย์ ไม่ขึ้นตอนคลิก */
+:where(button,[role=button],a[href],summary,.pjt,.bvt,.gptog,.rowtog,.g-open,.sb-item,
+  .kbn-side,.kbn-od,.mkpi.clk,.mkpi-half):focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:7px}
+#loginGate :focus-visible{outline-color:#7cc4ff}
+
+@media(max-width:760px){
+  /* ══ พื้นที่กดอย่างน้อย 44x44 ══
+     นิ้วไม่แม่นเท่าเมาส์ ขยายด้วย padding กับ margin ติดลบ
+     เพื่อไม่ให้หน้าตาขยับ */
+  .gtbtn,.icon-btn,.tbtn,.g-open,.rowtog{min-width:44px;min-height:44px}
+  .gtbtn{padding:0 10px}
+  .kbn-side,.kbn-od{display:inline-block;padding:12px 8px;margin:-12px -2px}
+  /* ลูกศรกางขั้นตอนเล็กเกินไป ขยายพื้นที่กดโดยไม่ดันความสูงแถว */
+  .g-tcol{position:relative}
+  .g-tcol::after{content:'';position:absolute;left:50%;top:50%;
+    width:44px;height:38px;transform:translate(-50%,-50%)}
+  .gpx,.lgx{min-width:44px;min-height:44px}
+  /* ข้อความรองบนมือถือไม่ควรต่ำกว่า 13px ของเดิมมี 11px อยู่ 15 จุด */
+  .chip,.g-pill,.kbn-od,.pgs-chip,.slipchip,.g-duechip,.g-phslip{font-size:13px}
+  .mkpi-cap,.pjcard .pjs{font-size:12.5px}
+}
+
+/* ══ ตาราง Full Details บนมือถือ ══
+   เก้าคอลัมน์กว้าง 1317px บนจอ 390px ต้องเลื่อนแนวนอนหาสิ่งที่ต้องการ
+   ซ่อนคอลัมน์รอง เหลือสี่คอลัมน์ที่ใช้ตัดสินจริง
+   รายละเอียดทั้งหมดดูได้ด้วยการแตะที่แถวเพื่อเปิดหน้าต่างงาน จึงไม่มีข้อมูลไหนหายไป */
+@media(max-width:760px){
+  #piTbl thead th:nth-child(1),#piTbl tbody td:nth-child(1),
+  #piTbl thead th:nth-child(3),#piTbl tbody td:nth-child(3),
+  #piTbl thead th:nth-child(6),#piTbl tbody td:nth-child(6),
+  #piTbl thead th:nth-child(8),#piTbl tbody td:nth-child(8),
+  #piTbl thead th:nth-child(9),#piTbl tbody td:nth-child(9){display:none}
+  /* เหลืองานหลัก สถานะ วันสิ้นสุด สามอย่างที่ตัดสินจริงบนมือถือ */
+  #piTbl{min-width:0;width:100%;table-layout:fixed}
+  #piTbl thead th:nth-child(2),#piTbl tbody td:nth-child(2){width:auto}
+  #piTbl thead th:nth-child(4),#piTbl tbody td:nth-child(4){width:86px}
+  #piTbl thead th:nth-child(5),#piTbl tbody td:nth-child(5){display:none}
+  #piTbl thead th:nth-child(7),#piTbl tbody td:nth-child(7){width:82px}
+  #piTbl thead th,#piTbl tbody td{padding-left:8px;padding-right:8px}
+  #piTbl .chip,#piTbl .sidechip{white-space:normal;word-break:break-word}
+  #piTbl thead th:nth-child(2),#piTbl tbody td:nth-child(2){min-width:0;max-width:none}
+  #piTbl tbody td{padding-top:12px;padding-bottom:12px}
+  #piTbl .parcell{white-space:normal}
+}
+
+@media(max-width:760px){
+  /* ช่องค้นหายัง 13px เพราะมีกฎที่เจาะจงกว่าครอมทับ
+     iOS Safari ซูมหน้าเข้าเองทุกครั้งที่แตะช่องที่เล็กกว่า 16px แล้วไม่ซูมกลับ */
+  #piSearch,#fSearch,#actSearch,#rptSearch,#gpQ,#apSearch{font-size:16px}
+  /* ตัวเปิด dropdown ถูกแตะบ่อย ต้องสูงพอให้นิ้วกดติด */
+  .cs-trg{min-height:44px}
+  .dt .cs-trg{min-height:36px}
+  .kbn-od{min-width:44px;text-align:center}
+  /* ปุ่มเพิ่มงานในแถวเฟสสูงแค่ 18px ขยายพื้นที่กดโดยไม่ดันความสูงแถว */
+  .g-add{position:relative}
+  .g-add::after{content:'';position:absolute;left:50%;top:50%;
+    width:44px;height:44px;transform:translate(-50%,-50%)}
+}
 </style>
 <div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
   <div class="rcm-card" role="dialog" aria-modal="true">
@@ -5301,7 +5370,9 @@ function actReqToggle(id){var ta=document.getElementById('actReqTa'),vw=document
   else{vw.innerHTML=fmtReq(ta.value)||'<div class="rq-plain muted">— ไม่มีรายละเอียด —</div>';ta.style.display='none';vw.style.display='block';if(btn)btn.innerHTML='<svg class="fic filab" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไข';}}
 function actSave(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;var g=function(k){var el=document.getElementById(k);return el?el.value:undefined;};a.status=g('ea_status');a.status2=g('ea_status2');a.pri=g('ea_pri');a.due=g('ea_due');a.done=g('ea_done');a.owner=g('ea_owner');a.note=g('ea_note');a.note2=g('ea_note2');a.action=g('actReqTa');actSaveOne(a);renderActs();closeModal();if(window.toast)toast(T('saved'));}
 function actAdd(){var nid=ACTS.reduce(function(m,a){return Math.max(m,a._id||0);},0)+1;var a={_id:nid,cat:'',dept:'',action:'รายการใหม่',pri:'Low',owner:'',due:'',status:'Not Started',status2:'Not Started',done:'',note:'',note2:''};ACTS.push(a);actNorm();actSaveOne(a);fillActFilters();renderActs();openAct(nid);}
-function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!confirm('ลบ Action #'+id+' ?'))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
+async function actDel(id){var a=ACTS.find(function(x){return x._id===id;});if(!a)return;if(!await erpConfirm({title:'ลบ Action #'+id,
+    body:'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบ Action'}))return;ACTS=ACTS.filter(function(x){return x._id!==id;});actDelOne(id);fillActFilters();renderActs();closeModal();if(window.toast)toast('ลบแล้ว');}
 
 // ══ Report Levels — view ══
 let rptSortK='',rptSortD=1;
@@ -5397,9 +5468,11 @@ function rptAdd(){
   var r={_id:nid,dept:(rptDepts()[0]||''),level:'Operational',name:'รายงานใหม่',user:'',freq:'',kpi:'',src:'',decide:'',sample:'',want:''};
   RPTS.push(r);rptNorm();rptSaveOne(r);fillRptFilters();renderRpts();openRpt(nid);
 }
-function rptDel(id){
+async function rptDel(id){
   var r=RPTS.find(function(x){return x._id===id;});if(!r){closeModal();if(window.toast)toast('รายการนี้ถูกลบไปแล้ว');return;}
-  if(!confirm('ลบรายงาน #'+id+' ?'))return;
+  if(!await erpConfirm({title:'ลบรายงาน #'+id,
+    body:'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบรายงาน'}))return;
   RPTS=RPTS.filter(function(x){return x._id!==id;});rptDelOne(id);fillRptFilters();renderRpts();closeModal();if(window.toast)toast('ลบแล้ว');
 }
 
@@ -5468,7 +5541,7 @@ var FTE_COST=600000;
    เดิมพิมพ์เสร็จเขียน Firestore ทันทีโดยไม่เช็กสิทธิ์และไม่ถาม ใครเปิดหน้านี้ก็
    เปลี่ยนตัวเลขที่ทุกคนเห็นได้ ตอนนี้เช็กสิทธิ์ก่อน ตรวจช่วงค่า แล้วค่อยถามยืนยัน
    ทุกทางที่ไม่ยืนยันจะคืนค่าเดิมกลับเข้าช่อง ไม่ให้หน้าจอค้างเลขที่ไม่ได้บันทึก */
-function setFteCost(val){
+async function setFteCost(val){
   var el=document.getElementById('fteCost');
   var back=function(){if(el)el.value=FTE_COST;};
   if(erpDenyEdit()){back();return;}
@@ -5478,7 +5551,8 @@ function setFteCost(val){
   if(n===FTE_COST)return;
   var old=FTE_COST;
   var _msg='เปลี่ยนต้นทุนต่อ FTE จาก '+old.toLocaleString('en-US')+' เป็น '+n.toLocaleString('en-US')+' บาทต่อปี'+'\n\nค่านี้ใช้คำนวณผลตอบแทนที่ทุกคนในทีมเห็น และจะเปลี่ยนให้ทุกคนทันที';
-  if(!confirm(_msg)){back();return;}
+  if(!await erpConfirm({title:'เปลี่ยนต้นทุนต่อ FTE',body:_msg,
+    go:'เปลี่ยนค่า',danger:false})){back();return;}
   FTE_COST=n;renderCockpit();
   if(window.DB)window.DB.saveItem(COL_SET,'global',{fteCost:FTE_COST})
     .then(function(){toast('บันทึกต้นทุนต่อ FTE เป็น '+n.toLocaleString('en-US')+' บาทต่อปีแล้ว');})
@@ -5792,7 +5866,11 @@ function renderReqKbar(){const el=document.getElementById('reqKbar');if(!el)retu
   }}
 function setGapKpi(val){const f=document.getElementById('fGap');if(f.dataset.multi){if(!f._m)f._m=new Set();if(f._m.size===1&&f._m.has(val))f._m.clear();else{f._m.clear();f._m.add(val);}csSyncMulti(f);}else{f.value=(f.value===val)?'':val;}page=1;renderReqTable();}
 function editCell(id,f,val){const r=REQS.find(x=>x._id===id);if(!r)return;r[f]=val;reqSaveOne(r);renderKPI();renderCharts();renderReqTable();renderProjRibbon();renderCockpit();toast(T('saved'));}
-function delRow(id){if(!confirm("ลบรายการนี้?"))return;REQS=REQS.filter(x=>x._id!==id);reqDelOne(id);fillFilters();renderAll();toast("ลบแล้ว");}
+async function delRow(id){
+  var _r=REQS.find(function(x){return x._id===id;});
+  if(!await erpConfirm({title:'ลบ '+((_r&&_r.name)||('รายการ #'+id)),
+    body:'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบรายการ'}))return;REQS=REQS.filter(x=>x._id!==id);reqDelOne(id);fillFilters();renderAll();toast("ลบแล้ว");}
 ['fMod','fSub','fType','fGap','fStatus','fSearch'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{page=1;if(id==='fMod')fillSub();renderReqTable();}));
 document.querySelectorAll('#reqTable thead th[data-sort]').forEach(th=>th.onclick=()=>{const k=th.dataset.sort;if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=1;}document.querySelectorAll('#reqTable th .ar').forEach(a=>a.textContent='');th.querySelector('.ar').textContent=sortDir>0?'▲':'▼';page=1;renderReqTable();});
 
@@ -5862,7 +5940,9 @@ var _brFirst=true;
 function subscribeBr(){if(!window.DB)return;window.DB.subscribe(COL_BR,function(docs){if(_brFirst){_brFirst=false;return;}brBuild(docs);fillBrFilters();renderBridge();fillAbout();});}
 function setBrField(bid,field,val){if(erpDenyEdit())return;var b=BR.find(x=>x._bid===bid);if(!b)return;var sv=(field==='risk')?(val==='High'?'Yes':'No'):val;b[field]=sv;brSaveOne(b);if(field==='name'){var mt=document.getElementById('mTitle');if(mt)mt.textContent=sv||'(ไม่มีชื่อ)';}renderBrKpi();renderBrTable();renderBrCharts();}
 async function brAddRow(){if(erpDenyEdit())return;brNid++;var nk='a'+brNid;var nb={_key:nk,_nid:brNid,module:'(ใหม่)',name:'รายการใหม่',type:'',cycle:'',hrs:'',save:'',fteNow:'',cplx:'',risk:'No',status:'Not Started',req:'',dept:'',owner:'',app:'',cat:'',src:nk};if(window.DB)await window.DB.saveItem(COL_BR,nk,nb);await loadBR();fillBrFilters();renderBridge();var a=BR.find(x=>x._key===nk);if(a)openBridge(a._bid);toast(T('added'));}
-async function brDelRow(bid){if(erpDenyEdit())return;var b=BR.find(x=>x._bid===bid);if(!b)return;if(!confirm('ลบรายการนี้?'))return;if(window.DB)await window.DB.deleteItem(COL_BR,b._key);await loadBR();fillBrFilters();closeModal();renderBridge();toast('ลบแล้ว');}
+async function brDelRow(bid){if(erpDenyEdit())return;var b=BR.find(x=>x._bid===bid);if(!b)return;if(!await erpConfirm({title:'ลบ '+(b.name||'รายการนี้'),
+    body:'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบรายการ'}))return;if(window.DB)await window.DB.deleteItem(COL_BR,b._key);await loadBR();fillBrFilters();closeModal();renderBridge();toast('ลบแล้ว');}
 function brSel(bid,field,val,opts){return '<select class="selmini" onclick="event.stopPropagation()" onchange="setBrField('+bid+',&quot;'+field+'&quot;,this.value)">'+opts.map(function(o){return '<option value="'+attr(o)+'" '+(String(o)===String(val||'')?'selected':'')+'>'+(o===''?'—':esc(o))+'</option>';}).join('')+'</select>';}
 function brNum(x){const n=parseFloat(x);return isNaN(n)?0:n;}
 function brRiskVal(b){return (b.risk||'').includes('Yes')?'High':'Safe';}
@@ -6458,10 +6538,13 @@ function piToISO(x){var p=(x||'').split('/');if(p.length!==3)return '';var z=fun
 function piFromISO(v){var p=(v||'').split('-');return p.length===3?(p[2]+'/'+p[1]+'/'+p[0]):'';}
 function piNextId(){return PIMPL.reduce(function(m,d){return Math.max(m,d._pi);},999)+1;}
 function piAddTask(ph){if(erpDenyEdit())return;var nid=piNextId();var t=new Date();var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear();};var e=new Date(t.getTime()+7*86400000);var d={ph:ph,name:'งานใหม่',asg:['Everyone'],s:fmt(t),e:fmt(e),prog:0,st:'Not Started',pr:'Low',dep:[],_pi:nid,_key:'a'+nid};PIMPL.push(d);PI_STORE[GCTX]=PIMPL;piSaveTask(d);renderPI();openPI(nid);}
-function piDelSub(parentPid,subPid){var d=PIMPL.find(function(z){return z._pi===subPid;});if(!d)return;if(!confirm('ลบงานย่อย "'+d.name+'" ?'))return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();openPI(parentPid);}
+async function piDelSub(parentPid,subPid){var d=PIMPL.find(function(z){return z._pi===subPid;});if(!d)return;if(!await erpConfirm({title:'ลบงานย่อย '+d.name,
+    body:'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบงานย่อย'}))return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();openPI(parentPid);}
 function piLogStamp(){var d=new Date(),z=function(n){return ('0'+n).slice(-2);};return z(d.getDate())+'/'+z(d.getMonth()+1)+'/'+d.getFullYear()+' '+z(d.getHours())+':'+z(d.getMinutes());}
 function piAddLog(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var el=document.getElementById('piLogIn');if(!el)return;var m=(el.value||'').trim();if(!m)return;if(!Array.isArray(d.log))d.log=[];d.log.push({t:piLogStamp(),m:m});piSaveTask(d);el.value='';openPI(pid);}
-function piDelLog(pid,i){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log))return;if(!confirm('ลบบันทึกนี้?'))return;d.log.splice(i,1);piSaveTask(d);openPI(pid);}
+async function piDelLog(pid,i){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log))return;if(!await erpConfirm({title:'ลบบันทึกความคืบหน้านี้',
+    body:'ลบแล้วกู้คืนไม่ได้',go:'ลบบันทึก'}))return;d.log.splice(i,1);piSaveTask(d);openPI(pid);}
 function piEditLog(pid,i,el){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log)||!d.log[i])return;if(el.querySelector('textarea'))return;var cur=d.log[i].m;var ta=document.createElement('textarea');ta.className='lgedit';ta.value=cur;el.textContent='';el.appendChild(ta);ta.focus();ta.select();var done=false;var fin=function(ok){if(done)return;done=true;var v=(ta.value||'').trim();if(ok&&v&&v!==cur){d.log[i].m=v;piSaveTask(d);}openPI(pid);};ta.onkeydown=function(e){e.stopPropagation();if(e.key==='Escape'){e.preventDefault();fin(false);}};ta.onblur=function(){fin(true);};ta.onclick=function(e){e.stopPropagation();};}
 function piLogSection(d){var L=Array.isArray(d.log)?d.log:[];var items=L.map(function(e,i){return '<div class="lgi"><div class="lgt">'+esc(e.t)+'<button class="lgx" onclick="piDelLog('+d._pi+','+i+')" title="ลบบันทึก">&times;</button></div>'+'<div class="lgm" onclick="piEditLog('+d._pi+','+i+',this)" title="คลิกเพื่อแก้ไข">'+esc(e.m)+'</div></div>';}).reverse().join('');return '<div class="dsec">บันทึกความคืบหน้า ('+L.length+')</div>'+'<div class="lgadd"><textarea id="piLogIn" placeholder="เขียนสิ่งที่อัปเดต แล้วกดเพิ่ม…"></textarea>'+'<button class="btn btn-sec" onclick="piAddLog('+d._pi+')">เพิ่ม</button></div>'+(items||'<div class="roval" style="color:var(--ink3)">ยังไม่มีบันทึก</div>');}
 /* ══════════ การเลื่อนกำหนดส่ง (2026-09-09) ══════════
@@ -6542,9 +6625,11 @@ function piDueSave(pid){if(erpDenyEdit())return;
   openPI(pid);
   var dd=Math.round((piDate(to)-piDate(from))/86400000);
   if(window.toast)toast('เลื่อนกำหนดเป็น '+to+' ('+piDueDays(dd)+')');}
-function piDueDel(pid,i){if(erpDenyEdit())return;
+async function piDueDel(pid,i){if(erpDenyEdit())return;
   var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.dueLog)||!d.dueLog[i])return;
-  if(!confirm('ลบประวัติการเลื่อนรายการนี้?\n(วันกำหนดปัจจุบันไม่เปลี่ยน)'))return;
+  if(!await erpConfirm({title:'ลบประวัติการเลื่อนรายการนี้',
+    body:'วันกำหนดปัจจุบันไม่เปลี่ยน แต่ร่องรอยว่าเคยเลื่อนจะหายไป',
+    go:'ลบประวัติ'}))return;
   d.dueLog.splice(i,1);piSaveTask(d);renderPI();openPI(pid);}
 function piDueEditWhy(pid,i,el){if(erpDenyEdit())return;
   var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.dueLog)||!d.dueLog[i])return;
@@ -6569,7 +6654,10 @@ function piDueSection(d){
       +'<div class="lgm" onclick="piDueEditWhy('+d._pi+','+i+',this)" title="คลิกเพื่อแก้เหตุผล">'
       +(e.why?esc(e.why):'<span style="color:var(--ink3)">ไม่ได้ระบุเหตุผล</span>')+'</div></div>';}).join('');
   return '<div class="dsec">ประวัติการเลื่อนกำหนด ('+L.length+')</div>'+items;}
-function piDeleteTask(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);if(!confirm('ลบงาน "'+d.name+'"'+(desc.length?(' และงานย่อย '+desc.length+' รายการ'):'')+' ?'))return;var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();closeModal();toast('ลบแล้ว');}
+async function piDeleteTask(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);if(!await erpConfirm({title:'ลบงาน '+d.name,
+    body:(desc.length?('งานย่อยข้างใน '+desc.length+' รายการจะถูกลบด้วย '):'')
+      +'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบงาน'}))return;var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();closeModal();toast('ลบแล้ว');}
 /* ══ ล้างแผนงานกลับเป็นข้อมูลตั้งต้น — ไม่มีปุ่มใน UI โดยตั้งใจ ══
    ลบ doc ทุกตัวใน pi_tasks/ap_tasks บน Firebase แล้วเขียนข้อมูลตั้งต้นทับ
    = วันที่ที่ทีมปรับ · งานที่เพิ่มเอง · dependency · บันทึก · ประวัติการเลื่อน หายถาวรทั้งทีม
@@ -6582,7 +6670,10 @@ function piDeleteTask(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){
    ชื่อเดิมคือ piResetNotion() แต่ระบบไม่ได้ดึงข้อมูลจาก Notion แล้ว
    ข้อมูลตั้งต้นคือ PI_BASE0 / AP_BASE ที่ฝังอยู่ในไฟล์นี้
    (piSeedBase() ที่ loadPITasks() ใช้ตอน collection ว่าง เป็นคนละเรื่อง ไม่ลบอะไร) */
-async function piResetPlanToSeed(){if(!confirm("⚠️ คืนค่าแผนงานทั้งหมดเป็นข้อมูลตั้งต้นบน Firebase — การแก้ไข/งานที่เพิ่มของทั้งทีมจะหาย\n\nยืนยันหรือไม่?"))return;await resetPITasks();fillPIFilters();renderPI();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();}
+async function piResetPlanToSeed(){
+  if(!await erpConfirm({title:'คืนค่าแผนงานทั้งหมดเป็นข้อมูลตั้งต้น',
+    body:'งานที่ทุกคนแก้ไขและงานที่เพิ่มเข้ามาทั้งหมดจะหายจาก Firebase กู้คืนไม่ได้',
+    go:'คืนค่าแผนงาน'}))return;await resetPITasks();fillPIFilters();renderPI();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();}
 function piSubSection(d){var ch=piChildren(d);var rows=ch.map(function(c){var sc=STATUS_COLORS[c.st]||'#888';return `<div class="subrow" onclick="openPI(${c._pi})"><span class="subname">${esc(c.name)}</span><span class="subchip" style="background:${sc}1f;color:${sc}">${c.st}</span><span class="subdate">${c.s} ถึง ${c.e}</span><button class="subdel" onclick="event.stopPropagation();piDelSub(${d._pi},${c._pi})" title="ลบงานย่อย">×</button></div>`;}).join('');return `<div class="fld"><div class="subhd"><label style="margin:0">งานย่อย (${ch.length})</label><button class="btn btn-sec subadd" onclick="piAddSub(${d._pi})">+ เพิ่มงานย่อย</button></div>${ch.length?`<div class="sublist">${rows}</div>`:`<div class="submt">— ยังไม่มีงานย่อย —</div>`}</div>`;}
 function piChildren(d){return PIMPL.filter(function(x){return x.parent===d._key;});}
 function piIsSummary(d){return piChildren(d).length>0;}
@@ -7182,7 +7273,62 @@ document.getElementById('importFile').addEventListener('change',e=>{const f=e.ta
     if(!got.length){toast("ไม่พบแถวข้อมูล");return;}
     openImportConfirm(got);}catch(err){toast("นำเข้าไม่สำเร็จ: "+err.message);}e.target.value="";};
   rd.readAsBinaryString(f);});
-let toastT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);}
+
+/* ══ กล่องยืนยันของระบบ ══
+   confirm() ของเบราว์เซอร์มีปุ่ม OK กับ Cancel ซึ่งไม่บอกว่ากดแล้วเกิดอะไร
+   จัดสไตล์ไม่ได้ และบางเบราว์เซอร์บนมือถือระงับเมื่อเด้งถี่
+   ตัวนี้คืน Promise จึงใช้แทนได้ด้วย await
+   โฟกัสเริ่มที่ปุ่มปลอดภัย กด Esc หรือคลิกนอกกรอบเท่ากับยกเลิก */
+function erpAskLogout(){
+  erpConfirm({title:L('ออกจากระบบ','Sign out'),
+    body:L('งานที่แก้ไว้บันทึกอัตโนมัติไปแล้ว เข้าระบบใหม่ต้องใส่รหัสอีกครั้ง',
+      'Your edits are already saved. You will need the password to sign back in.'),
+    go:L('ออกจากระบบ','Sign out'),danger:false})
+    .then(function(ok){if(ok)erpLogout();});}
+function erpConfirm(o){
+  o=o||{};
+  return new Promise(function(res){
+    var w=document.getElementById('erpAsk');
+    if(!w){
+      w=document.createElement('div');w.id='erpAsk';
+      w.innerHTML='<div class="rcm-card" role="dialog" aria-modal="true" aria-labelledby="erpAskT">'
+        +'<h3 id="erpAskT"></h3><p id="erpAskB"></p>'
+        +'<div class="rcm-act"><button class="btn btn-sec" id="erpAskNo"></button>'
+        +'<button class="btn" id="erpAskGo"></button></div></div>';
+      document.body.appendChild(w);
+      /* ผูกครั้งเดียว จึงต้องเรียกตัวปิดของรอบปัจจุบัน ไม่ใช่ของรอบแรก */
+      w.addEventListener('click',function(ev){if(ev.target===w&&w._done)w._done(false);});
+    }
+    var t=w.querySelector('#erpAskT'),b=w.querySelector('#erpAskB'),
+        no=w.querySelector('#erpAskNo'),go=w.querySelector('#erpAskGo');
+    t.textContent=o.title||'ยืนยันการทำรายการนี้';
+    b.textContent=o.body||'';
+    b.style.display=o.body?'':'none';
+    no.textContent=o.cancel||L('ยกเลิก','Cancel');
+    go.textContent=o.go||L('ดำเนินการ','Continue');
+    go.className='btn'+(o.danger===false?'':' btn-dgr');
+    var closed=false;
+    function done(v){
+      if(closed)return;closed=true;
+      w.classList.remove('open');w._done=null;
+      document.removeEventListener('keydown',key,true);
+      setTimeout(function(){res(v);},0);
+    }
+    function key(ev){
+      if(ev.key==='Escape'){ev.preventDefault();done(false);}
+      else if(ev.key==='Enter'&&document.activeElement===go){ev.preventDefault();done(true);}
+    }
+    w._done=done;
+    no.onclick=function(){done(false);};
+    go.onclick=function(){done(true);};
+    document.addEventListener('keydown',key,true);
+    w.classList.add('open');
+    /* โฟกัสไปที่ปุ่มยกเลิก คนกด Enter รัวๆ จะได้ทางที่ปลอดภัย */
+    setTimeout(function(){try{no.focus();}catch(e){}},30);
+  });
+}
+let toastT;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);/* 2.6 วินาทีสั้นกว่าเกณฑ์ขั้นต่ำ 3 วินาที ข้อความยาวอ่านไม่ทัน */
+  toastT=setTimeout(()=>t.classList.remove('show'),5000);}
 
 let LANG='th';
 const EN={brandSub:"· Requirement Inventory",tabOverview:"Overview",tabReqs:"Requirements",tabBridge:"Project Automation 2026",import:"Import",export:"Export",reset:"Reset",restore:"Restore original",editedNote:"Changes auto-saved",module:"Module",sub:"Group",type:"Type",clear:"Clear",addRow:"+ Add",heroTitle:"Requirement Inventory",heroSub:"Every dimension of the new ERP requirements — explore, edit and export in one place.",distribution:"Distribution",byModule:"By Module",byModuleSub:"Click a slice to filter",gapSub:"Vendor assessment status (RFP)",byType:"By Request Type",byTypeSub:"Click a bar to filter",matrix:"Module × Type",matrixSub:"Cross view per module",reqTitle:"Requirements",reqSub:"Edit type & Fit-Gap inline · auto-saved in your browser",bridgeNote:"Current SAP pain points from Automation 2026 that become Oracle requirements",brModSub:"Processes per department",brFteSub:"FTE savings per department"};
@@ -7697,10 +7843,12 @@ function gpAdd(){
   setTimeout(function(){var i=document.querySelector('.gpin[data-gid="'+gid+'"][data-f="name"]');
     if(i){i.focus();i.scrollIntoView({block:'center'});}},60);}
 
-function gpDel(gid){
+async function gpDel(gid){
   if(erpDenyEdit())return;
   var g=gpAll().find(function(x){return x.gid===gid;});if(!g)return;
-  if(!confirm('ลบ '+gid+(g.name?(' — '+g.name):'')+' ?\n\nลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที'))return;
+  if(!await erpConfirm({title:'ลบ '+gid+(g.name?(' '+g.name):''),
+    body:'ลบแล้วกู้คืนไม่ได้ และทุกคนในทีมเห็นผลทันที',
+    go:'ลบรายการ'}))return;
   var i=gpAll().indexOf(g);if(i>=0)gpAll().splice(i,1);
   gpPaint();
   if(window.DB)window.DB.deleteItem(COL_GAPS,gid)
@@ -8254,20 +8402,40 @@ window.openProgEntry=openProgEntry;
   function hide(){
     if(cur&&cur._erpTip!=null){try{cur.setAttribute('title',cur._erpTip);}catch(e){}cur._erpTip=null;}
     cur=null;if(tip)tip.classList.remove('on');}
+  /* ══ จอสัมผัส ══
+     เดิมซ่อน tooltip ทิ้ง และ title ของเบราว์เซอร์ก็ไม่ขึ้นเมื่อแตะ
+     คำอธิบายทั้งหมด 649 จุดจึงเข้าไม่ถึงบนมือถือ
+     ตอนนี้แตะค้างไว้เพื่อเปิด ไม่ preventDefault การกดปกติจึงทำงานเหมือนเดิม
+     แตะที่อื่นหรือเลื่อนหน้าแล้วการ์ดหาย */
+  var TOUCH=(window.matchMedia&&window.matchMedia('(hover:none)').matches);
+  function pick(ev){return ev.target&&ev.target.closest?ev.target.closest('[title]'):null;}
   document.addEventListener('mouseover',function(ev){
-    var n=ev.target&&ev.target.closest?ev.target.closest('[title]'):null;
+    if(TOUCH||fromTap())return;
+    var n=pick(ev);
     if(n===cur)return;
     hide();
     if(!n)return;
     if(n.closest('#loginGate'))return;          /* หน้า login มีฉากของตัวเอง */
     show(n,ev.clientX,ev.clientY);},true);
+  /* การแตะหนึ่งครั้งทำให้เบราว์เซอร์ส่ง mousedown กับ mouseover ตามมาด้วย
+     ถ้าไม่กันไว้ tooltip จะถูกปิดทันทีที่เพิ่งเปิด */
+  var tapAt=0;
+  function fromTap(){return (Date.now()-tapAt)<800;}
+  document.addEventListener('pointerdown',function(ev){
+    if(ev.pointerType!=='touch'&&ev.pointerType!=='pen')return;
+    tapAt=Date.now();
+    var n=pick(ev);
+    hide();
+    if(!n||n.closest('#loginGate'))return;
+    show(n,ev.clientX,ev.clientY);},true);
+  window.addEventListener('scroll',function(){if(TOUCH&&!fromTap())hide();},true);
   document.addEventListener('mousemove',function(ev){if(cur)place(ev.clientX,ev.clientY);},true);
   document.addEventListener('mouseout',function(ev){
-    if(!cur)return;
+    if(!cur||fromTap())return;
     var to=ev.relatedTarget;
     if(to&&cur.contains&&cur.contains(to))return;
     hide();},true);
-  document.addEventListener('mousedown',hide,true);
+  document.addEventListener('mousedown',function(){if(!fromTap())hide();},true);
   window.addEventListener('scroll',hide,true);
   window.addEventListener('blur',hide);
 })();
