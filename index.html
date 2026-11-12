@@ -3258,6 +3258,27 @@ body.ro .gpadd,body.ro .gpx{display:none}
 #erpTip .erpTipL:only-child::before{display:none}
 @media (prefers-reduced-motion:reduce){#erpTip{transition:none}}
 @media (hover:none){#erpTip{display:none}}
+
+/* ── แถบสรุปบนมือถือ ──
+   .pjcard ขอ min-width:128px ไว้ แต่กลุ่มการ์ดรวมที่ประกาศทีหลังตั้ง min-width:0
+   ทับไว้ การ์ดจึงบีบเหลือ 41px ทุกใบตั้งแต่ก่อนแยกการ์ดนี้
+   อ่านไม่ออกสักใบ วางเป็นสองคอลัมน์แทน แล้วให้ป้ายกับค่าขึ้นบรรทัดใหม่ได้ */
+@media(max-width:1100px){
+  .projribbon{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  #projRibbon .pjcard{min-width:0}
+  #projRibbon .pjcard .pjk{white-space:normal;overflow:visible;line-height:1.35}
+  #projRibbon .pjcard .pjv{white-space:normal;word-break:break-word}
+}
+@media(max-width:760px){
+  .projribbon{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #projRibbon .pjcard{padding:12px 13px}
+  #projRibbon .pjcard .pjv{font-size:19px}
+}
+
+/* ── สีสถานะของตัวเลขความคืบหน้า ──
+   พื้นสว่างใช้โทนเข้ม พื้นมืดใช้โทนสว่าง ทุกคู่ผ่าน 3:1 ของตัวอักษรขนาดใหญ่ */
+:root{--stat-ok:#1f8f36;--stat-warn:#9a6b00;--stat-bad:#d02a20}
+[data-theme="dark"]{--stat-ok:#28cd41;--stat-warn:#ffb340;--stat-bad:#ff6b5e}
 </style>
 <div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
   <div class="rcm-card" role="dialog" aria-modal="true">
@@ -5468,12 +5489,20 @@ function erpProgVarCard(){
   var p=(typeof progCur==='function')?progCur():null;
   if(!p||p.actual==null||p.plan==null)return null;
   var d=Math.round(p.actual-p.plan);
-  var col=(d>=-5?'#1f8f36':(d>=-15?'#9a6b00':'#d02a20'));
-  return {val:p.actual+'% / '+p.plan+'%', col:col, d:d,
+  /* สีเขียนลงใน style โดยตรง จึงเขียน media query ครอบไม่ได้
+     ใช้ token แทน เพราะสีเข้มชุดเดิมบนพื้นมืดได้แค่ 2.68:1 ต่ำกว่าเกณฑ์ 3:1 */
+  var col=(d>=-5?'var(--stat-ok)':(d>=-15?'var(--stat-warn)':'var(--stat-bad)'));
+  /* ตัวเลขสองตัวอยู่การ์ดสามใบ: จริง · ตามแผน · ส่วนต่าง เพราะอ่านค่าเดียว
+     ง่ายกว่าอ่าน "72% / 85%" ที่ต้องแก้เองว่าตัวไหนเป็นตัวไหน
+     ใบจริงใส่สีสุขภาพ ใบแผนเป็นเส้นพื้นเทียบ จึงเป็นสีกลาง */
+  var _as=L(' · ข้อมูล ณ ',' · as of ')+(p.at||p._key||'');
+  return {col:col, d:d,
+    aval:p.actual+'%',
+    asub:L('คืบหน้าที่ทำได้จริงตามรายงาน weekly ของผู้ขาย','Actual progress from the vendor weekly report')+_as,
+    pval:p.plan+'%',
+    psub:L('เส้นพื้นตามแผนของผู้ขาย คือค่าที่ควรทำได้ ณ วันเดียวกัน','Baseline from the vendor plan for the same date')+_as,
     dval:(d>0?'+':'')+d+'%',
-    dsub:(d<0?('ช้ากว่าแผน '+Math.abs(d)+' จุด'):(d>0?('เร็วกว่าแผน '+d+' จุด'):'ตรงตามแผน'))
-      +' · ข้อมูล ณ '+(p.at||p._key||''),
-    sub:'จริง '+p.actual+'% เทียบแผน '+p.plan+'% · ข้อมูล ณ '+(p.at||p._key||'')};}
+    dsub:(d<0?(L('ช้ากว่าแผน ','Behind plan by ')+Math.abs(d)+L(' จุด',' points')):(d>0?(L('เร็วกว่าแผน ','Ahead of plan by ')+d+L(' จุด',' points')):L('ตรงตามแผน','On plan')))+_as};}
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
   var now=new Date(),phs={};
@@ -5511,7 +5540,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
      กับวันที่ของ milestone จึงไม่ทิ้ง ย้ายไปเป็น tooltip ของการ์ด ชี้เมาส์ยังอ่านได้ */
   function c(k,v,sub,col){return `<div class="pjcard"${sub?` title="${attr(sub)}"`:''}><div class="pjk">${k}</div><div class="pjv"${col?` style="color:${col}"`:''}>${v}</div></div>`;}
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+L(' · อีก ',' · in ')+Math.max(0,Math.ceil((_nm.e-now)/86400000))+L(' วัน',' days')):L('ไม่มี milestone ข้างหน้า','No upcoming milestone');
-  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol)].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('ความคืบหน้า จริง/แผน','Progress actual/plan'),pv.val,pv.sub,pv.col));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}return ex;})()).concat([c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')]).join('');}
+  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',curPhKey?piPhColor(curPhKey):''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol)].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('คืบหน้าจริง','Actual Progress'),pv.aval,pv.asub,pv.col));ex.push(c(L('คืบหน้าตามแผน','Planned Progress'),pv.pval,pv.psub,'var(--ink3)'));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}return ex;})()).concat([c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,'#ff3b30'),c('Go-Live',golive,'','#c79200')]).join('');}
 function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('tb-open');if(typeof tbClose==='function')tbClose();var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
 function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});
   document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
