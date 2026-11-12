@@ -360,12 +360,17 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .stchip b{color:var(--ink);font-weight:700;margin-left:1px}
 .stchip:hover{background:var(--hover)}
 .stchip.on{background:color-mix(in srgb,var(--sc) 15%,transparent);border-color:color-mix(in srgb,var(--sc) 42%,transparent);color:var(--ink)}
-.modal{position:fixed;inset:0;z-index:1000;display:flex;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease}
+/* แผ่นงานเว้นขอบไว้รอบด้าน เห็นฉากหลังลอดออกมาทุกด้าน จึงรู้ว่ามันลอยอยู่ข้างหน้า
+   ไม่ใช่แผ่นที่เชื่อมติดขอบจอ มุมมนทั้งสี่มุมจึงเว้นขวาด้วย ไม่งั้นสองมุมขวาจะเหลี่ยมค้างกลางอากาศ */
+.modal{position:fixed;inset:0;z-index:1000;display:flex;justify-content:flex-end;padding:14px;box-sizing:border-box;opacity:0;pointer-events:none;transition:opacity .3s ease}
 .modal::before{content:"";position:absolute;inset:0;background:rgba(8,10,12,.38);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
 .modal.open{opacity:1;pointer-events:auto}
-.mbox{position:relative;background:var(--surface);border-left:1px solid var(--line);border-radius:0;width:min(1060px,96vw);max-width:96vw;height:100%;max-height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:-18px 0 50px rgba(0,0,0,.22);transform:translateX(102%);transition:transform .36s cubic-bezier(.32,.72,0,1)}
+.mbox{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:20px;width:min(1060px,100%);max-width:100%;height:100%;max-height:100%;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 28px 64px rgba(0,0,0,.28),0 4px 12px rgba(0,0,0,.10);transform:translateX(104%);transition:transform .36s cubic-bezier(.32,.72,0,1)}
 .modal.open .mbox{transform:none;animation:mboxIn .36s cubic-bezier(.32,.72,0,1)}
-@keyframes mboxIn{from{transform:translateX(102%)}to{transform:translateX(0)}}
+@keyframes mboxIn{from{transform:translateX(104%)}to{transform:translateX(0)}}
+/* จอเล็กไม่มีที่ให้เสีย เต็มจอเหมือนเดิม */
+@media(max-width:760px){.modal{padding:0}
+  .mbox{border-radius:0;border:0;border-left:1px solid var(--line)}}
 .mhead{padding:20px 30px 14px;flex:none;background:var(--surface);border-bottom:1px solid var(--line2)}.mhead .mt{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:-.01em;padding-right:42px;line-height:1.3}.mhead .ms{font-size:13px;color:var(--ink3);margin-top:5px;padding-right:42px}
 .stepper{display:flex;align-items:center;gap:6px;margin:4px 0 20px;flex-wrap:nowrap}
 .stp{display:flex;align-items:center;gap:6px;flex:none}
@@ -380,7 +385,7 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 /* the status pill is a badge, so it takes the badge type style (same as .chip), not the row's body size */
 .stsel{color:var(--sc)!important;font-size:11px;font-weight:600;max-width:158px;background-image:none!important;padding-right:7px!important}
 .stsel:hover{border-color:transparent;background:transparent}
-.dsec{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin:18px 0 11px;padding-top:15px;border-top:1px solid var(--line2)}
+.dsec{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin:24px 0 13px;padding-top:19px;border-top:1px solid var(--line2)}
 .dsec.dsec1{margin-top:2px}
 .dsec-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .reqedit{border:1px solid var(--line);background:var(--surface);color:var(--accent-d);font-family:inherit;font-size:12px;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;transition:.15s}
@@ -393,7 +398,8 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .rq-plain.muted{color:var(--ink3)}
 .reqedit-ta{width:100%;font-size:13px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;font-family:inherit;color:var(--ink);background:var(--surface);line-height:1.72;resize:vertical}
 .reqedit-ta:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--mint)}
-.roval{font-size:13px;padding:9px 12px;border:1px solid var(--line2);border-radius:11px;background:var(--surface2);color:var(--ink);min-height:38px;line-height:1.5;word-break:break-word}
+/* ให้สูงเท่าช่องกรอกจริง (padding 10 + font 13 + เส้นขอบ) แถวที่ปนกันจะได้ไม่เหลื่อม */
+.roval{font-size:13px;padding:10px 12px;border:1px solid var(--line2);border-radius:11px;background:var(--surface2);color:var(--ink);min-height:40px;line-height:1.5;box-sizing:border-box;word-break:break-word}
 .brviewtabs{display:inline-flex;background:var(--chip);border-radius:10px;padding:3px;gap:3px;margin:0}
 .bvt{border:0;background:none;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink2);padding:7px 16px;border-radius:8px;cursor:pointer;transition:.15s}
 .bvt.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.15)}
@@ -685,18 +691,21 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .close-x{position:absolute;right:22px;top:18px;background:var(--chip);border:0;color:var(--ink2);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px;transition:.15s}.close-x:hover{background:var(--hover);color:var(--ink)}
 .mbody{flex:1;min-height:0;display:flex;flex-direction:column;padding:0;overflow:hidden}
 .dtwo{flex:1;min-height:0;display:grid;grid-template-columns:362px 1fr;overflow:hidden}
-.dleft{overflow-y:auto;overflow-x:hidden;padding:18px 22px;border-right:1px solid var(--line2)}
-.dright{overflow-y:auto;padding:18px 26px;min-width:0}
+.dleft{overflow-y:auto;overflow-x:hidden;padding:20px 24px 26px;border-right:1px solid var(--line2)}
+.dright{overflow-y:auto;padding:20px 26px 26px;min-width:0}
 .dright .dsec1{margin-top:0}
 @media(max-width:880px){.mbox{width:100vw;max-width:100vw}.dtwo{grid-template-columns:1fr;overflow-y:auto}.dleft,.dright{overflow:visible}.dright{order:1;border-bottom:1px solid var(--line2)}.dleft{order:2;border-right:0}}
 #e_req{min-height:150px;font-size:15px!important;line-height:1.72;max-height:54vh}
 .fld.req-fld label{color:var(--accent-d)}
-.fld{margin-bottom:13px}.fld label{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;text-transform:uppercase;display:block;margin-bottom:6px}
+.fld{margin-bottom:16px}.fld label{font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.03em;text-transform:uppercase;display:block;margin-bottom:7px;line-height:1.45}
 .fld input,.fld select,.fld textarea{width:100%;min-width:0;max-width:100%;font-size:13px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-family:inherit;color:var(--ink);background:var(--surface)}
 .fld textarea{min-height:90px;resize:vertical;line-height:1.6}
 .fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--mint)}
-.frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:13px}
-.mact{flex:none;display:flex;gap:10px;padding:13px 26px;align-items:center;background:var(--surface);border-top:1px solid var(--line)}
+/* ป้ายบางอันยาวจนขึ้นสองบรรทัด ช่องกรอกฝั่งนั้นเลยถูกดันต่ำกว่าอีกฝั่ง
+   ดันช่องกรอกไปชิดขอบล่างของช่อง สองช่องในแถวเดียวกันจึงตรงแนวเสมอ */
+.frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 16px;align-items:end;margin-bottom:16px}
+.frow>.fld{margin-bottom:0}
+.mact{flex:none;display:flex;gap:10px;padding:14px 26px;align-items:center;background:var(--surface);border-top:1px solid var(--line)}
 .btn{font-family:inherit;font-size:13px;font-weight:500;padding:10px 20px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:background .15s,box-shadow .15s,border-color .15s}
 .btn-pri{background:var(--accent);color:#fff;box-shadow:0 1px 4px rgba(0,113,227,.28)}.btn-pri:hover{background:var(--accent-d);box-shadow:0 3px 10px rgba(0,113,227,.32)}
 .btn-sec{background:var(--surface);color:var(--ink);border-color:var(--line)}.btn-sec:hover{background:var(--chip)}
@@ -706,7 +715,10 @@ input[type=text]{min-width:190px;flex:1;max-width:320px}
 .lgadd textarea{flex:1;min-height:52px;resize:vertical;font-family:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;outline:none}
 .lgadd textarea:focus{border-color:var(--accent)}
 .lgadd .btn{flex:none;align-self:stretch}
-.lgi{border-left:2px solid var(--line2);padding:0 0 10px 10px;margin-bottom:2px}
+/* .lgm กินขอบออกด้านละ 4px (margin ติดลบ) ให้พื้นหลังของซ้อนทับตัวอักษรพอดี
+   เว้นขอบขวาคืนให้ 4px ไม่งั้นกล่องจะกว้างเกินแล้วมีแถบเลื่อนแนวนอนโผล่มา */
+.lgi{border-left:2px solid var(--line2);padding:0 4px 10px 10px;margin-bottom:2px;min-width:0;overflow-wrap:anywhere}
+.lgt{flex-wrap:wrap}
 .lgt{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:6px;margin-bottom:2px}
 .lgx{border:0;background:none;color:var(--ink3);cursor:pointer;font-size:14px;line-height:1;padding:0 2px;display:none}
 .lgi:hover .lgx{display:inline-block}
@@ -6319,11 +6331,18 @@ function piLogSection(d){var L=Array.isArray(d.log)?d.log:[];var items=L.map(fun
    "รวมกี่วัน" คิดจาก กำหนดเดิม → d.e ปัจจุบัน ไม่ใช่ผลรวมของ log
    ตัวเลขจึงตรงกับความจริงเสมอ แม้มีคนไปลากแถบหรือแก้ช่องวันที่ทีหลัง
    และถ้า d.e ไม่ตรงกับปลายทางของรายการล่าสุด จะรายงานเป็น drift ให้เห็น ไม่ซ่อน */
+/* เส้นปะบนบาร์เคยวาดแค่จุดเดียว (L[0].from) เลื่อนสามครั้งจึงเห็นขีดเดียว
+   marks เก็บวันจบเดิมทุกครั้งที่เคยตั้งไว้ เรียงเก่า→ใหม่ ตัดวันซ้ำออก
+   base ยังอยู่เหมือนเดิม เพราะ tooltip กับชิปสรุปอ่านค่านี้อยู่ */
+function piDueMarks(L){
+  var seen={},out=[];
+  L.forEach(function(x){var v=x&&x.from;if(!v||seen[v])return;seen[v]=1;out.push(v);});
+  return out.sort(function(a,b){return (piDate(a)||0)-(piDate(b)||0);});}
 function piDueInfo(d){
   var L=(d&&Array.isArray(d.dueLog))?d.dueLog:[];if(!L.length)return null;
   var b=piDate(L[0].from),c=piDate(d.e);if(!b||!c)return null;
   var last=piDate(L[L.length-1].to);
-  return {n:L.length,base:L[0].from,days:Math.round((c-b)/86400000),
+  return {n:L.length,base:L[0].from,marks:piDueMarks(L),days:Math.round((c-b)/86400000),
           drift:(last&&last.getTime()!==c.getTime())?{from:L[L.length-1].to,to:d.e}:null};}
 function piDueDays(n){return (n>0?'+':'')+n+' วัน';}
 /* ══════════ การเลื่อนกำหนดระดับเฟส (2026-10-06) ══════════
@@ -6336,7 +6355,7 @@ function piPhDueInfo(p){
   var L=(p&&Array.isArray(p.dueLog))?p.dueLog:[];if(!L.length)return null;
   var b=piDate(L[0].from),c=piDate(p.e);if(!b||!c)return null;
   var last=piDate(L[L.length-1].to);
-  return {n:L.length,base:L[0].from,days:Math.round((c-b)/86400000),
+  return {n:L.length,base:L[0].from,marks:piDueMarks(L),days:Math.round((c-b)/86400000),
           drift:(last&&last.getTime()!==c.getTime())?{from:L[L.length-1].to,to:p.e}:null};}
 function piTbdNote(d){
   if(!piDate(d.e))return '<div class="tbdnote">ยังไม่กำหนดวัน Sign Off — บาร์ในผังใช้ขอบเขตของงานย่อยแทน</div>';
@@ -6726,8 +6745,14 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var _qtip='วันจบเดิม '+_pdue.base+' → ปัจจุบัน '+(_phd.e||'-')+'\n'+_qlog
         +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' → '+_pdue.drift.to+')'):'');
       _pslip=`<span class="g-phslip${_qd>0?'':' ok'}" title="${attr(_qtip)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_qtxt}</span>`;
-      var _qb=piDate(_pdue.base),_qx=_qb?dayOf(_qb):-1;
-      if(_qx>=0&&_qx<totalDays)_pmark=`<span class="g-phmark" style="left:${250+(_qx+1)*dw}px" title="${attr('วันจบเดิมของเฟส '+_pdue.base)}"></span>`;
+      /* เหมือนระดับงาน — เฟสที่เลื่อนหลายครั้งต้องเห็นทุกครั้ง */
+      (_pdue.marks||[_pdue.base]).forEach(function(_pm,_pi2){
+        var _qb=piDate(_pm),_qx=_qb?dayOf(_qb):-1;
+        if(_qx<0||_qx>=totalDays)return;
+        var _pt=((_pdue.marks&&_pdue.marks.length>1)
+          ?('วันจบก่อนเลื่อนครั้งที่ '+(_pi2+1)+' · ')
+          :'วันจบเดิมของเฟส ')+_pm;
+        _pmark+=`<span class="g-phmark" style="left:${250+(_qx+1)*dw}px" title="${attr(_pt)}"></span>`;});
     }
     else if(_ps){
       var _pd=_ps.d,_txt=_pd>0?('ช้ากว่าแผนเดิม '+_pd+' วัน')
@@ -6787,14 +6812,20 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
         +(d.st==='In Review'?`<span class="g-pill" style="background:var(--bg);color:var(--ink2)">${esc(d.rvw||'Civil')}</span>`:'');
       var _di=(GCTX==='ap')?null:piDueInfo(d);
       var _dmk='';
-      if(_di){var _bx=dayOf(piDate(_di.base));
-        if(_bx>=0&&_bx<totalDays){
-          /* ถ้าเลื่อนไกลกว่าความยาวบาร์ เส้นกำหนดเดิมจะไปอยู่นอกบาร์ กลายเป็นขีดลอยๆ
-             จึงลากเส้นจุดเชื่อมจากกำหนดเดิมถึงขอบขวาปัจจุบัน วาดไว้ใต้บาร์
-             ช่วงที่ทับบาร์จึงถูกบังไป เหลือให้เห็นเฉพาะระยะที่เลื่อนออกมาจริง */
-          var _mx=(_bx+1)*dw,_rx=left+width;
-          _dmk=`<span class="g-duelink" style="left:${Math.min(_mx,_rx)}px;width:${Math.abs(_rx-_mx)}px"></span>`
-              +`<span class="g-duemark" style="left:${_mx}px"></span>`;}}
+      if(_di){
+        /* ถ้าเลื่อนไกลกว่าความยาวบาร์ เส้นกำหนดเดิมจะไปอยู่นอกบาร์ กลายเป็นขีดลอยๆ
+           จึงลากเส้นจุดเชื่อมจากกำหนดเดิมที่เก่าสุดถึงขอบขวาปัจจุบัน วาดไว้ใต้บาร์
+           ส่วนเส้นตั้งขึ้นวาดทุกครั้งที่เลื่อน ไม่ใช่เฉพาะครั้งแรก */
+        var _mks=(_di.marks||[_di.base]),_rx=left+width,_fx=null;
+        _mks.forEach(function(_md,_mi){
+          var _bx=dayOf(piDate(_md));
+          if(_bx<0||_bx>=totalDays)return;
+          var _mx=(_bx+1)*dw;
+          if(_fx===null||_mx<_fx)_fx=_mx;
+          var _tip=(_mks.length>1?('กำหนดก่อนเลื่อนครั้งที่ '+(_mi+1)+' · '):'กำหนดเดิม ')+_md;
+          _dmk+=`<span class="g-duemark" title="${attr(_tip)}" style="left:${_mx}px"></span>`;});
+        if(_fx!==null)_dmk=`<span class="g-duelink" style="left:${Math.min(_fx,_rx)}px;`
+          +`width:${Math.abs(_rx-_fx)}px"></span>`+_dmk;}
       /* ยุบงานแม่แล้วเส้นของงานย่อยหายไปทั้งหมด ต้องยกยอดขึ้นมาไว้บนบาร์แม่
          (ช่องโหว่เดียวกับระดับเฟส) แสดงเฉพาะตอนยุบ ตอนกางงานย่อยบอกตัวเองอยู่แล้ว */
       var _rn=0;
