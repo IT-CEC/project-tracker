@@ -2477,7 +2477,7 @@ body.locked{overflow:hidden}
 .duei .lgt{gap:5px}
 .duen{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;
   border-radius:9px;background:var(--chip);color:var(--ink2);font-size:10px;font-weight:700;flex:none}
-.duearr{color:var(--ink3)}
+.duearr{color:var(--ink3);font-size:11px}
 .duedelta{font-weight:600;color:var(--ink2)}
 /* เส้นจุดเชื่อม วาดก่อนบาร์จึงถูกบาร์ทับ เหลือให้เห็นเฉพาะระยะที่เลื่อนพ้นบาร์ออกมา */
 .g-duelink{position:absolute;top:50%;height:0;border-top:1.5px dotted var(--ink3);
@@ -3402,7 +3402,7 @@ function reqSaveOne(r){if(window.DB&&r&&r._id!=null)window.DB.saveItem(COL_REQ,r
 function reqDelOne(id){if(window.DB&&id!=null)window.DB.deleteItem(COL_REQ,id).catch(dbErr('req del'));}
 async function reqReplaceAll(){if(!window.DB)return;try{var ex=await window.DB.loadAll(COL_REQ);var keep={};REQS.forEach(function(r){keep[String(r._id)]=1;});await Promise.all(ex.filter(function(d){return !keep[String(d._id)];}).map(function(d){return window.DB.deleteItem(COL_REQ,d._id);}));await Promise.all(REQS.map(function(r){return window.DB.saveItem(COL_REQ,r._id,r);}));}catch(e){console.error('[req replace]',e);if(window.toast)toast('ซิงก์ Firebase มีปัญหา — ลองรีเฟรช');}}
 async function resetReqs(){if(!window.DB){REQS=reqBase();reqNorm();return;}try{var ex=await window.DB.loadAll(COL_REQ);await Promise.all(ex.map(function(d){return window.DB.deleteItem(COL_REQ,d._id);}));REQS=reqBase();await Promise.all(REQS.map(function(r){return window.DB.saveItem(COL_REQ,r._id,r);}));}catch(e){console.error('[req reset]',e);if(window.toast)toast('ซิงก์ Firebase มีปัญหา — ลองรีเฟรช');REQS=reqBase();}reqNorm();}
-/* งบ mandays เก็บอยู่ใน settings/global ก้อนเดียวกับ fteCost แต่เดิมอ่านแค่ fteCost
+/* งบ man-day เก็บอยู่ใน settings/global ก้อนเดียวกับ fteCost แต่เดิมอ่านแค่ fteCost
    ตัวเลขที่บันทึกไปจึงไม่เคยกลับขึ้นหน้าจอ หน้า Gaps ขึ้นว่าทั้งที่มีข้อมูลแล้ว */
 function bucketFrom(g){if(!g)return;
   ['bucketMd','bucketHrs','crMd','crHrs'].forEach(function(k){
@@ -5153,7 +5153,7 @@ let ACTS = [];
      bst    'Customer Review'|'SR Review'|'E-signoff Request'
             |'Pending further clarification'|'Signed Off'
 
-   settings/global เพิ่ม: bucketMd bucketHrs crMd crHrs (งบ mandays/ชั่วโมง)
+   settings/global เพิ่ม: bucketMd bucketHrs crMd crHrs (งบ man-day/ชั่วโมง)
    ══════════════════════════════════════════════════════════════════════ */
 const COL_PROG='progress', COL_GAPS='gaps';
 const BRD_ST=['Customer Review','SR Review','E-signoff Request','Pending further clarification','Signed Off'];
@@ -5558,7 +5558,7 @@ function erpProgVarCard(){
     aval:p.actual+'%',
     asub:L('คืบหน้าที่ทำได้จริงตามรายงาน weekly ของผู้ขาย','Actual progress from the vendor weekly report')+_as,
     pval:p.plan+'%',
-    psub:L('เส้นพื้นตามแผนของผู้ขาย คือค่าที่ควรทำได้ ณ วันเดียวกัน','Baseline from the vendor plan for the same date')+_as,
+    psub:L('ค่าที่ผู้ขายวางแผนไว้ว่าควรทำได้ ณ วันเดียวกัน','The value the vendor planned for the same date')+_as,
     /* ลูกศรเป็นช่องทางที่สอง ถ้าอ่านสีไม่ออกก็ยังรู้ทิศทาง */
     dval:(d<0?'▼ ':(d>0?'▲ ':''))+(d>0?'+':'')+d+'%',
     dsub:(d<0?(L('ช้ากว่าแผน ','Behind plan by ')+Math.abs(d)+L(' จุด',' points')):(d>0?(L('เร็วกว่าแผน ','Ahead of plan by ')+d+L(' จุด',' points')):L('ตรงตามแผน','On plan')))+_as};}
@@ -5606,7 +5606,7 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   (function(){var _gv=erpProgVarCard();if(!_gv)return;
     if(_gv.d<=-15){_glRisk='<span class="pjrisk bad">'+L('เสี่ยงเลื่อน','At risk')+'</span>';
       _glSub=L('โครงการช้ากว่าแผน ','Project is ')+Math.abs(_gv.d)
-        +L(' จุด วันนี้มีโอกาสเลื่อน',' pts behind plan — this date may move');}
+        +L(' จุด วันขึ้นระบบนี้มีโอกาสเลื่อน',' pts behind plan, this date may move');}
     else if(_gv.d<=-5){_glRisk='<span class="pjrisk warn">'+L('เฝ้าระวัง','Watch')+'</span>';
       _glSub=L('โครงการช้ากว่าแผน ','Project is ')+Math.abs(_gv.d)+L(' จุด',' pts behind plan');}})();
   var glR=PIMPL.find(d=>/go live/i.test(d.name)&&d.s===d.e);var glD=glR?piDate(glR.e):(PIMPL.map(d=>piDate(d.e)).filter(Boolean).sort((a,b)=>b-a)[0]||null),golive=glD?fmtDMY(glD):'—';
@@ -5630,8 +5630,9 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
     var _phi=(_pho&&typeof piPhDueInfo==='function')?piPhDueInfo(_pho):null;
     if(_phi&&_phi.days>0)ex.push(c(L('เฟสนี้ช้าไป','Phase Slip'),
       _phi.days+L(' วัน',' days'),
-      L('วันจบเดิม ','Original end ')+_phi.base+' → '+(_pho.e||'-')
-        +L(' · เลื่อนมาแล้ว ',' · moved ')+_phi.n+L(' ครั้ง',' times'),''));
+      L('กำหนดเดิม ','Original end ')+_phi.base
+        +L(' เลื่อนเป็น ',' moved to ')+(_pho.e||'-')
+        +L(' · เลื่อนแล้ว ',' · moved ')+_phi.n+L(' ครั้ง',' times'),''));
     var _rvL=PIMPL.filter(function(z){return z.st==='In Review'&&piChildren(z).length===0;});
     if(_rvL.length){var _rvC={};
       _rvL.forEach(function(z){var k=z.rvw||'Civil';_rvC[k]=(_rvC[k]||0)+1;});
@@ -6095,24 +6096,24 @@ function piTblKpi(tops){
   var shown=tops.filter(piTblHit).length;
   var anyF=!!(piTblF.st||piTblF.side||piTblF.ovd||piTblF.slip);
   el.innerHTML='<div class="mkpi-grid">'
-   +kCard({lab:L('ทั้งหมด · TOTAL','ALL · TOTAL'),val:shown,
+   +kCard({lab:L('ทั้งหมด','Total'),val:shown,
            cap:anyF?L('จาก '+tops.length+' งานหลัก','of '+tops.length+' main tasks')
                    :L('งานหลักทั้งหมด','main tasks'),
            on:!anyF,fn:'piTblClear()'})
-   +kCard({vcol:'var(--stat-warn)',lab:L('กำลังทำ · IN PROGRESS','IN PROGRESS'),
+   +kCard({vcol:'var(--stat-warn)',lab:L('กำลังทำ','In progress'),
            val:cnt(st('In Progress')),cap:L('งาน','tasks'),
            on:on('st','In Progress'),fn:clk(cnt(st('In Progress')),'piTblKf(&quot;st&quot;,&quot;In Progress&quot;)')})
-   +kCard({vcol:'#0071e3',lab:L('รอตรวจ · IN REVIEW','IN REVIEW'),split:[
+   +kCard({vcol:'#0071e3',lab:L('รอตรวจ','In review'),split:[
        {val:side('Civil'),cap:'Civil',on:on('side','Civil'),fn:clk(side('Civil'),'piTblKf(&quot;side&quot;,&quot;Civil&quot;)')},
        {val:side('PS Global'),cap:'PS Global',on:on('side','PS Global'),
         fn:clk(side('PS Global'),'piTblKf(&quot;side&quot;,&quot;PS Global&quot;)')}]})
-   +kCard({vcol:'var(--stat-ok)',lab:L('เสร็จแล้ว · COMPLETED','COMPLETED'),
+   +kCard({vcol:'var(--stat-ok)',lab:L('เสร็จแล้ว','Completed'),
            val:cnt(st('Completed')),cap:L('งาน','tasks'),
            on:on('st','Completed'),fn:clk(cnt(st('Completed')),'piTblKf(&quot;st&quot;,&quot;Completed&quot;)')})
-   +kCard({vcol:'var(--stat-bad)',lab:L('เลยกำหนด · OVERDUE','OVERDUE'),
+   +kCard({vcol:'var(--stat-bad)',lab:L('เลยกำหนด','Overdue'),
            val:cnt(piIsOverdue),cap:L('ยังไม่เสร็จ','still open'),
            on:!!piTblF.ovd,fn:clk(cnt(piIsOverdue),'piTblKf(&quot;ovd&quot;,1)')})
-   +kCard({lab:L('เลื่อนกำหนด · SLIPPED','SLIPPED'),val:slips.length,
+   +kCard({lab:L('เลื่อนกำหนด','Slipped'),val:slips.length,
            cap:sDays?L('รวม +'+sDays+' วัน','+'+sDays+' days total'):L('งาน','tasks'),
            on:!!piTblF.slip,fn:clk(slips.length,'piTblKf(&quot;slip&quot;,1)')})
    +'</div>';}
@@ -6235,7 +6236,7 @@ function piRvwNote(){
       +' onclick="piRvwFilter('+si+',0)"'
       +' title="'+attr(L('กดเพื่อกรองเฉพาะที่ค้างฝั่งนี้','Click to filter to this side')+'\n'
         +L2.map(function(d){
-          return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
+          return codeOf(d)+' · '+shortOf(d)+' · '+(d.e||L('ไม่กำหนด','no due'));}).join('\n'))+'">'
       +esc(shortSide[side]||side)+' <b>'+L2.length+'</b>'
       /* คำว่า "เลยกำหนด"/"overdue" กิน ~60px ต่อฝั่ง สองฝั่งก็ 120px ซึ่งดันชิป
          ออกนอกช่องว่าง เหลือแค่ตัวเลขในวงเล็บสีแดง คำเต็มกับรายชื่อไปอยู่ใน tooltip
@@ -6247,7 +6248,7 @@ function piRvwNote(){
           +' title="'+attr(L('กดเพื่อกรองเฉพาะที่เลยกำหนด','Click to filter to overdue only')+'\n'
           +L(' เลยกำหนด ',' Overdue ')+od+L(' งาน:',' tasks:')+'\n'
           +L2.filter(piIsOverdue).map(function(d){
-             return codeOf(d)+' — '+shortOf(d)+' · '+(d.e||'');}).join('\n'))
+             return codeOf(d)+' · '+shortOf(d)+' · '+(d.e||'');}).join('\n'))
         +'">('+od+')</span>':'')+'</span>';};
   var parts=REVIEW_SIDES.map(half).filter(Boolean);
   var h='<span class="kbn-dot" style="background:'+STATUS_COLORS['In Review']+'"></span>'
@@ -6281,7 +6282,7 @@ function piKbSummary(){
    ไม่เคยแสดง คนที่ดูบอร์ดจึงแยกไม่ออกว่าใบไหนเคยหลุดกำหนดมาแล้ว */
 function piSlipChip(d){
   var i=piDueInfo(d);if(!i||!i.days)return '';
-  var tip='กำหนดเดิม '+i.base+' · เลื่อน '+i.n+' ครั้ง · รวม '+piDueDays(i.days)
+  var tip='กำหนดเดิม '+i.base+' · เลื่อนแล้ว '+i.n+' ครั้ง · รวม '+piDueDays(i.days)
     +(i.drift?' · มีการแก้กำหนดโดยไม่ได้บันทึกเหตุผล':'');
   return '<span class="slipchip'+(i.days>0?'':' ok')+'" title="'+attr(tip)+'">'
     +piDueDays(i.days)+'</span>';}
@@ -6373,7 +6374,7 @@ function buildAP(){var d0=new Date(2026,6,1);var base=(DATA.bridge||[]).map(func
 var AP_STG={req:['Req','#2563eb','#e6edff'],dev:['Dev + Test','#7c3aed','#efe6fd'],uat:['UAT','#0d9488','#d6f2ec']};
 var AP_STCLR={'Not Started':'#8e8e93','In Progress':'#ff9500','Partial Done':'#2f6fed','Blocker':'#e0322b','Done':'#28cd41'};
 function apStatusIcon(st){var c=AP_STCLR[st||'Not Started']||AP_STCLR['Not Started'];return {bg:c,bd:c,ic:''};}
-function apSegs(d,dw,dayOf){var h='',circ='';(d.stages||[]).forEach(function(sg){var a=piDate(sg.s),b=piDate(sg.e);if(!a||!b)return;var x1=dayOf(a),x2=dayOf(b);if(x2<x1){var t=x1;x1=x2;x2=t;}var left=x1*dw,width=Math.max((x2-x1+1)*dw,8);var def=AP_STG[sg.k]||['Stage','#888'];var sc=AP_STCLR[sg.st||'Not Started']||AP_STCLR['Not Started'];h+='<div class="ap-seg" style="left:'+left+'px;width:'+width+'px;background:color-mix(in srgb,'+sc+' 14%,var(--surface));color:var(--ink);border:1px solid var(--line)" onclick="event.stopPropagation();openPI('+d._pi+')" title="'+attr(def[0]+' ['+(sg.st||'Not Started')+'] '+sg.s+' → '+sg.e)+'">'+(width>34?esc(def[0]):'')+'</div>';var si=apStatusIcon(sg.st||'Not Started');circ+='<span class="ap-stc" style="left:'+(left+9)+'px;background:'+si.bg+';border-color:'+si.bd+'" onclick="event.stopPropagation();openPI('+d._pi+')" title="'+attr((sg.st||'Not Started')+' · '+def[0])+'">'+si.ic+'</span>';});if(d.gld){var g=piDate(d.gld);if(g){h+='<span class="ap-gl" style="left:'+(dayOf(g)*dw)+'px" onclick="event.stopPropagation();openPI('+d._pi+')" title="Go-Live '+attr(d.gld)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>Go-Live</span>';}}return h+circ;}
+function apSegs(d,dw,dayOf){var h='',circ='';(d.stages||[]).forEach(function(sg){var a=piDate(sg.s),b=piDate(sg.e);if(!a||!b)return;var x1=dayOf(a),x2=dayOf(b);if(x2<x1){var t=x1;x1=x2;x2=t;}var left=x1*dw,width=Math.max((x2-x1+1)*dw,8);var def=AP_STG[sg.k]||['Stage','#888'];var sc=AP_STCLR[sg.st||'Not Started']||AP_STCLR['Not Started'];h+='<div class="ap-seg" style="left:'+left+'px;width:'+width+'px;background:color-mix(in srgb,'+sc+' 14%,var(--surface));color:var(--ink);border:1px solid var(--line)" onclick="event.stopPropagation();openPI('+d._pi+')" title="'+attr(def[0]+' ['+(sg.st||'Not Started')+'] '+sg.s+' ถึง '+sg.e)+'">'+(width>34?esc(def[0]):'')+'</div>';var si=apStatusIcon(sg.st||'Not Started');circ+='<span class="ap-stc" style="left:'+(left+9)+'px;background:'+si.bg+';border-color:'+si.bd+'" onclick="event.stopPropagation();openPI('+d._pi+')" title="'+attr((sg.st||'Not Started')+' · '+def[0])+'">'+si.ic+'</span>';});if(d.gld){var g=piDate(d.gld);if(g){h+='<span class="ap-gl" style="left:'+(dayOf(g)*dw)+'px" onclick="event.stopPropagation();openPI('+d._pi+')" title="Go-Live '+attr(d.gld)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>Go-Live</span>';}}return h+circ;}
 function brByKey(k){for(var i=0;i<BR.length;i++){if(BR[i]._key===k)return BR[i];}return null;}
 var AP_PROGW={'Not Started':0,'In Progress':50,'Partial Done':75,'Blocker':50,'Done':100};
 function apRollup(d){var sg=(d&&d.stages)||[];if(!sg.length)return {prog:(d&&d.prog)||0,st:(d&&d.st)||'Not Started',blocker:false,started:false};var sum=0,done=0,blk=false,started=false;sg.forEach(function(s){var v=AP_PROGW[s.st];sum+=(v==null?0:v);if(s.st==='Done')done++;if(s.st==='Blocker')blk=true;if(s.st&&s.st!=='Not Started')started=true;});return {prog:Math.round(sum/sg.length),st:(done===sg.length?'Completed':blk?'Delayed':started?'In Progress':'Not Started'),blocker:blk,started:started};}
@@ -6432,7 +6433,7 @@ function piBrdFields(d){
     +`<div class="frow"><div class="fld"><label>เวอร์ชันล่าสุด</label><input type="text" size="8" value="${attr(d.bver||'')}" placeholder="V3.0" onchange="setPIField(${d._pi},'bver',this.value)"></div>`
     +`<div class="fld"><label>สถานะ BRD</label><select onchange="setPIField(${d._pi},'bst',this.value)"><option value="">&mdash;</option>${BRD_ST.map(function(x){return '<option'+(x===d.bst?' selected':'')+'>'+esc(x)+'</option>';}).join('')}</select></div></div>`
     +`<div class="frow">${dt('bdisc','วัน Discovery')}${dt('bsub','วันส่งล่าสุด')}</div>`
-    +`<div class="frow">${dt('bsodue','วันที่ต้อง sign off')}<div class="fld"></div></div>`;}
+    +`<div class="frow">${dt('bsodue','วันที่ต้อง Sign Off')}<div class="fld"></div></div>`;}
 function setPIField(pid,f,val){if(erpDenyEdit())return;var d=PIMPL.find(z=>z._pi===pid);if(!d)return;d[f]=val;if(f==='st'&&val==='In Review'&&!d.rvw)d.rvw='Civil';piSaveTask(d);
   /* ══ ฝั่งที่ตรวจไหลขึ้นหางานแม่ เหมือนที่สถานะทำอยู่แล้ว ══
      ของเดิม rvw ของงานแม่ตั้งด้วยมือครั้งเดียวแล้วไม่เคยตามลูก พองานย้ายฝั่ง
@@ -6462,7 +6463,7 @@ function piLogStamp(){var d=new Date(),z=function(n){return ('0'+n).slice(-2);};
 function piAddLog(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var el=document.getElementById('piLogIn');if(!el)return;var m=(el.value||'').trim();if(!m)return;if(!Array.isArray(d.log))d.log=[];d.log.push({t:piLogStamp(),m:m});piSaveTask(d);el.value='';openPI(pid);}
 function piDelLog(pid,i){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log))return;if(!confirm('ลบบันทึกนี้?'))return;d.log.splice(i,1);piSaveTask(d);openPI(pid);}
 function piEditLog(pid,i,el){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d||!Array.isArray(d.log)||!d.log[i])return;if(el.querySelector('textarea'))return;var cur=d.log[i].m;var ta=document.createElement('textarea');ta.className='lgedit';ta.value=cur;el.textContent='';el.appendChild(ta);ta.focus();ta.select();var done=false;var fin=function(ok){if(done)return;done=true;var v=(ta.value||'').trim();if(ok&&v&&v!==cur){d.log[i].m=v;piSaveTask(d);}openPI(pid);};ta.onkeydown=function(e){e.stopPropagation();if(e.key==='Escape'){e.preventDefault();fin(false);}};ta.onblur=function(){fin(true);};ta.onclick=function(e){e.stopPropagation();};}
-function piLogSection(d){var L=Array.isArray(d.log)?d.log:[];var items=L.map(function(e,i){return '<div class="lgi"><div class="lgt">'+esc(e.t)+'<button class="lgx" onclick="piDelLog('+d._pi+','+i+')" title="ลบบันทึก">&times;</button></div>'+'<div class="lgm" onclick="piEditLog('+d._pi+','+i+',this)" title="คลิกเพื่อแก้ไข">'+esc(e.m)+'</div></div>';}).reverse().join('');return '<div class="dsec">บันทึกความคืบหน้า ('+L.length+')</div>'+'<div class="lgadd"><textarea id="piLogIn" placeholder="เขียนสิ่งที่อัปเดต แล้วกดเพิ่ม…"></textarea>'+'<button class="btn btn-sec" onclick="piAddLog('+d._pi+')">เพิ่ม</button></div>'+(items||'<div class="roval" style="color:var(--ink3)">— ยังไม่มีบันทึก —</div>');}
+function piLogSection(d){var L=Array.isArray(d.log)?d.log:[];var items=L.map(function(e,i){return '<div class="lgi"><div class="lgt">'+esc(e.t)+'<button class="lgx" onclick="piDelLog('+d._pi+','+i+')" title="ลบบันทึก">&times;</button></div>'+'<div class="lgm" onclick="piEditLog('+d._pi+','+i+',this)" title="คลิกเพื่อแก้ไข">'+esc(e.m)+'</div></div>';}).reverse().join('');return '<div class="dsec">บันทึกความคืบหน้า ('+L.length+')</div>'+'<div class="lgadd"><textarea id="piLogIn" placeholder="เขียนสิ่งที่อัปเดต แล้วกดเพิ่ม…"></textarea>'+'<button class="btn btn-sec" onclick="piAddLog('+d._pi+')">เพิ่ม</button></div>'+(items||'<div class="roval" style="color:var(--ink3)">ยังไม่มีบันทึก</div>');}
 /* ══════════ การเลื่อนกำหนดส่ง (2026-09-09) ══════════
    d.dueLog = [{from,to,at,why}] — from/to เป็น วว/ดด/ปปปป · at ใช้ piLogStamp() ตัวเดียวกับบันทึกความคืบหน้า
    piSaveTask() บันทึกทั้งอ็อบเจกต์โดยไม่มี allow-list ฟิลด์นี้จึงลง Firestore เอง ไม่ต้องแก้ชั้น persistence
@@ -6504,7 +6505,7 @@ function piPhDueInfo(p){
   return {n:L.length,base:L[0].from,marks:piDueMarks(L,p.e),days:Math.round((c-b)/86400000),
           drift:(last&&last.getTime()!==c.getTime())?{from:L[L.length-1].to,to:p.e}:null};}
 function piTbdNote(d){
-  if(!piDate(d.e))return '<div class="tbdnote">ยังไม่กำหนดวัน Sign Off — บาร์ในผังใช้ขอบเขตของงานย่อยแทน</div>';
+  if(!piDate(d.e))return '<div class="tbdnote">ยังไม่กำหนดวัน Sign Off แถบในผังจึงใช้ขอบเขตของงานย่อยแทน</div>';
   var mx=null;piChildren(d).forEach(function(c){var e=piDate(piSpan(c).e);if(e&&(!mx||e>mx))mx=e;});
   var pe=piDate(d.e);
   if(pe&&mx&&mx>pe)return '<div class="tbdnote warn">งานย่อยส่งกลับ '+Math.round((mx-pe)/86400000)
@@ -6513,7 +6514,7 @@ function piTbdNote(d){
 function piDueBar(d){
   var i=piDueInfo(d);
   var sum=i?('<div class="duesum">เดิม <b>'+esc(i.base)+'</b> · เลื่อน <b>'+i.n+'</b> ครั้ง · <b>'+piDueDays(i.days)+'</b>'
-      +(i.drift?'<div class="duedrift">มีการแก้กำหนดหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+esc(i.drift.from)+' → '+esc(i.drift.to)+')</div>':'')
+      +(i.drift?'<div class="duedrift">มีการแก้กำหนดหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+esc(i.drift.from)+' เป็น '+esc(i.drift.to)+')</div>':'')
       +'</div>'):'';
   return '<div class="duerow"><button class="btn btn-sec duebtn" id="piDueBtn" onclick="piDueOpen('+d._pi+')">เลื่อนกำหนด</button>'+sum+'</div>'
     +'<div class="dueform" id="piDueForm">'
@@ -6561,12 +6562,12 @@ function piDueSection(d){
   var items=L.map(function(e,i){
     var a=piDate(e.from),b=piDate(e.to),dd=(a&&b)?Math.round((b-a)/86400000):0;
     return '<div class="lgi duei"><div class="lgt"><span class="duen">'+(i+1)+'</span>'
-      +esc(e.from)+' <span class="duearr">→</span> <b>'+esc(e.to)+'</b>'
+      +esc(e.from)+' <span class="duearr">เป็น</span> <b>'+esc(e.to)+'</b>'
       +'<span class="duedelta">'+piDueDays(dd)+'</span>'
       +'<span style="flex:1"></span>'+esc(e.at)
       +'<button class="lgx" onclick="piDueDel('+d._pi+','+i+')" title="ลบรายการนี้">&times;</button></div>'
       +'<div class="lgm" onclick="piDueEditWhy('+d._pi+','+i+',this)" title="คลิกเพื่อแก้เหตุผล">'
-      +(e.why?esc(e.why):'<span style="color:var(--ink3)">— ไม่ได้ระบุเหตุผล —</span>')+'</div></div>';}).join('');
+      +(e.why?esc(e.why):'<span style="color:var(--ink3)">ไม่ได้ระบุเหตุผล</span>')+'</div></div>';}).join('');
   return '<div class="dsec">ประวัติการเลื่อนกำหนด ('+L.length+')</div>'+items;}
 function piDeleteTask(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){return z._pi===pid;});if(!d)return;var desc=[];piCollectDesc(d._key,desc);var all=[d].concat(desc);if(!confirm('ลบงาน "'+d.name+'"'+(desc.length?(' และงานย่อย '+desc.length+' รายการ'):'')+' ?'))return;var keys={};all.forEach(function(x){keys[x._key]=1;piDelTaskDoc(x._key);});PIMPL=PIMPL.filter(function(z){return !keys[z._key];});PI_STORE[GCTX]=PIMPL;renderPI();closeModal();toast('ลบแล้ว');}
 /* ══ ล้างแผนงานกลับเป็นข้อมูลตั้งต้น — ไม่มีปุ่มใน UI โดยตั้งใจ ══
@@ -6582,7 +6583,7 @@ function piDeleteTask(pid){if(erpDenyEdit())return;var d=PIMPL.find(function(z){
    ข้อมูลตั้งต้นคือ PI_BASE0 / AP_BASE ที่ฝังอยู่ในไฟล์นี้
    (piSeedBase() ที่ loadPITasks() ใช้ตอน collection ว่าง เป็นคนละเรื่อง ไม่ลบอะไร) */
 async function piResetPlanToSeed(){if(!confirm("⚠️ คืนค่าแผนงานทั้งหมดเป็นข้อมูลตั้งต้นบน Firebase — การแก้ไข/งานที่เพิ่มของทั้งทีมจะหาย\n\nยืนยันหรือไม่?"))return;await resetPITasks();fillPIFilters();renderPI();if(window.renderProjRibbon)renderProjRibbon();if(window.renderCockpit)renderCockpit();}
-function piSubSection(d){var ch=piChildren(d);var rows=ch.map(function(c){var sc=STATUS_COLORS[c.st]||'#888';return `<div class="subrow" onclick="openPI(${c._pi})"><span class="subname">${esc(c.name)}</span><span class="subchip" style="background:${sc}1f;color:${sc}">${c.st}</span><span class="subdate">${c.s} – ${c.e}</span><button class="subdel" onclick="event.stopPropagation();piDelSub(${d._pi},${c._pi})" title="ลบงานย่อย">×</button></div>`;}).join('');return `<div class="fld"><div class="subhd"><label style="margin:0">งานย่อย (${ch.length})</label><button class="btn btn-sec subadd" onclick="piAddSub(${d._pi})">+ เพิ่มงานย่อย</button></div>${ch.length?`<div class="sublist">${rows}</div>`:`<div class="submt">— ยังไม่มีงานย่อย —</div>`}</div>`;}
+function piSubSection(d){var ch=piChildren(d);var rows=ch.map(function(c){var sc=STATUS_COLORS[c.st]||'#888';return `<div class="subrow" onclick="openPI(${c._pi})"><span class="subname">${esc(c.name)}</span><span class="subchip" style="background:${sc}1f;color:${sc}">${c.st}</span><span class="subdate">${c.s} ถึง ${c.e}</span><button class="subdel" onclick="event.stopPropagation();piDelSub(${d._pi},${c._pi})" title="ลบงานย่อย">×</button></div>`;}).join('');return `<div class="fld"><div class="subhd"><label style="margin:0">งานย่อย (${ch.length})</label><button class="btn btn-sec subadd" onclick="piAddSub(${d._pi})">+ เพิ่มงานย่อย</button></div>${ch.length?`<div class="sublist">${rows}</div>`:`<div class="submt">— ยังไม่มีงานย่อย —</div>`}</div>`;}
 function piChildren(d){return PIMPL.filter(function(x){return x.parent===d._key;});}
 function piIsSummary(d){return piChildren(d).length>0;}
 function piSpan(d){if(piDate(d.s)&&piDate(d.e))return {s:d.s,e:d.e};var ch=piChildren(d);if(!ch.length)return {s:d.s,e:d.e};var ss=null,ee=null;ch.forEach(function(c){var cs=piSpan(c);var a=piDate(cs.s),b=piDate(cs.e);if(a&&(!ss||a<ss))ss=a;if(b&&(!ee||b>ee))ee=b;});var z=function(n){return (''+n).padStart(2,'0');};var fmt=function(dt){return dt?z(dt.getDate())+'/'+z(dt.getMonth()+1)+'/'+dt.getFullYear():'';};return {s:ss?fmt(ss):d.s,e:ee?fmt(ee):d.e};}
@@ -6787,7 +6788,7 @@ function piEnforce(){var topo=piTopo();if(!topo)return false;var ch=false;topo.f
 function piCritical(){var topo=piTopo();if(!topo)return {};if(!PIMPL.some(d=>d.dep&&d.dep.length))return {};var dur={},ef={},pre={};PIMPL.forEach(d=>{var a=piDate(d.s),b=piDate(d.e);dur[d._pi]=(a&&b)?Math.round((b-a)/86400000)+1:0;});topo.forEach(function(id){var d=PIMPL.find(z=>z._pi===id),best=0,bp=null;(d.dep||[]).forEach(function(p){if(ef[p]!=null&&ef[p]>best){best=ef[p];bp=p;}});ef[id]=best+(dur[id]||0);pre[id]=bp;});var end=null,mxv=-1;topo.forEach(function(id){if(ef[id]>mxv){mxv=ef[id];end=id;}});var crit={},x=end;while(x!=null){crit[x]=1;x=pre[x];}return crit;}
 function piDepsAdd(succId,predId){succId=+succId;predId=+predId;if(succId===predId)return;var d=PIMPL.find(z=>z._pi===succId);if(!d)return;d.dep=d.dep||[];if(d.dep.indexOf(predId)>=0)return;if(piReaches(succId,predId)){if(window.toast)toast('เชื่อมไม่ได้ — จะเกิดวงวน (cycle)');return;}d.dep.push(predId);piSaveTask(d);renderPI();}
 function piDepsDel(succId,predId){succId=+succId;predId=+predId;var d=PIMPL.find(z=>z._pi===succId);if(!d||!d.dep)return;d.dep=d.dep.filter(x=>x!==predId);piSaveTask(d);renderPI();}
-function piDepEditor(d){var cur=(d.dep||[]).map(function(p){var t=PIMPL.find(z=>z._pi===p);return t?`<span class="depchip"><span class="dotc" style="background:${STATUS_COLORS[t.st]||'#888'}"></span>${esc(t.name)}<a onclick="piDepsDel(${d._pi},${p});openPI(${d._pi})" title="ลบ">×</a></span>`:'';}).join('');var opts='<option value="">+ เพิ่มงานก่อนหน้า…</option>'+PIMPL.filter(t=>t._pi!==d._pi&&(d.dep||[]).indexOf(t._pi)<0).map(t=>`<option value="${t._pi}">${esc(t.name)}</option>`).join('');return `<div class="depbox">${cur||'<span class="muted">— ไม่มี —</span>'}<select class="depadd" onchange="if(this.value){piDepsAdd(${d._pi},this.value);openPI(${d._pi});}">${opts}</select></div>`;}
+function piDepEditor(d){var cur=(d.dep||[]).map(function(p){var t=PIMPL.find(z=>z._pi===p);return t?`<span class="depchip"><span class="dotc" style="background:${STATUS_COLORS[t.st]||'#888'}"></span>${esc(t.name)}<a onclick="piDepsDel(${d._pi},${p});openPI(${d._pi})" title="ลบ">×</a></span>`:'';}).join('');var opts='<option value="">+ เพิ่มงานก่อนหน้า…</option>'+PIMPL.filter(t=>t._pi!==d._pi&&(d.dep||[]).indexOf(t._pi)<0).map(t=>`<option value="${t._pi}">${esc(t.name)}</option>`).join('');return `<div class="depbox">${cur||'<span class="muted">ยังไม่มี</span>'}<select class="depadd" onchange="if(this.value){piDepsAdd(${d._pi},this.value);openPI(${d._pi});}">${opts}</select></div>`;}
 function drawPIDeps(){var gw=document.getElementById(PIGID);if(!gw)return;var gb=gw.querySelector('.g-body');if(!gb)return;var old=gb.querySelector('.g-deps');if(old)old.remove();var crit=piCritical();
   var bars={};gb.querySelectorAll('.g-bar[data-pi]').forEach(function(b){bars[+b.dataset.pi]=b;});
   var gbR=gb.getBoundingClientRect();function pos(el){var r=el.getBoundingClientRect();return {l:r.left-gbR.left,t:r.top-gbR.top,w:r.width,h:r.height};}
@@ -6901,27 +6902,28 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var _qlines=_qSlip.slice(0,_QMAX).map(function(x){
         var dd=x.i.days;
         var _d=(dd>0?('+'+dd+' วัน'):(dd<0?('−'+(-dd)+' วัน'):'วันจบเท่าเดิม'));
-        var _t='เลื่อน '+x.i.n+' ครั้ง · '+_d;
+        var _t='เลื่อนแล้ว '+x.i.n+' ครั้ง · '+_d;
         /* ตัวแสดง tooltip ทำตัวหนาให้ข้อความหน้าเครื่องหมาย : ที่ยาวไม่เกิน 26 ตัว
            แยกรหัสออกมาคั่นด้วย : จึงได้ตัวหนาโดยไม่ต้องแก้ตัวแสดงผล */
         var _m=String(x.d.name||'').match(/^([^:：]{1,26}?)\s*-\s*(.+)$/);
-        return _m?(_m[1]+': '+_m[2]+' — '+_t):(x.d.name+' — '+_t);});
+        return _m?(_m[1]+': '+_m[2]+', '+_t):(x.d.name+', '+_t);});
       if(_qSlip.length>_QMAX)_qlines.push('และอีก '+(_qSlip.length-_QMAX)+' งาน');
       /* ไม่มีงานหลักไหนเลื่อนเลย — ถอยกลับไปไล่ log ของเฟสแบบเดิม ดีกว่าการ์ดว่าง */
       if(!_qlines.length)_qlines=(_phd.dueLog||[]).map(function(x){
-        return x.from+' → '+x.to+(x.why?(' — '+x.why):' — (ไม่ได้ระบุเหตุผล)');});
-      else _qlines.unshift('งานหลักที่ถูกเลื่อน '+_qSlip.length+' จาก '+_qTops.length+' งาน');
-      var _qhd='เฟสถูกเลื่อน '+_pdue.n+' ครั้ง · วันจบ '+_pdue.base+' → '+(_phd.e||'-');
+        return 'จาก '+x.from+' เป็น '+x.to+(x.why?(', '+x.why):', ไม่ได้ระบุเหตุผล');});
+      else _qlines.unshift('งานหลักที่เลื่อนแล้ว '+_qSlip.length+' จาก '+_qTops.length+' งาน');
+      /* ใช้คำเดียวกับที่อื่น: กำหนดเดิม และ เลื่อนแล้ว N ครั้ง */
+      var _qhd='เฟสนี้เลื่อนวันจบแล้ว '+_pdue.n+' ครั้ง · กำหนดเดิม '+_pdue.base+' เลื่อนเป็น '+(_phd.e||'-');
       var _qtip=_qhd+'\n'+_qlines.join('\n')
-        +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' → '+_pdue.drift.to+')'):'');
+        +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' เป็น '+_pdue.drift.to+')'):'');
       _pslip=`<span class="g-phslip${_qd>0?'':' ok'}" title="${attr(_qtip)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_qtxt}</span>`;
       /* เหมือนระดับงาน — เฟสที่เลื่อนหลายครั้งต้องเห็นทุกครั้ง */
       (_pdue.marks||[_pdue.base]).forEach(function(_pm,_pi2){
         var _qb=piDate(_pm),_qx=_qb?dayOf(_qb):-1;
         if(_qx<0||_qx>=totalDays)return;
         var _pt=((_pdue.marks&&_pdue.marks.length>1)
-          ?('วันจบก่อนเลื่อนครั้งที่ '+(_pi2+1)+' · ')
-          :'วันจบเดิมของเฟส ')+_pm;
+          ?('กำหนดเดิมก่อนเลื่อนครั้งที่ '+(_pi2+1)+' · ')
+          :'กำหนดเดิมของเฟส ')+_pm;
         _pmark+=`<span class="g-phmark" style="left:${250+(_qx+1)*dw}px" title="${attr(_pt)}"></span>`;});
     }
     else if(_ps){
@@ -6992,7 +6994,7 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
           if(_bx<0||_bx>=totalDays)return;
           var _mx=(_bx+1)*dw;
           if(_fx===null||_mx<_fx)_fx=_mx;
-          var _tip=(_mks.length>1?('กำหนดก่อนเลื่อนครั้งที่ '+(_mi+1)+' · '):'กำหนดเดิม ')+_md;
+          var _tip=(_mks.length>1?('กำหนดเดิมก่อนเลื่อนครั้งที่ '+(_mi+1)+' · '):'กำหนดเดิม ')+_md;
           /* ลำดับนับจากเส้นที่วาดจริง ครั้งที่ถูกข้ามไปดูได้ในชิปสรุป */
           _dmk+=`<span class="g-duemark" title="${attr(_tip)}" style="left:${_mx}px"></span>`;});
         if(_fx!==null)_dmk=`<span class="g-duelink" style="left:${Math.min(_fx,_rx)}px;`
@@ -7009,8 +7011,8 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var _odN=0;
       if(_sum&&_est!=='Delayed'&&GCTX!=='ap'){var _od=[];piCollectDesc(d._key,_od);
         _od.forEach(function(x){if(piEffSt(x)==='Delayed')_odN++;});}
-      var _owarn2=_odN?`<span class="g-ovwarn" title="มีงานย่อยล่าช้า ${_odN} งาน — ยังไม่พลาดกำหนดของงานนี้ (${attr(d.e||'ยังไม่กำหนด')}) แต่เสี่ยง">งานย่อยล่าช้า ${_odN}</span>`:'';
-      var _tchip=_tbd?`<span class="g-tbdchip" title="ยังไม่กำหนดวัน Sign Off — ปลายบาร์มาจากงานย่อย ไม่ใช่วันที่ตกลงกันไว้">TBD</span>`:'';
+      var _owarn2=_odN?`<span class="g-ovwarn" title="มีงานย่อยล่าช้า ${_odN} งาน งานนี้ยังไม่พลาดกำหนด ${attr(d.e||'ที่ยังไม่ได้กำหนด')} แต่เสี่ยง">งานย่อยล่าช้า ${_odN}</span>`:'';
+      var _tchip=_tbd?`<span class="g-tbdchip" title="ยังไม่กำหนดวัน Sign Off ปลายแถบจึงมาจากงานย่อย ไม่ใช่วันที่ตกลงกันไว้">TBD</span>`:'';
       var _owarn=_ovd?`<span class="g-ovwarn" title="งานย่อยส่งกลับ ${_ovd} วันหลังวัน Sign Off (${attr(d.e)}) — Sign Off จะไม่ทัน">เลย Sign Off ${_ovd} วัน</span>`:'';
       var _dchip=_di?`<span class="g-duechip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_di.n}</span>`:'';
       var _slim=(_dep>0&&!_sum);var _mid=_slim?`<span class="g-sbpill">${pill}</span>`:`<span class="g-bdot" style="background:${sc}"></span><span class="g-bname">${d.gl?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ':''}${d.pin?'<svg class="eic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M9 3h6l-1 7 3 3v1H7v-1l3-3-1-7z"/></svg> ':''}${GCTX==='ap'?'Req.':esc(d.name)}</span>${GCTX==='ap'?'':pill}${_tchip}${_owarn}${_owarn2}${_dchip}${_rchip}`;var bar=`<div class="g-bar pi-bar${_sum?' pi-sum':''}${_slim?' pi-slim':''}${_tbd?' pi-tbd':''}" data-pi="${d._pi}" data-hl="${left}" data-hw="${width}" style="left:${left}px;width:${width}px;background:${_slim?`color-mix(in srgb,${sc} 28%,var(--surface))`:`color-mix(in srgb,${sc} ${_dep>0?5:14}%,var(--surface))`}" onmousedown="piBarDown(event,${d._pi})"><span class="g-rsz l"></span>${_mid}<span class="g-rsz r"></span><span class="g-link" onmousedown="piLinkStart(event,${d._pi})" title="ลากเพื่อเชื่อมงาน"></span></div>`;
@@ -7052,14 +7054,14 @@ function openPI(id){if(GCTX==='ap')return openAP(id);var d=PIMPL.find(x=>x._pi==
   var rw=(l,vv)=>`<div class="fld"><label>${l}</label><div class="roval">${vv}</div></div>`;
   document.getElementById('mBody').innerHTML=`<div class="dtwo"><div class="dleft">
     <div class="fld"><label>ชื่องาน</label><input value="${attr(d.name)}" onchange="setPIName(${d._pi},this.value)"></div>
-    <div class="frow"><div class="fld"><label>สถานะ</label><select onchange="setPIField(${d._pi},'st',this.value);openPI(${d._pi})">${STATUS_LIST.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select></div>${d.st==='In Review'?`<div class="fld"><label>กำลังตรวจโดย</label><select onchange="setPIField(${d._pi},'rvw',this.value)">${REVIEW_SIDES.map(x=>`<option ${x===(d.rvw||'Civil')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class="fld"><label>ความสำคัญ (Priority)</label><select onchange="setPIField(${d._pi},'pr',this.value)">${Object.keys(PI_PRC).map(x=>`<option ${x===d.pr?'selected':''}>${x}</option>`).join('')}</select></div></div>
+    <div class="frow"><div class="fld"><label>สถานะ</label><select onchange="setPIField(${d._pi},'st',this.value);openPI(${d._pi})">${STATUS_LIST.map(x=>`<option ${x===d.st?'selected':''}>${x}</option>`).join('')}</select></div>${d.st==='In Review'?`<div class="fld"><label>กำลังตรวจโดย</label><select onchange="setPIField(${d._pi},'rvw',this.value)">${REVIEW_SIDES.map(x=>`<option ${x===(d.rvw||'Civil')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class="fld"><label>ความสำคัญ</label><select onchange="setPIField(${d._pi},'pr',this.value)">${Object.keys(PI_PRC).map(x=>`<option ${x===d.pr?'selected':''}>${x}</option>`).join('')}</select></div></div>
     <div class="fld"><label>ความคืบหน้า (${_isSum?'จากงานย่อย':'ตามสถานะ'})</label><div class="roval">${piProg(_cp,STATUS_COLORS[d.st])}</div></div>
-    <div class="frow"><div class="fld"><label>วันเริ่ม</label><input type="text" inputmode="numeric" size="10" value="${d.s}" placeholder="วว/ดด/ปปปป" onchange="setPIDate(${d._pi},'s',this.value)"></div><div class="fld"><label>วันสิ้นสุด${piChildren(d).length?' · Target Sign Off':''}</label><input type="text" inputmode="numeric" size="10" value="${d.e}" placeholder="เว้นว่าง = TBD" onchange="setPIDate(${d._pi},'e',this.value)"></div></div>
+    <div class="frow"><div class="fld"><label>วันเริ่ม</label><input type="text" inputmode="numeric" size="10" value="${d.s}" placeholder="วว/ดด/ปปปป" onchange="setPIDate(${d._pi},'s',this.value)"></div><div class="fld"><label>วันสิ้นสุด${piChildren(d).length?' (Target Sign Off)':''}</label><input type="text" inputmode="numeric" size="10" value="${d.e}" placeholder="เว้นว่างไว้ถ้ายังไม่กำหนด" onchange="setPIDate(${d._pi},'e',this.value)"></div></div>
     ${piTbdNote(d)}
     ${piBrdFields(d)}
     ${piDueBar(d)}
-    <div class="fld"><label>เฟส (Category)</label><select onchange="setPIField(${d._pi},'ph',this.value)">${Object.keys(PI_PHASES).map(k=>`<option value="${k}" ${k===d.ph?'selected':''}>${esc(PI_PHASES[k])}</option>`).join('')}</select></div>
-    <div class="fld"><label>หมุดหมาย (Milestone)</label><input value="${attr(d.ms||'')}" placeholder="— ไม่ใช่ milestone —" onchange="setPIField(${d._pi},'ms',this.value)"></div>
+    <div class="fld"><label>เฟส</label><select onchange="setPIField(${d._pi},'ph',this.value)">${Object.keys(PI_PHASES).map(k=>`<option value="${k}" ${k===d.ph?'selected':''}>${esc(PI_PHASES[k])}</option>`).join('')}</select></div>
+    <div class="fld"><label>Milestone</label><input value="${attr(d.ms||'')}" placeholder="เว้นว่างไว้ถ้าไม่ใช่ milestone" onchange="setPIField(${d._pi},'ms',this.value)"></div>
     <div class="fld"><label>ผู้รับผิดชอบ (คั่นด้วย ,)</label><input value="${attr(d.asg.join(', '))}" onchange="setPIAsg(${d._pi},this.value)"></div>
   </div><div class="dright">
     ${piSubSection(d)}
@@ -7555,7 +7557,7 @@ function gpMd(n){return (Math.round(n*10)/10).toLocaleString('en-US');}
 function gpBudget(){
   var b=(typeof BUCKET!=='undefined'&&BUCKET)?BUCKET:{};
   var bm=gpNum(b.bucketMd),bh=gpNum(b.bucketHrs),cm=gpNum(b.crMd),ch=gpNum(b.crHrs);
-  if(!bm&&!bh&&!cm&&!ch)return '<div class="gpnote">ยังไม่ได้บันทึกงบ mandays '
+  if(!bm&&!bh&&!cm&&!ch)return '<div class="gpnote">ยังไม่ได้บันทึกงบ man-day '
     +'<span>กรอกได้ที่ปุ่ม “อัปเดตตัวเลขสัปดาห์นี้” ในหน้า Progress Summary</span></div>';
   var used=gpCount('all').md, tot=bm+cm;
   var left=tot-used;
@@ -7603,7 +7605,7 @@ function gpTable(){
   return '<div class="tablecard"><div class="tscroll" style="max-height:620px">'
     +'<table class="dt gptbl"><thead><tr>'
     +'<th>GAP ID</th><th>ชื่องาน</th><th>กลุ่ม</th><th>ประเภท</th>'
-    +'<th>สถานะ</th><th>Milestone blocker</th><th>man-days</th><th></th>'
+    +'<th>สถานะ</th><th>Milestone blocker</th><th>man-day</th><th></th>'
     +'</tr></thead><tbody id="gpBody">'+rows.map(gpRowHtml).join('')+'</tbody></table></div></div>';}
 
 function renderRegisters(){
@@ -7611,7 +7613,7 @@ function renderRegisters(){
   if(regOnlyPI(el))return;
   el.innerHTML=regErrBanner()
     +'<div class="rgwrap">'
-    +'<div class="regsec"><div class="reghd"><h3>งบ mandays</h3>'
+    +'<div class="regsec"><div class="reghd"><h3>งบ man-day</h3>'
     +'<span class="reghint">ยอดรวมคือ Bucket บวก CR · ใช้ไปแล้วคิดจาก man-day ที่กรอกในตาราง</span>'
     +'</div>'+gpBudget()+'</div>'
     +'<div class="regsec"><div class="reghd"><h3>รายการ Gaps</h3>'
@@ -7665,7 +7667,7 @@ function gpSet(gid,f,val,elm){
   if(f==='md'){
     var n=gpNum(v);
     if(v&&(!isFinite(parseFloat(v.replace(/,/g,'')))||n<0)){
-      toast('man-days ต้องเป็นตัวเลขไม่ติดลบ');if(elm)elm.value=g.md?gpMd(gpNum(g.md)):'';return;}
+      toast('man-day ต้องเป็นตัวเลขไม่ติดลบ');if(elm)elm.value=g.md?gpMd(gpNum(g.md)):'';return;}
     g.md=n; if(elm)elm.value=n?gpMd(n):'';
     gpSave(g,{md:n}); gpPaint(); return;}
   if(f==='scope'){
@@ -7832,7 +7834,7 @@ function peBuild(){
    +'<div class="pe-tabs" role="tablist">'
    +'<button type="button" class="pe-tab" role="tab" data-pet="week" onclick="peTab(\'week\')">ตัวเลขสัปดาห์</button>'
    +'<button type="button" class="pe-tab" role="tab" data-pet="gaps" onclick="peTab(\'gaps\')">นำเข้า Gaps</button>'
-   +'<button type="button" class="pe-tab" role="tab" data-pet="bucket" onclick="peTab(\'bucket\')">งบ mandays</button>'
+   +'<button type="button" class="pe-tab" role="tab" data-pet="bucket" onclick="peTab(\'bucket\')">งบ man-day</button>'
    +'</div><div class="pe-body" id="peBody" role="tabpanel"></div><div class="pe-act" id="peAct"></div></div>';
   document.body.appendChild(m);
   document.addEventListener('keydown',function(e){
@@ -7933,7 +7935,7 @@ function peF(grp,key,lab,ph,hint,num){
 function peRowHtml(r,i){
   var ce=function(k){return PE.err['r'+i+k]?' bad':'';};
   var num=function(k,lab){return '<td><input class="pe-in pe-num'+ce(k)+'" type="text" inputmode="decimal"'+(PE.err['r'+i+k]?' aria-invalid="true"':'')
-   +' autocomplete="off" placeholder="—" aria-label="'+attr(lab)+' แถวที่ '+(i+1)+'"'
+   +' autocomplete="off" placeholder="ยังไม่ระบุ" aria-label="'+attr(lab)+' แถวที่ '+(i+1)+'"'
    +' value="'+attr(esc(String(r[k]==null?'':r[k])))+'" oninput="peRowSet('+i+',\''+k+'\',this.value)"></td>';};
   return '<tr><td><input class="pe-in pe-num" type="text" autocomplete="off" aria-label="ลำดับเฟส แถวที่ '+(i+1)+'"'
    +' value="'+attr(esc(String(r.k||'')))+'" oninput="peRowSet('+i+',\'k\',this.value)"></td>'
@@ -7993,7 +7995,7 @@ function peGapRowHtml(r,i){
    +'<td><input class="pe-in" type="text" autocomplete="off" placeholder="ชื่อรายการ"'
    +' aria-label="ชื่อรายการ แถวที่ '+(i+1)+'" value="'+attr(esc(String(r.name||'')))+'"'
    +' oninput="peGapSet('+i+',\'name\',this.value)"></td>'
-   +'<td><input class="pe-in" type="text" autocomplete="off" placeholder="—"'
+   +'<td><input class="pe-in" type="text" autocomplete="off" placeholder="ยังไม่ระบุ"'
    +' aria-label="ประเภท แถวที่ '+(i+1)+'" value="'+attr(esc(String(r.type||'')))+'"'
    +' oninput="peGapSet('+i+',\'type\',this.value)"></td>'
    +'<td><span class="pe-tag'+(ex?' pe-upd':'')+'">'+(ex?'ทับของเดิม':'ใหม่')+'</span></td>'
@@ -8036,7 +8038,7 @@ function peGapsAct(){
    +esc(GAP_SCOPE[PE.gaps.scope]||'')+' '+n+' รายการ</button></div>';}
 function peBucketHtml(){
   var b=PE.bucket,q=function(k){var n=peRawNum(b[k]);return (typeof n==='number'&&isFinite(n))?n:0;};
-  return '<div class="pe-sec"><div class="pe-sech">งบ mandays / ชั่วโมง</div><div class="pe-grid">'
+  return '<div class="pe-sec"><div class="pe-sech">งบ man-day / ชั่วโมง</div><div class="pe-grid">'
    +peF('bucket','bucketMd','Bucket (mandays)','30','',1)
    +peF('bucket','bucketHrs','Bucket (ชั่วโมง)','240','',1)
    +peF('bucket','crMd','CR (mandays)','50','',1)
@@ -8197,7 +8199,7 @@ async function peSaveBucket(){
   }catch(err){dbErr('bucket save')(err);return;}
   if(window.BUCKET)Object.keys(d).forEach(function(k){BUCKET[k]=d[k];});
   if(typeof piCurV!=='undefined'&&piCurV==='summary'&&typeof renderProgSummary==='function')renderProgSummary();
-  if(window.toast)toast('บันทึกงบ mandays แล้ว ('+Object.keys(d).map(function(k){return labs[k];}).join(' · ')+')');
+  if(window.toast)toast('บันทึกงบ man-day แล้ว ('+Object.keys(d).map(function(k){return labs[k];}).join(' · ')+')');
   peClose();}
 window.openProgEntry=openProgEntry;
 
