@@ -3258,7 +3258,7 @@ body.ro .gpadd,body.ro .gpx{display:none}
 
 /* ── tooltip ── ตามเคอร์เซอร์ ไม่กินคลิก และไม่ทับของที่กำลังชี้อยู่ */
 #erpTip{position:fixed;z-index:4000;pointer-events:none;opacity:0;
-  max-width:340px;padding:9px 12px;border-radius:11px;
+  max-width:min(480px,calc(100vw - 32px));padding:11px 14px;border-radius:11px;
   background:var(--surface);color:var(--ink);
   border:1px solid var(--line);
   box-shadow:0 2px 6px rgba(16,24,40,.08),0 12px 28px rgba(16,24,40,.16);
@@ -6893,12 +6893,19 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var _qTops=PIMPL.filter(function(z){return z.ph===ph&&!z.parent;});
       var _qSlip=_qTops.map(function(z){var i=piDueInfo(z);return i?{d:z,i:i}:null;})
         .filter(Boolean)
-        .sort(function(a,b){return (b.i.days||0)-(a.i.days||0);});
+        /* เรียงตามรหัสงาน ไม่ใช่ตามจำนวนวัน เพราะคนอ่านไล่หา BRD ที่ตัวเองรับผิดชอบ
+           ลำดับคงที่หาได้เร็วกว่าลำดับที่เปลี่ยนทุกสัปดาห์ */
+        .sort(function(a,b){return String(a.d.name||'')
+          .localeCompare(String(b.d.name||''),'th',{numeric:true});});
       var _QMAX=12;
       var _qlines=_qSlip.slice(0,_QMAX).map(function(x){
         var dd=x.i.days;
-        return x.d.name+' — เลื่อน '+x.i.n+' ครั้ง · '
-          +(dd>0?('+'+dd+' วัน'):(dd<0?('−'+(-dd)+' วัน'):'วันจบเท่าเดิม'));});
+        var _d=(dd>0?('+'+dd+' วัน'):(dd<0?('−'+(-dd)+' วัน'):'วันจบเท่าเดิม'));
+        var _t='เลื่อน '+x.i.n+' ครั้ง · '+_d;
+        /* ตัวแสดง tooltip ทำตัวหนาให้ข้อความหน้าเครื่องหมาย : ที่ยาวไม่เกิน 26 ตัว
+           แยกรหัสออกมาคั่นด้วย : จึงได้ตัวหนาโดยไม่ต้องแก้ตัวแสดงผล */
+        var _m=String(x.d.name||'').match(/^([^:：]{1,26}?)\s*-\s*(.+)$/);
+        return _m?(_m[1]+': '+_m[2]+' — '+_t):(x.d.name+' — '+_t);});
       if(_qSlip.length>_QMAX)_qlines.push('และอีก '+(_qSlip.length-_QMAX)+' งาน');
       /* ไม่มีงานหลักไหนเลื่อนเลย — ถอยกลับไปไล่ log ของเฟสแบบเดิม ดีกว่าการ์ดว่าง */
       if(!_qlines.length)_qlines=(_phd.dueLog||[]).map(function(x){
