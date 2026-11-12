@@ -3258,7 +3258,7 @@ body.ro .gpadd,body.ro .gpx{display:none}
 
 /* ── tooltip ── ตามเคอร์เซอร์ ไม่กินคลิก และไม่ทับของที่กำลังชี้อยู่ */
 #erpTip{position:fixed;z-index:4000;pointer-events:none;opacity:0;
-  max-width:340px;padding:9px 12px;border-radius:11px;
+  max-width:min(480px,calc(100vw - 32px));padding:11px 14px;border-radius:11px;
   background:var(--surface);color:var(--ink);
   border:1px solid var(--line);
   box-shadow:0 2px 6px rgba(16,24,40,.08),0 12px 28px rgba(16,24,40,.16);
@@ -3283,8 +3283,11 @@ body.ro .gpadd,body.ro .gpx{display:none}
    .pjcard ขอ min-width:128px ไว้ แต่กลุ่มการ์ดรวมที่ประกาศทีหลังตั้ง min-width:0
    ทับไว้ การ์ดจึงบีบเหลือ 41px ทุกใบตั้งแต่ก่อนแยกการ์ดนี้
    อ่านไม่ออกสักใบ วางเป็นสองคอลัมน์แทน แล้วให้ป้ายกับค่าขึ้นบรรทัดใหม่ได้ */
+/* กำหนดความกว้างขั้นต่ำที่ยังอ่านครบ แล้วปล่อยให้เบราว์เซอร์จัดเองว่าแถวหนึ่งลงกี่ใบ
+   ดีกว่าตั้งจำนวนคอลัมน์ไว้เอง เพราะจำนวนการ์ดเปลี่ยนได้ตามข้อมูล */
+.projribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
 @media(max-width:1100px){
-  .projribbon{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .projribbon{gap:10px}
   #projRibbon .pjcard{min-width:0}
   #projRibbon .pjcard .pjk{white-space:normal;overflow:visible;line-height:1.35}
   #projRibbon .pjcard .pjv{white-space:normal;word-break:break-word}
@@ -3297,8 +3300,24 @@ body.ro .gpadd,body.ro .gpx{display:none}
 
 /* ── สีสถานะของตัวเลขความคืบหน้า ──
    พื้นสว่างใช้โทนเข้ม พื้นมืดใช้โทนสว่าง ทุกคู่ผ่าน 3:1 ของตัวอักษรขนาดใหญ่ */
-:root{--stat-ok:#1f8f36;--stat-warn:#9a6b00;--stat-bad:#d02a20}
-[data-theme="dark"]{--stat-ok:#28cd41;--stat-warn:#ffb340;--stat-bad:#ff6b5e}
+/* --stat-* ใช้กับตัวเลขใหญ่บนการ์ด (เกณฑ์ 3:1)
+   --chip-* ใช้กับป้ายตัวเล็ก ซึ่งต้องการ 4.5:1 จึงเข้มกว่า */
+:root{--stat-ok:#1f8f36;--stat-warn:#9a6b00;--stat-bad:#d02a20;
+  --chip-warn:#7a5500;--chip-bad:#b3231a}
+/* เลือกด้วยการวัด ไม่ใช่การเดา: คู่ที่ต่างกันน้อยสุดของชุดนี้
+   ได้ ΔE 17.8 สำหรับคนตาบอดสี เทียบกับชุดเดิมที่ได้แค่ 2.9 (แยกไม่ออก)
+   คอนทราสต์กับพื้นหลัง 6.12 / 6.49 / 5.18 ผ่านทั้งสามตัว */
+[data-theme="dark"]{--stat-ok:#22c55e;--stat-warn:#f59e0b;--stat-bad:#fb7185;
+  --chip-warn:#f59e0b;--chip-bad:#fb7185}
+/* ป้ายเสี่ยงข้างวัน Go-Live — สีบวกคำ ไม่ใช่สีอย่างเดียว */
+.pjrisk{display:inline-block;margin-left:9px;padding:2px 9px;border-radius:980px;
+  font-size:11px;font-weight:700;vertical-align:middle;letter-spacing:0;white-space:nowrap}
+.pjrisk.bad{background:color-mix(in srgb,var(--stat-bad) 9%,var(--surface));color:var(--chip-bad)}
+.pjrisk.warn{background:color-mix(in srgb,var(--stat-warn) 9%,var(--surface));color:var(--chip-warn)}
+/* ธีมมืดพื้นการ์ดสว่างกว่า พอผสมสีเข้าไปพื้นจะสว่างเกิน ตัวอักษร 11px จึงตกเกณฑ์ 4.5:1
+   ผสมกับ --bg แทนซึ่งเข้มกว่า ได้พื้นที่มืดพอให้ตัวอักษรสีสดลอยขึ้นมา */
+[data-theme="dark"] .pjrisk.bad{background:color-mix(in srgb,var(--stat-bad) 16%,var(--bg))}
+[data-theme="dark"] .pjrisk.warn{background:color-mix(in srgb,var(--stat-warn) 17%,var(--bg))}
 </style>
 <div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
   <div class="rcm-card" role="dialog" aria-modal="true">
@@ -5540,7 +5559,8 @@ function erpProgVarCard(){
     asub:L('คืบหน้าที่ทำได้จริงตามรายงาน weekly ของผู้ขาย','Actual progress from the vendor weekly report')+_as,
     pval:p.plan+'%',
     psub:L('เส้นพื้นตามแผนของผู้ขาย คือค่าที่ควรทำได้ ณ วันเดียวกัน','Baseline from the vendor plan for the same date')+_as,
-    dval:(d>0?'+':'')+d+'%',
+    /* ลูกศรเป็นช่องทางที่สอง ถ้าอ่านสีไม่ออกก็ยังรู้ทิศทาง */
+    dval:(d<0?'▼ ':(d>0?'▲ ':''))+(d>0?'+':'')+d+'%',
     dsub:(d<0?(L('ช้ากว่าแผน ','Behind plan by ')+Math.abs(d)+L(' จุด',' points')):(d>0?(L('เร็วกว่าแผน ','Ahead of plan by ')+d+L(' จุด',' points')):L('ตรงตามแผน','On plan')))+_as};}
 function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById('projRibbon');if(!el)return;
   var n=PIMPL.length;var _lv=PIMPL.filter(function(d){return piChildren(d).length===0;}),_tw=0,_sw=0;_lv.forEach(function(d){var w=piDurOf(d);_tw+=w;_sw+=piCalcProg(d)*w;});var prog=_tw?Math.round(_sw/_tw):0;
@@ -5581,6 +5601,14 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
       else if(_pe.over>0)_cal=L(' · มีงานเกินกรอบเฟส ',' · tasks exceed phase by ')+_pe.over+L(' วัน',' days');}
     _pstat=_vs.st;_pcol=_vs.col;
     _psub=_vs.sub+_cal+L(' · จากรายงาน weekly ของผู้ขาย',' · from the vendor weekly report');}
+  /* ป้ายเสี่ยงข้าง Go-Live — อ่านจากส่วนต่างรวมของโครงการ เกณฑ์เดียวกับใบส่วนต่าง */
+  var _glRisk='',_glSub=L('กำหนดขึ้นระบบจริง','Planned go-live date');
+  (function(){var _gv=erpProgVarCard();if(!_gv)return;
+    if(_gv.d<=-15){_glRisk='<span class="pjrisk bad">'+L('เสี่ยงเลื่อน','At risk')+'</span>';
+      _glSub=L('โครงการช้ากว่าแผน ','Project is ')+Math.abs(_gv.d)
+        +L(' จุด วันนี้มีโอกาสเลื่อน',' pts behind plan — this date may move');}
+    else if(_gv.d<=-5){_glRisk='<span class="pjrisk warn">'+L('เฝ้าระวัง','Watch')+'</span>';
+      _glSub=L('โครงการช้ากว่าแผน ','Project is ')+Math.abs(_gv.d)+L(' จุด',' pts behind plan');}})();
   var glR=PIMPL.find(d=>/go live/i.test(d.name)&&d.s===d.e);var glD=glR?piDate(glR.e):(PIMPL.map(d=>piDate(d.e)).filter(Boolean).sort((a,b)=>b-a)[0]||null),golive=glD?fmtDMY(glD):'—';
   /* แถบสรุปวาดก่อนที่ requirements จะโหลดเสร็จได้ ถ้าอ่าน REQS ตรงๆ
      ทั้งฟังก์ชันโยน TypeError แถบสรุปหายทั้งแถบ ไม่ใช่แค่สองใบสุดท้าย */
@@ -5593,7 +5621,24 @@ function renderProjRibbon(){if(GCTX!=='pi')return;var el=document.getElementById
   var _msL=PIMPL.filter(function(d){return d.ms;}).map(function(d){return {n:d.ms,e:piDate(d.e)};}).filter(function(x){return x.e;}).sort(function(a,b){return a.e-b.e;});var _nm=_msL.filter(function(x){return x.e>=now;})[0]||null;var _nmD=_nm?Math.max(0,Math.ceil((_nm.e-now)/86400000)):null;/* เดิมทาแดงตลอด ทั้งที่ชื่อ milestone ไม่ได้แปลว่ามีอะไรผิด
      ให้สีบอกความใกล้แทน ภายในสองสัปดาห์เหลือง นอกนั้นสีปกติ */
   var _nmCol=(_nmD!=null&&_nmD<=14)?'var(--stat-warn)':'';var _nmV=_nm?_nm.n:'—',_nmSub=_nm?(fmtDMY(_nm.e)+L(' · อีก ',' · in ')+Math.max(0,Math.ceil((_nm.e-now)/86400000))+L(' วัน',' days')):L('ไม่มี milestone ข้างหน้า','No upcoming milestone');
-  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol)].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('คืบหน้าจริง','Actual Progress'),pv.aval,pv.asub,pv.col));ex.push(c(L('คืบหน้าตามแผน','Planned Progress'),pv.pval,pv.psub,'var(--ink3)'));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}return ex;})()).concat([c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,_nmCol),c('Go-Live',golive,'','')]).join('');}
+  el.innerHTML=[c(L('เฟสปัจจุบัน','Current Phase'),curPh,_vp?L('จากรายงาน weekly ของผู้ขาย · เฟสแรกที่ยังไม่ถึง 100% (ตอนนี้ '+_vp.a+'%)','From vendor weekly report · first phase under 100% (now '+_vp.a+'%)'):'',''),c(L('สถานะเฟส','Phase Status'),_pstat,_psub,_pcol)].concat((function(){var ex=[];var pv=erpProgVarCard();if(pv){ex.push(c(L('คืบหน้าจริง','Actual Progress'),pv.aval,pv.asub,''));ex.push(c(L('คืบหน้าตามแผน','Planned Progress'),pv.pval,pv.psub,'var(--ink3)'));ex.push(c(L('ส่วนต่าง','Variance'),pv.dval,pv.dsub,pv.col));}
+    /* ══ สองใบนี้เพิ่มมาเพื่อตอบคำถามที่ผู้บริหารถามจริง ══
+       "−32 จุด" เป็นนามธรรม สั่งงานไม่ได้ แต่ "ช้าไป 61 วัน" สั่งได้
+       สองใบนี้เป็นสีตัวอักษรปกติ เพราะเป็นค่าที่วัดได้ ไม่ใช่คำตัดสิน
+       สีบนแถบนี้เก็บไว้ให้สามที่เท่านั้น: สถานะเฟส · ส่วนต่าง · ป้ายเสี่ยงข้าง Go-Live */
+    var _pho=(typeof PH_STORE!=='undefined'&&PH_STORE[GCTX])?PH_STORE[GCTX][curPhKey]:null;
+    var _phi=(_pho&&typeof piPhDueInfo==='function')?piPhDueInfo(_pho):null;
+    if(_phi&&_phi.days>0)ex.push(c(L('เฟสนี้ช้าไป','Phase Slip'),
+      _phi.days+L(' วัน',' days'),
+      L('วันจบเดิม ','Original end ')+_phi.base+' → '+(_pho.e||'-')
+        +L(' · เลื่อนมาแล้ว ',' · moved ')+_phi.n+L(' ครั้ง',' times'),''));
+    var _rvL=PIMPL.filter(function(z){return z.st==='In Review'&&piChildren(z).length===0;});
+    if(_rvL.length){var _rvC={};
+      _rvL.forEach(function(z){var k=z.rvw||'Civil';_rvC[k]=(_rvC[k]||0)+1;});
+      ex.push(c(L('รอตรวจ','Awaiting Review'),_rvL.length,
+        Object.keys(_rvC).sort().map(function(k){return k+' '+_rvC[k];}).join(' · ')
+          +L(' · งานที่ค้างรอการตรวจอยู่',' · tasks waiting for review'),''));}
+    return ex;})()).concat([c(L('Milestone ถัดไป','Next Milestone'),_nmV,_nmSub,_nmCol),c('Go-Live',golive+_glRisk,_glSub,'')]).join('');}
 function showTab(id){if(id==='oracle'){var _of=document.getElementById('oracleFrame');if(_of&&!_of.getAttribute('src'))_of.setAttribute('src','Oracle_Process_Interactive.html');}document.querySelectorAll('.nav-item[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));refreshCrumb();var _pt=document.getElementById('projToggle');if(_pt)_pt.classList.toggle('show',id==='project');var _bt=document.getElementById('brToggle');if(_bt)_bt.classList.toggle('show',id==='bridge');if(id==='bridge'){setBrView(curBrView);}if(id==='overview'){setGanttCtx('pi');renderCockpit();}if(id==='project'){setGanttCtx('pi');renderProjRibbon();setProjView(curProjView);}else{syncTopAdd();}document.getElementById('app').classList.remove('tb-open');if(typeof tbClose==='function')tbClose();var _m=document.querySelector('.main');if(_m)_m.scrollTo({top:0,behavior:'smooth'});if(typeof updateNavActive==='function')updateNavActive();}
 function updateNavActive(){var tab=(document.querySelector('.panel.active')||{}).id||'';document.querySelectorAll('.sb-item').forEach(function(el){var m;if(el.dataset.pv)m=(tab==='project'&&el.dataset.pv===curProjView);else if(el.dataset.bv)m=(tab==='bridge'&&el.dataset.bv===curBrView);else m=(el.dataset.tab===tab);el.classList.toggle('active',!!m);});
   document.querySelectorAll('.tb-a').forEach(function(a){var on=a.dataset.goto?(a.dataset.goto===tab)
@@ -6848,12 +6893,19 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       var _qTops=PIMPL.filter(function(z){return z.ph===ph&&!z.parent;});
       var _qSlip=_qTops.map(function(z){var i=piDueInfo(z);return i?{d:z,i:i}:null;})
         .filter(Boolean)
-        .sort(function(a,b){return (b.i.days||0)-(a.i.days||0);});
+        /* เรียงตามรหัสงาน ไม่ใช่ตามจำนวนวัน เพราะคนอ่านไล่หา BRD ที่ตัวเองรับผิดชอบ
+           ลำดับคงที่หาได้เร็วกว่าลำดับที่เปลี่ยนทุกสัปดาห์ */
+        .sort(function(a,b){return String(a.d.name||'')
+          .localeCompare(String(b.d.name||''),'th',{numeric:true});});
       var _QMAX=12;
       var _qlines=_qSlip.slice(0,_QMAX).map(function(x){
         var dd=x.i.days;
-        return x.d.name+' — เลื่อน '+x.i.n+' ครั้ง · '
-          +(dd>0?('+'+dd+' วัน'):(dd<0?('−'+(-dd)+' วัน'):'วันจบเท่าเดิม'));});
+        var _d=(dd>0?('+'+dd+' วัน'):(dd<0?('−'+(-dd)+' วัน'):'วันจบเท่าเดิม'));
+        var _t='เลื่อน '+x.i.n+' ครั้ง · '+_d;
+        /* ตัวแสดง tooltip ทำตัวหนาให้ข้อความหน้าเครื่องหมาย : ที่ยาวไม่เกิน 26 ตัว
+           แยกรหัสออกมาคั่นด้วย : จึงได้ตัวหนาโดยไม่ต้องแก้ตัวแสดงผล */
+        var _m=String(x.d.name||'').match(/^([^:：]{1,26}?)\s*-\s*(.+)$/);
+        return _m?(_m[1]+': '+_m[2]+' — '+_t):(x.d.name+' — '+_t);});
       if(_qSlip.length>_QMAX)_qlines.push('และอีก '+(_qSlip.length-_QMAX)+' งาน');
       /* ไม่มีงานหลักไหนเลื่อนเลย — ถอยกลับไปไล่ log ของเฟสแบบเดิม ดีกว่าการ์ดว่าง */
       if(!_qlines.length)_qlines=(_phd.dueLog||[]).map(function(x){
