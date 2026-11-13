@@ -2686,7 +2686,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
     <div class="topbar">
       <div class="tb-left">
         <img class="tb-logo" src="CIVIL_LOGO_ENG_Full color.png" alt="Civil Engineering Public Company Limited" title="ไปหน้าแผนงานโครงการ" onclick="showTab('project')">
-        <span class="tb-vd"></span><span class="tb-sys">ระบบติดตามงาน ERP</span>
+        <span class="tb-vd"></span><span class="tb-sys" data-i18n="tbSys">ระบบติดตามงาน ERP</span>
       </div>
       <nav class="tb-nav">
         <button class="tb-a" data-pop="tbPlan" aria-expanded="false" aria-controls="tbPlan"><span data-nav="navImpl">โครงการวางระบบ Oracle</span> <span class="plus">+</span></button>
@@ -2697,7 +2697,7 @@ body.ro #brTableView [contenteditable]{pointer-events:none;opacity:.72}
         <span class="robadge" id="roBadge" style="display:none" title="แผนงานโครงการและ Automation แก้ได้เฉพาะผู้ดูแล IT">ดูอย่างเดียว</span>
         <button class="icon-btn" id="fsBtn" onclick="toggleFS()" title="โหมดนำเสนอเต็มจอ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg><span id="fsTxt" class="ib-lbl">นำเสนอ</span></button>
         <button class="tb-user" data-pop="tbUser" aria-expanded="false" aria-controls="tbUser" aria-label="เมนูผู้ใช้"><span class="tb-av">CE</span><span class="tb-un">Civil ERP Team</span></button>
-        <button class="tb-out" onclick="erpAskLogout()" title="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="tb-outl">ออกจากระบบ</span></button>
+        <button class="tb-out" onclick="erpAskLogout()" title="ออกจากระบบ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span class="tb-outl" data-i18n="tbLogout">ออกจากระบบ</span></button>
         <button class="tb-ham" data-pop="tbAll" aria-expanded="false" aria-controls="tbAll" aria-label="เมนูทั้งหมด" title="เมนูทั้งหมด"><i></i><i></i><i></i></button>
       </div>
     </div>
@@ -3386,6 +3386,55 @@ body.ro .gpadd,body.ro .gpx{display:none}
   .g-add{position:relative}
   .g-add::after{content:'';position:absolute;left:50%;top:50%;
     width:44px;height:44px;transform:translate(-50%,-50%)}
+}
+
+/* ══ ประวัติการเลื่อนวันจบของเฟส ══ */
+.g-phslip.clk{cursor:pointer}
+.g-phslip.clk:hover{border-color:var(--accent);color:var(--accent)}
+.g-phslip.clk:hover svg{color:var(--accent)}
+.mbox.m-phd{width:min(680px,100%)}
+.phdwrap{grid-template-columns:minmax(0,1fr)}
+.phdwrap .dleft{border-right:0}
+.phd-sum{margin:0 0 4px}
+.phd-row{display:grid;grid-template-columns:76px minmax(0,1fr) 32px;gap:4px 12px;align-items:start;padding:14px 0;border-top:1px solid var(--line2)}
+.phd-row:first-child{border-top:0;padding-top:4px}
+.phd-k{font-size:13px;font-weight:700;color:var(--ink2);padding-top:8px;white-space:nowrap}
+.phd-main{min-width:0}
+.phd-line{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;font-size:14px;color:var(--ink2);line-height:1.5}
+.phd-line b{color:var(--ink);font-weight:600}
+.phd-dro{display:inline-block;padding:7px 0;font-size:14px}
+/* กฎเดิม input[type=text]{min-width:190px;flex:1;max-width:320px} ทำให้ช่องวันที่ยืดเต็มบรรทัด
+   และช่องเหตุผลถูกตัดที่ 320px ปลดเฉพาะในลิ้นชักนี้ */
+input.phd-date{flex:none;min-width:0;max-width:none;width:122px;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit;font-weight:600}
+input.phd-date:focus,input.phd-why:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--mint)}
+.phd-delta{font-size:13px;font-weight:600;color:var(--ink2);white-space:nowrap}
+.phd-cur{font-size:11px;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--surface));border-radius:999px;padding:2px 9px;white-space:nowrap}
+input.phd-why{min-width:0;max-width:none;flex:none;display:block;width:100%;box-sizing:border-box;margin-top:8px;font-size:13px;padding:7px 10px;border:1px solid var(--line2);border-radius:8px;background:var(--surface);color:var(--ink);font-family:inherit}
+.phd-why::placeholder{color:var(--ink3)}
+.phd-whyro{font-size:13px;color:var(--ink);margin-top:6px;white-space:pre-wrap;overflow-wrap:anywhere}
+.phd-meta{font-size:12px;color:var(--ink3);margin-top:6px;line-height:1.5}
+.phd-del{width:32px;height:32px;margin-top:2px;border:0;border-radius:8px;background:none;color:var(--ink3);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.phd-del svg{width:16px;height:16px}
+.phd-del:hover{background:color-mix(in srgb,var(--red) 10%,transparent);color:var(--red)}
+.phd-err{font-size:13px;font-weight:600;color:var(--chip-bad);line-height:1.5}
+.phd-err:not(:empty){margin:-6px 0 8px}
+.phd-note{font-size:12.5px;color:var(--ink3);line-height:1.55;margin-top:2px}
+/* ช่อง "จากวันจบปัจจุบัน" เป็นค่าอ่านอย่างเดียว สูงไม่เท่าช่องกรอกข้างๆ
+   จัดชิดบนแล้วให้สูงเท่ากัน ป้ายสองช่องจึงอยู่ระดับเดียวกัน */
+.phd-add .frow{align-items:start}
+.phd-add .roval{display:flex;align-items:center;min-height:42px;padding-top:0;padding-bottom:0}
+@media(max-width:760px){
+  .phd-row{grid-template-columns:minmax(0,1fr) 44px;gap:6px 8px}
+  .phd-k{grid-column:1/-1;padding-top:0}
+  .phd-main{grid-column:1}
+  .phd-del{width:44px;height:44px;margin-top:-6px}
+  input.phd-date{width:140px;min-height:44px;font-size:16px}
+  input.phd-why,#phdTo,#phdWhy{font-size:16px}
+  input.phd-why{min-height:44px}
+  .phd-add .dueact .btn{flex:1;min-height:44px}
+  .phd-add .roval{min-height:46px;font-size:16px}
+  .g-phslip.clk{position:relative}
+  .g-phslip.clk::after{content:'';position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
 }
 </style>
 <div id="resetConfirm" onclick="if(event.target===this)closeResetConfirm()">
@@ -5900,7 +5949,9 @@ function openModal(id){editId=id;const r=id?REQS.find(x=>x._id===id):{module:'�
   paintStep(st);
   document.getElementById('modal').classList.add('open');
   setReqMode((id&&(r.req||'').trim())?'view':'edit');}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
+function closeModal(){document.getElementById('modal').classList.remove('open');
+  /* หน้าประวัติการเลื่อนของเฟสใช้ลิ้นชักแคบกว่า คืนความกว้างให้ลิ้นชักอื่น */
+  var _mb=document.querySelector('#modal .mbox');if(_mb)_mb.classList.remove('m-phd');PH_DUE_KEY=null;}
 var _mdlDown=null;document.getElementById('modal').addEventListener('mousedown',function(e){_mdlDown=e.target;});document.getElementById('modal').onclick=function(e){if(e.target.id==='modal'&&_mdlDown&&_mdlDown.id==='modal')closeModal();_mdlDown=null;};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 function autoGrow(el){if(!el)return;el.style.height='auto';el.style.height=Math.min(el.scrollHeight+2,Math.round(window.innerHeight*0.54))+'px';}
@@ -6430,24 +6481,25 @@ function piAddPhase(nm){if(erpDenyEdit())return;nm=(nm||'').trim();if(!nm)return
 function piAddPhaseInline(el){if(erpDenyEdit())return;var wrap=el.parentNode;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.placeholder=(GCTX==='ap'?'ชื่อกลุ่มใหม่…':'ชื่อเฟสใหม่…');wrap.innerHTML='';wrap.appendChild(inp);inp.focus();var done=false;var fin=function(ok){if(done)return;done=true;var v=ok?inp.value.trim():'';if(v)piAddPhase(v);else renderPI();};inp.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
 function piRenamePhase(key,nm){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;nm=(nm||'').trim();if(!nm||nm===cur.name){renderPI();return;}cur.name=nm;piPhSave(GCTX,cur);applyPhaseMap(GCTX);renderPI();if(window.renderProjRibbon)renderProjRibbon();}
 function piSetPhaseDates(key,sv,ev,why){if(erpDenyEdit())return;var m=PH_STORE[GCTX]||{};var cur=m[key];if(!cur)return;sv=(sv||'').trim();ev=(ev||'').trim();var msg;var _oldE=cur.e;if(!sv&&!ev){delete cur.s;delete cur.e;msg='กลับไปคำนวณจากงาน';}else if(!sv||!ev){if(window.toast)toast('ต้องกรอกทั้งวันเริ่มและวันจบ');renderPI();return;}else{var a=piDate(sv),b=piDate(ev);if(!a||!b){if(window.toast)toast('รูปแบบวันที่ต้องเป็น dd/mm/yyyy');renderPI();return;}if(b<a){var t=sv;sv=ev;ev=t;msg='ตั้งวันที่เฟสแล้ว (สลับวันเริ่ม-จบให้)';}else{msg='ตั้งวันที่เฟสแล้ว';}cur.s=sv;cur.e=ev;
-    /* วันจบเปลี่ยนจากของเดิมที่เคยตั้งไว้ = การเลื่อนกำหนด ต้องเก็บไว้
-       ไม่ใช่เขียนทับเงียบๆ · ครั้งแรกที่ตั้งวัน (ยังไม่เคยมี e) ไม่นับเป็นการเลื่อน */
-    if(_oldE&&ev!==_oldE){
-      if(!Array.isArray(cur.dueLog))cur.dueLog=[];
-      cur.dueLog.push({from:_oldE,to:ev,at:piLogStamp(),why:(why||'').trim()});
-      var _dd=Math.round((piDate(ev)-piDate(_oldE))/86400000);
-      msg=(_dd>0?'เลื่อนวันจบเฟสไป '+_dd+' วัน':'ร่นวันจบเฟสเข้ามา '+(-_dd)+' วัน')+' (บันทึกแล้ว)';
-    }}piPhSave(GCTX,cur);renderPI();if(window.toast)toast(msg);}
+    /* ที่นี่ตั้งวันอย่างเดียว ไม่บันทึกการเลื่อนแล้ว (2026-11-12)
+       การเลื่อนวันจบลงประวัติผ่านหน้าประวัติการเลื่อน (piPhDueOpen) ที่ต้องกรอกเหตุผล */}piPhSave(GCTX,cur);renderPI();if(window.toast)toast(msg);}
 function piPhDatesInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var d=(PH_STORE[GCTX]||{})[key]||{};var wrap=document.createElement('span');wrap.className='g-phdt';var mk=function(v,ph2){var i2=document.createElement('input');i2.className='g-inl-inp g-dtin';i2.type='text';i2.value=v||'';i2.placeholder=ph2;return i2;};var a=mk(d.s,'dd/mm/yyyy'),b=mk(d.e,'dd/mm/yyyy');wrap.appendChild(a);wrap.appendChild(document.createTextNode(' → '));wrap.appendChild(b);
-  /* ช่องเหตุผลโผล่เองเฉพาะตอนที่วันจบถูกแก้จากของเดิม — ถ้าโผล่ตลอดจะกวนตอนแก้วันเริ่ม
-     ไม่บังคับกรอก (ให้เหมือนระดับงาน) แต่ตัวตรวจ drift จะฟ้องถ้าเลี่ยงไปแก้ทางอื่น */
-  var why=mk('','เหตุผลที่เลื่อน…');why.className='g-inl-inp g-whyin';why.style.display='none';
-  wrap.appendChild(why);
-  var syncWhy=function(){var ch=!!(d.e&&(b.value||'').trim()&&(b.value||'').trim()!==d.e);
-    why.style.display=ch?'':'none';};
-  b.oninput=syncWhy;
+  /* แก้วันจบตรงนี้เคยบันทึกเป็น "เลื่อน" ทันทีที่คลิกออก โดยไม่ต้องยืนยัน (2026-11-12)
+     เฟส 02 จึงนับได้ 6 ครั้งทั้งที่เลื่อนจริง 3 ครั้ง ส่วนที่เกินคือการพิมพ์ผิดแล้วแก้กลับ
+     ตอนนี้ช่องนี้ตั้งวันเริ่มได้ตามเดิม แต่ถ้าวันจบเปลี่ยน จะเปิดหน้าประวัติการเลื่อน
+     พร้อมวันที่กรอกไว้ ให้ยืนยันพร้อมเหตุผลก่อนถึงจะนับเป็นการเลื่อน */
   nameEl.textContent='';nameEl.appendChild(wrap);a.focus();a.select();
-  var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piSetPhaseDates(key,a.value,b.value,why.value);else renderPI();};[a,b,why].forEach(function(el){el.onmousedown=function(e){e.stopPropagation();};el.onclick=function(e){e.stopPropagation();};el.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};el.onblur=function(){setTimeout(function(){if(document.activeElement!==a&&document.activeElement!==b&&document.activeElement!==why)fin(true);},0);};});}
+  var done=false;var fin=function(ok){if(done)return;done=true;if(!ok){renderPI();return;}
+    var sv=(a.value||'').trim(),ev=(b.value||'').trim();
+    if(d.e&&ev&&ev!==d.e){
+      var ne=piPhNormDate(ev);
+      if(!ne){if(window.toast)toast('วันจบต้องเป็นรูปแบบ วว/ดด/ปปปป');renderPI();return;}
+      if(ne!==d.e){
+        if(sv!==(d.s||''))piSetPhaseDates(key,sv,d.e);else renderPI();
+        piPhDueOpen(key,ne);return;}
+      ev=ne;}
+    piSetPhaseDates(key,sv,ev);};
+  [a,b].forEach(function(el){el.onmousedown=function(e){e.stopPropagation();};el.onclick=function(e){e.stopPropagation();};el.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};el.onblur=function(){setTimeout(function(){if(document.activeElement!==a&&document.activeElement!==b)fin(true);},0);};});}
 function piRenameInline(btn,key){if(erpDenyEdit())return;var row=btn.closest('.g-deprow');if(!row)return;var nameEl=row.querySelector('.g-phname');if(!nameEl)return;var cur=(PH_STORE[GCTX]&&PH_STORE[GCTX][key])?PH_STORE[GCTX][key].name:nameEl.textContent;var inp=document.createElement('input');inp.className='g-inl-inp';inp.type='text';inp.value=cur;nameEl.textContent='';nameEl.appendChild(inp);inp.focus();inp.select();var done=false;var fin=function(ok){if(done)return;done=true;if(ok)piRenamePhase(key,inp.value);else renderPI();};inp.onmousedown=function(e){e.stopPropagation();};inp.onclick=function(e){e.stopPropagation();};inp.onkeydown=function(e){e.stopPropagation();if(e.key==='Enter'){e.preventDefault();fin(true);}else if(e.key==='Escape'){e.preventDefault();fin(false);}};inp.onblur=function(){fin(true);};}
 function piDeletePhase(key){if(erpDenyEdit())return;if(PIMPL.some(function(d){return d.ph===key;})){if(window.toast)toast(GCTX==='ap'?'ลบไม่ได้ — กลุ่มยังมีงาน':'ลบไม่ได้ — เฟสยังมีงาน');return;}var m=PH_STORE[GCTX]||{};if(!m[key])return;delete m[key];if(window.DB)window.DB.deleteItem(COL_PH[GCTX],key).catch(dbErr('phase del'));applyPhaseMap(GCTX);renderPI();if(window.toast)toast('ลบแล้ว');}
 function buildAP(){var d0=new Date(2026,6,1);var base=(DATA.bridge||[]).map(function(b){return {ph:(b.module||"อื่นๆ"),name:b.name||"(ไม่มีชื่อ)",asg:(b.owner?[b.owner]:[""]),s:"",e:"",prog:0,st:(b.status||"Not Started"),pr:(b.cplx==="High"?"High":"Low"),dep:[]};});var seq={};base.forEach(function(d,i){d._pi=i;d._key="b"+i;var dp=d.ph;var k=(seq[dp]=(seq[dp]||0));seq[dp]++;var st=new Date(d0.getTime()+k*14*86400000);var seg=10,p=st.getTime();var r0=new Date(p),r1=new Date(p+seg*864e5),v0=new Date(p+(seg+1)*864e5),v1=new Date(p+(2*seg+1)*864e5),u0=new Date(p+(2*seg+2)*864e5),u1=new Date(p+(3*seg+2)*864e5);d.stages=[{k:'req',s:fmtDMY(r0),e:fmtDMY(r1),st:'Not Started'},{k:'dev',s:fmtDMY(v0),e:fmtDMY(v1),st:'Not Started'},{k:'uat',s:fmtDMY(u0),e:fmtDMY(u1),st:'Not Started'}];d.gld=fmtDMY(new Date(u1.getTime()+3*864e5));d.s=fmtDMY(st);d.e=fmtDMY(u1);});AP_BASE=base;var depts=[...new Set((DATA.bridge||[]).map(function(b){return b.module||"อื่นๆ";}))];AP_GROUPS={};AP_PHC={};depts.forEach(function(dp){AP_GROUPS[dp]=dp;AP_PHC[dp]=deptColor(dp);});}
@@ -6587,6 +6639,175 @@ function piPhDueInfo(p){
   var last=piDate(L[L.length-1].to);
   return {n:L.length,base:L[0].from,marks:piDueMarks(L,p.e),days:Math.round((c-b)/86400000),
           drift:(last&&last.getTime()!==c.getTime())?{from:L[L.length-1].to,to:p.e}:null};}
+/* ══════════ ประวัติการเลื่อนวันจบของเฟส (2026-11-12) ══════════
+   เดิมเฟสมีแค่ช่องวันจบช่องเดียวบนหัวเฟส คนเห็นแค่ "เลื่อนแล้ว N ครั้ง"
+   แต่ไม่เห็นว่าครั้งที่ 1 เลื่อนจากวันไหนไปวันไหน และจะลงประวัติย้อนหลังก็ทำไม่ได้
+   เพราะช่องเดียวที่มีคือ "เป็นวันไหน" พอพยายามทำ ก็ได้รายการปลอมเพิ่มมาอีก
+   หน้านี้แยก "กำหนดเดิม" เป็นช่องของตัวเอง แล้วไล่ทีละครั้งให้เห็นวันทั้งสองฝั่ง
+   วัน "จาก" ของแต่ละครั้งผูกกับวัน "เป็น" ของครั้งก่อนเสมอ โซ่จึงไม่ขาด
+   และวันจบปัจจุบันของเฟสคือวันของครั้งล่าสุด
+   โครงข้อมูลยังเป็น dueLog [{from,to,at,why}] ตัวแสดงผลที่อื่นจึงไม่ต้องแก้ */
+var PH_DUE_KEY=null;
+/* ใส่ค่าลงใน onclick ต้องเป็นสตริง JS ที่ปลอดภัยและเป็น attribute ที่ปลอดภัยพร้อมกัน
+   คีย์เฟสมาจาก Firestore ที่ทุกคนที่ล็อกอินเขียนได้ ถ้าต่อด้วย '...' ตรงๆ
+   คีย์ที่มี ' จะหลุดออกไปเป็นโค้ด และ attr() เดิม escape แค่ " จึงต้อง escape & ด้วย */
+function piJsArg(v){return JSON.stringify(String(v==null?'':v)).replace(/&/g,'&amp;')
+  .replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function piPhNormDate(v){
+  var m=String(v||'').trim().replace(/[-.]/g,'/').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(!m)return null;
+  var dt=new Date(+m[3],+m[2]-1,+m[1]);
+  if(dt.getDate()!==+m[1]||dt.getMonth()!==+m[2]-1)return null;
+  return fmtDMY(dt);}
+function piPhDueDoc(key){return (PH_STORE[GCTX]||{})[key]||null;}
+function piPhDueGap(a,b){var x=piDate(a),y=piDate(b);return (x&&y)?Math.round((y-x)/86400000):0;}
+function piPhDueKey(ev,key){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();ev.stopPropagation();piPhDueOpen(key);}}
+function piPhDueOpen(key,pre){
+  var cur=piPhDueDoc(key);if(!cur)return;
+  var tip=document.getElementById('erpTip');if(tip)tip.classList.remove('on');
+  var mdl=document.getElementById('modal');
+  /* วาดใหม่ทุกครั้งที่แก้ช่องในรายการ ต้องเก็บสิ่งที่พิมพ์ค้างในฟอร์มเลื่อนครั้งใหม่ไว้ ไม่งั้นหายเฉยๆ */
+  var keep=null,oT=document.getElementById('phdTo'),oW=document.getElementById('phdWhy');
+  if(PH_DUE_KEY===key&&oT&&mdl.classList.contains('open'))keep={to:oT.value,why:oW?oW.value:''};
+  PH_DUE_KEY=key;
+  var N=(GCTX==='ap')?'กลุ่ม':'เฟส',ed=erpCanEditPlan();
+  var L=Array.isArray(cur.dueLog)?cur.dueLog:[];
+  var base=L.length?L[0].from:(cur.e||'');
+  var last=L.length?L[L.length-1]:null;
+  var drift=!!(last&&cur.e&&last.to!==cur.e);
+  var tot=piPhDueGap(base,cur.e);
+  var K=piJsArg(key);
+  var enter="if(event.key==='Enter'){event.preventDefault();this.blur();}";
+  var dIn=function(v,fn,lab){
+    if(!ed)return '<b class="phd-dro">'+esc(v||'-')+'</b>';
+    return '<input class="phd-date" type="text" inputmode="numeric" placeholder="วว/ดด/ปปปป" value="'+attr(v||'')
+      +'" aria-label="'+attr(lab)+'" onkeydown="'+enter+'" onchange="'+fn+'">';};
+  document.getElementById('mTitle').textContent=PI_PHASES[key]||cur.name||key;
+  document.getElementById('mSub').textContent='ประวัติการเลื่อนวันจบของ'+N;
+
+  var sum='<div class="duesum phd-sum">'
+    +(L.length
+      ?('กำหนดเดิม <b>'+esc(base)+'</b> · เลื่อน <b>'+L.length+'</b> ครั้ง · '
+        +(tot>0?('ช้ากว่าเดิม <b>'+tot+' วัน</b>'):(tot<0?('เร็วกว่าเดิม <b>'+(-tot)+' วัน</b>'):'วันจบเท่าเดิม'))
+        +' · วันจบปัจจุบัน <b>'+esc(cur.e||'-')+'</b>')
+      :('ยังไม่เคยเลื่อน · วันจบ <b>'+esc(cur.e||'-')+'</b>'))
+    +(cur.s?(' · วันเริ่ม <b>'+esc(cur.s)+'</b>'):'')+'</div>';
+  var dr=drift?('<div class="duedrift">วันจบปัจจุบัน '+esc(cur.e)+' ไม่ตรงกับการเลื่อนครั้งล่าสุด '
+    +esc(last.to)+' เพราะถูกแก้จากที่อื่นโดยไม่ได้ลงประวัติ</div>'):'';
+
+  var rows='<div class="phd-row"><div class="phd-k">กำหนดเดิม</div><div class="phd-main">'
+    +'<div class="phd-line">'+dIn(base,'piPhDueSetBase('+K+',this.value)','กำหนดเดิม')
+    +((!L.length&&cur.e)?'<span class="phd-cur">วันจบปัจจุบัน</span>':'')+'</div>'
+    +(ed?'<div class="phd-meta">แผนแรกก่อนเลื่อนครั้งใด แก้ช่องนี้ได้โดยไม่นับเป็นการเลื่อน</div>':'')
+    +'</div><span></span></div>';
+  L.forEach(function(x,i){
+    var g=piPhDueGap(x.from,x.to),isCur=(i===L.length-1&&!drift),n=i+1;
+    rows+='<div class="phd-row"><div class="phd-k">ครั้งที่ '+n+'</div><div class="phd-main">'
+      +'<div class="phd-line"><span>จาก <b>'+esc(x.from)+'</b> เป็น</span>'
+      +dIn(x.to,'piPhDueSetTo('+K+','+i+',this.value)','วันที่เลื่อนไปในครั้งที่ '+n)
+      +'<span class="phd-delta">'+piDueDays(g)+'</span>'
+      +(isCur?'<span class="phd-cur">วันจบปัจจุบัน</span>':'')+'</div>'
+      +(ed?('<input class="phd-why" type="text" value="'+attr(x.why||'')+'" placeholder="ยังไม่ได้ระบุเหตุผล กรอกได้ที่นี่"'
+            +' aria-label="เหตุผลของการเลื่อนครั้งที่ '+n+'" onkeydown="'+enter+'"'
+            +' onchange="piPhDueSetWhy('+K+','+i+',this.value)">')
+          :('<div class="phd-whyro">'+(x.why?esc(x.why):'<span class="muted">ไม่ได้ระบุเหตุผล</span>')+'</div>'))
+      +'<div class="phd-meta">'+(x.at?('บันทึกเมื่อ '+esc(x.at)):'ไม่มีเวลาที่บันทึก')+'</div></div>'
+      +(ed?('<button class="phd-del" onclick="piPhDueDel('+K+','+i+')" title="ลบครั้งที่ '+n+'" aria-label="ลบการเลื่อนครั้งที่ '+n+'">'
+            +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>')
+          :'<span></span>')
+      +'</div>';});
+
+  var add='';
+  if(ed&&cur.e){
+    var clr="var e=document.getElementById('phdErr');if(e)e.textContent=''";
+    add='<div class="dsec">บันทึกการเลื่อนครั้งที่ '+(L.length+1)+'</div>'
+      +'<div class="dueform open phd-add">'
+      +'<div class="frow"><div class="fld"><label>จากวันจบปัจจุบัน</label><div class="roval">'+esc(cur.e)+'</div></div>'
+      +'<div class="fld"><label for="phdTo">เลื่อนเป็น</label><input id="phdTo" type="text" inputmode="numeric" placeholder="วว/ดด/ปปปป"'
+      +' oninput="'+clr+'" onkeydown="if(event.key===\'Enter\'){event.preventDefault();piPhDueAdd('+K+');}"></div></div>'
+      +'<div class="fld"><label for="phdWhy">เหตุผลที่เลื่อน</label><textarea id="phdWhy" placeholder="เช่น รอ PS Global ส่ง BRD กลับ" oninput="'+clr+'"></textarea></div>'
+      +'<div class="phd-err" id="phdErr" role="alert"></div>'
+      +'<div class="phd-note">ถ้าแค่พิมพ์วันผิด ให้แก้วันในรายการด้านบนแทน การแก้ในรายการไม่นับเป็นการเลื่อนครั้งใหม่</div>'
+      +'<div class="dueact"><button class="btn btn-pri" onclick="piPhDueAdd('+K+')">บันทึกการเลื่อน</button></div></div>';}
+  else if(ed)add='<div class="phd-note">'+N+'นี้ยังไม่ได้ตั้งวันจบ ตั้งวันที่จากปุ่มปฏิทินบนหัว'+N+'ก่อน</div>';
+
+  document.getElementById('mBody').innerHTML='<div class="dtwo phdwrap"><div class="dleft phd">'
+    +sum+dr+'<div class="dsec">ลำดับการเลื่อน</div><div class="phd-list">'+rows+'</div>'+add
+    +'</div></div><div class="mact"><span style="flex:1"></span><button class="btn btn-sec" onclick="closeModal()">ปิด</button></div>';
+  var nT=document.getElementById('phdTo'),nW=document.getElementById('phdWhy');
+  if(nT){if(pre)nT.value=pre;else if(keep)nT.value=keep.to;}
+  if(nW&&keep&&!pre)nW.value=keep.why;
+  document.querySelector('#modal .mbox').classList.add('m-phd');
+  mdl.classList.add('open');
+  if(pre&&nW)setTimeout(function(){try{nW.focus();}catch(e){}},380);}
+function piPhDueCommit(key,cur,msg){
+  piPhSave(GCTX,cur);renderPI();
+  if(window.renderProjRibbon)renderProjRibbon();
+  piPhDueOpen(key);
+  if(msg&&window.toast)toast(msg);}
+function piPhDueBad(key,msg){if(window.toast)toast(msg);piPhDueOpen(key);}
+function piPhDueSetBase(key,v){if(erpDenyEdit())return;
+  var cur=piPhDueDoc(key);if(!cur)return;
+  var d=piPhNormDate(v);if(!d)return piPhDueBad(key,'วันที่ต้องเป็นรูปแบบ วว/ดด/ปปปป');
+  var L=Array.isArray(cur.dueLog)?cur.dueLog:[];
+  if(L.length){
+    if(d===L[0].from)return;
+    if(d===L[0].to)return piPhDueBad(key,'กำหนดเดิมต้องต่างจากวันของครั้งที่ 1');
+    L[0].from=d;}
+  else{
+    if(d===cur.e)return;
+    if(cur.s&&piDate(d)<piDate(cur.s))return piPhDueBad(key,'วันจบต้องไม่ก่อนวันเริ่ม '+cur.s);
+    cur.e=d;}
+  piPhDueCommit(key,cur,'แก้กำหนดเดิมเป็น '+d+' แล้ว ไม่นับเป็นการเลื่อน');}
+function piPhDueSetTo(key,i,v){if(erpDenyEdit())return;
+  var cur=piPhDueDoc(key);if(!cur)return;var L=cur.dueLog;if(!Array.isArray(L)||!L[i])return;
+  var d=piPhNormDate(v);if(!d)return piPhDueBad(key,'วันที่ต้องเป็นรูปแบบ วว/ดด/ปปปป');
+  if(d===L[i].to)return;
+  if(d===L[i].from)return piPhDueBad(key,'วันใหม่ต้องต่างจากวันก่อนเลื่อน '+L[i].from);
+  if(L[i+1]&&d===L[i+1].to)return piPhDueBad(key,'วันนี้ซ้ำกับครั้งที่ '+(i+2)+' ให้ลบครั้งนั้นแทน');
+  var wasCur=(i===L.length-1&&cur.e===L[i].to);
+  if(wasCur&&cur.s&&piDate(d)<piDate(cur.s))return piPhDueBad(key,'วันจบต้องไม่ก่อนวันเริ่ม '+cur.s);
+  L[i].to=d;if(L[i+1])L[i+1].from=d;if(wasCur)cur.e=d;
+  piPhDueCommit(key,cur,'แก้ครั้งที่ '+(i+1)+' เป็น '+d+' แล้ว');}
+function piPhDueSetWhy(key,i,v){if(erpDenyEdit())return;
+  var cur=piPhDueDoc(key);if(!cur||!Array.isArray(cur.dueLog)||!cur.dueLog[i])return;
+  v=String(v||'').trim();if(v===(cur.dueLog[i].why||''))return;
+  cur.dueLog[i].why=v;
+  piPhDueCommit(key,cur,'บันทึกเหตุผลของครั้งที่ '+(i+1)+' แล้ว');}
+/* ลบครั้งกลางรายการ = ครั้งถัดไปนับว่าเลื่อนจากวันก่อนหน้าแทน
+   ถ้าครั้งถัดไปเลยกลายเป็นเลื่อนจากวันเดิมไปวันเดิม (เคสเลื่อนออกแล้วดึงกลับ) ก็ลบไปด้วย
+   ลบครั้งล่าสุด = วันจบกลับไปเป็นวันก่อนเลื่อนครั้งนั้น */
+async function piPhDueDel(key,i){if(erpDenyEdit())return;
+  var cur=piPhDueDoc(key);if(!cur||!Array.isArray(cur.dueLog)||!cur.dueLog[i])return;
+  var L=cur.dueLog,x=L[i],N=(GCTX==='ap')?'กลุ่ม':'เฟส';
+  var nx=L[i+1],isLast=!nx,revert=isLast&&cur.e===x.to,merge=!!(nx&&nx.to===x.from);
+  var body=revert?('วันจบของ'+N+'จะกลับเป็น '+x.from+' ตามก่อนเลื่อนครั้งนี้')
+    :(isLast?'วันจบปัจจุบันไม่เปลี่ยน'
+      :(merge?('ครั้งที่ '+(i+2)+' เลื่อนกลับมาที่ '+x.from+' พอดี จึงไม่นับเป็นการเลื่อนแล้วและจะลบไปด้วย วันจบปัจจุบันไม่เปลี่ยน')
+             :('ครั้งที่ '+(i+2)+' จะนับว่าเลื่อนจาก '+x.from+' แทน วันจบปัจจุบันไม่เปลี่ยน')));
+  if(!await erpConfirm({title:'ลบการเลื่อนครั้งที่ '+(i+1)+' จาก '+x.from+' เป็น '+x.to,body:body,go:'ลบรายการนี้'}))return;
+  /* ระหว่างรอยืนยันอาจมีคนอื่นแก้ประวัติไปแล้ว ถ้ารายการไม่ใช่ตัวเดิมให้หยุด */
+  cur=piPhDueDoc(key);L=(cur&&Array.isArray(cur.dueLog))?cur.dueLog:null;
+  if(!L||!L[i]||L[i].from!==x.from||L[i].to!==x.to)return piPhDueBad(key,'ประวัติเพิ่งถูกแก้จากที่อื่น ลองใหม่อีกครั้ง');
+  var cnt=1;
+  if(L[i+1]){L[i+1].from=x.from;if(L[i+1].to===L[i+1].from)cnt=2;}
+  else if(cur.e===x.to)cur.e=x.from;
+  L.splice(i,cnt);
+  piPhDueCommit(key,cur,cnt===2?('ลบครั้งที่ '+(i+1)+' และ '+(i+2)+' แล้ว'):('ลบการเลื่อนครั้งที่ '+(i+1)+' แล้ว'));}
+function piPhDueAdd(key){if(erpDenyEdit())return;
+  var cur=piPhDueDoc(key);if(!cur||!cur.e)return;
+  var tEl=document.getElementById('phdTo'),wEl=document.getElementById('phdWhy'),er=document.getElementById('phdErr');
+  var say=function(m,el){if(er)er.textContent=m;if(el){try{el.focus();}catch(e){}}};
+  var d=piPhNormDate(tEl&&tEl.value),why=String((wEl&&wEl.value)||'').trim();
+  if(!d)return say('กรอกวันที่เลื่อนเป็น ในรูปแบบ วว/ดด/ปปปป',tEl);
+  if(d===cur.e)return say('วันใหม่ต้องต่างจากวันจบปัจจุบัน '+cur.e,tEl);
+  if(cur.s&&piDate(d)<piDate(cur.s))return say('วันจบต้องไม่ก่อนวันเริ่ม '+cur.s,tEl);
+  if(!why)return say('กรอกเหตุผลที่เลื่อน คนที่มาอ่านทีหลังจะได้รู้ว่าทำไม',wEl);
+  if(!Array.isArray(cur.dueLog))cur.dueLog=[];
+  var from=cur.e;
+  cur.dueLog.push({from:from,to:d,at:piLogStamp(),why:why});cur.e=d;
+  if(tEl)tEl.value='';if(wEl)wEl.value='';
+  piPhDueCommit(key,cur,'บันทึกการเลื่อนครั้งที่ '+cur.dueLog.length+' แล้ว จาก '+from+' เป็น '+d+' '+piDueDays(piPhDueGap(from,d)));}
 function piTbdNote(d){
   if(!piDate(d.e))return '<div class="tbdnote">ยังไม่กำหนดวัน Sign Off แถบในผังจึงใช้ขอบเขตของงานย่อยแทน</div>';
   var mx=null;piChildren(d).forEach(function(c){var e=piDate(piSpan(c).e);if(e&&(!mx||e>mx))mx=e;});
@@ -7006,8 +7227,9 @@ function renderPIGantt(){var rows=filteredPI();var gw=document.getElementById(PI
       /* ใช้คำเดียวกับที่อื่น: กำหนดเดิม และ เลื่อนแล้ว N ครั้ง */
       var _qhd='เฟสนี้เลื่อนวันจบแล้ว '+_pdue.n+' ครั้ง · กำหนดเดิม '+_pdue.base+' เลื่อนเป็น '+(_phd.e||'-');
       var _qtip=_qhd+'\n'+_qlines.join('\n')
-        +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' เป็น '+_pdue.drift.to+')'):'');
-      _pslip=`<span class="g-phslip${_qd>0?'':' ok'}" title="${attr(_qtip)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_qtxt}</span>`;
+        +(_pdue.drift?('\nมีการแก้วันจบหลังจากนี้โดยไม่ได้บันทึกเหตุผล ('+_pdue.drift.from+' เป็น '+_pdue.drift.to+')'):'')
+        +'\n\n'+(erpCanEditPlan()?'กดที่ป้ายนี้เพื่อดูและแก้ประวัติการเลื่อนทีละครั้ง':'กดที่ป้ายนี้เพื่อดูประวัติการเลื่อนทีละครั้ง');
+      _pslip=`<span class="g-phslip clk${_qd>0?'':' ok'}" role="button" tabindex="0" onclick="event.stopPropagation();piPhDueOpen(${piJsArg(ph)})" onkeydown="piPhDueKey(event,${piJsArg(ph)})" title="${attr(_qtip)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/></svg>${_qtxt}</span>`;
       /* เหมือนระดับงาน — เฟสที่เลื่อนหลายครั้งต้องเห็นทุกครั้ง */
       (_pdue.marks||[_pdue.base]).forEach(function(_pm,_pi2){
         var _qb=piDate(_pm),_qx=_qb?dayOf(_qb):-1;
@@ -7331,7 +7553,7 @@ let toastT;function toast(m){const t=document.getElementById('toast');t.textCont
   toastT=setTimeout(()=>t.classList.remove('show'),5000);}
 
 let LANG='th';
-const EN={brandSub:"· Requirement Inventory",tabOverview:"Overview",tabReqs:"Requirements",tabBridge:"Project Automation 2026",import:"Import",export:"Export",reset:"Reset",restore:"Restore original",editedNote:"Changes auto-saved",module:"Module",sub:"Group",type:"Type",clear:"Clear",addRow:"+ Add",heroTitle:"Requirement Inventory",heroSub:"Every dimension of the new ERP requirements — explore, edit and export in one place.",distribution:"Distribution",byModule:"By Module",byModuleSub:"Click a slice to filter",gapSub:"Vendor assessment status (RFP)",byType:"By Request Type",byTypeSub:"Click a bar to filter",matrix:"Module × Type",matrixSub:"Cross view per module",reqTitle:"Requirements",reqSub:"Edit type & Fit-Gap inline · auto-saved in your browser",bridgeNote:"Current SAP pain points from Automation 2026 that become Oracle requirements",brModSub:"Processes per department",brFteSub:"FTE savings per department"};
+const EN={brandSub:"· Requirement Inventory",tabOverview:"Overview",tabReqs:"Requirements",tabBridge:"Project Automation 2026",import:"Import",export:"Export",reset:"Reset",restore:"Restore original",editedNote:"Changes auto-saved",module:"Module",sub:"Group",type:"Type",clear:"Clear",addRow:"+ Add",heroTitle:"Requirement Inventory",heroSub:"Every dimension of the new ERP requirements — explore, edit and export in one place.",distribution:"Distribution",byModule:"By Module",byModuleSub:"Click a slice to filter",gapSub:"Vendor assessment status (RFP)",byType:"By Request Type",byTypeSub:"Click a bar to filter",matrix:"Module × Type",matrixSub:"Cross view per module",reqTitle:"Requirements",reqSub:"Edit type & Fit-Gap inline · auto-saved in your browser",bridgeNote:"Current SAP pain points from Automation 2026 that become Oracle requirements",brModSub:"Processes per department",brFteSub:"FTE savings per department",tbSys:"ERP Project Tracker",tbLogout:"Sign out"};
 const TH={reqs:"Requirements",reqItems:"หัวข้อความต้องการ",subgroups:"กลุ่มงานย่อย",bridgeItems:"รายการเชื่อม Oracle",gapDone:"Fit-Gap ประเมินแล้ว",allMod:"ทุกโมดูล",allSub:"ทุกกลุ่มงาน",allType:"ทุกประเภท",showing:"แสดง {n} / {t}",nodata:"ไม่พบข้อมูล",done:"ประเมินแล้ว",notdone:"ยังไม่ประเมิน",total:"รายการ",addNew:"เพิ่มรายการใหม่",save:"บันทึก",cancel:"ยกเลิก",delete:"ลบ",saved:"บันทึกแล้ว",added:"เพิ่มแล้ว",exported:"ส่งออก {n} หัวข้อ",tplDone:"ดาวน์โหลด Template แล้ว",imported:"นำเข้า {n} หัวข้อ",potential:"ศักยภาพประหยัด",manualHrs:"งานคนปัจจุบัน",covered:"ครอบคลุม"};
 const ENx={reqs:"Requirements",reqItems:"requirement items",subgroups:"sub-groups",bridgeItems:"linked to Oracle",gapDone:"Fit-Gap assessed",allMod:"All modules",allSub:"All groups",allType:"All types",showing:"Showing {n} / {t}",nodata:"No data",done:"Assessed",notdone:"Not assessed",total:"items",addNew:"Add new requirement",save:"Save",cancel:"Cancel",delete:"Delete",saved:"Saved",added:"Added",exported:"Exported {n}",tplDone:"Template downloaded",imported:"Imported {n}",potential:"projected reduction",manualHrs:"current manual work",covered:"covered"};
 function T(k){return LANG==='en'?(ENx[k]||k):(TH[k]||k);}
